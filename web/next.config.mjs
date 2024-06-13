@@ -5,6 +5,7 @@ const nextConfig = {
   async rewrites() {
     return [{ source: "/", destination: "/galaxies" }];
   },
+  output: "standalone",
 };
 
 export default nextConfig;

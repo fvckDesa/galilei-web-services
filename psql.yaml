@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: postgresql-client
+  namespace: galaxy-a405fd28-b90f-4592-baf5-3330df7c46b2
+  labels:
+    app: postgresql-client
+spec:
+  containers:
+    - name: postgresql-client
+      image: andreswebs/postgresql-client
+      imagePullPolicy: Always
+      stdin: true
+      tty: true
+      command: ["/bin/sh"]

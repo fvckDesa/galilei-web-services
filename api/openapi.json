@@ -760,6 +760,277 @@
         }
       }
     },
+    "/galaxies/{galaxy_id}/stars/{star_id}/vars": {
+      "get": {
+        "tags": [
+          "routes::var"
+        ],
+        "operationId": "get_all_star_vars",
+        "parameters": [
+          {
+            "name": "galaxy_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "star_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/StarVariablesList"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizeResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalErrorResponse"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "routes::var"
+        ],
+        "operationId": "create_star_var",
+        "parameters": [
+          {
+            "name": "galaxy_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "star_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "data for creating the star",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateVariableData"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/StarVariableCreated"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizeResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundResponse"
+          },
+          "409": {
+            "$ref": "#/components/responses/AlreadyExistsResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalErrorResponse"
+          }
+        }
+      }
+    },
+    "/galaxies/{galaxy_id}/stars/{star_id}/vars/{variable_id}": {
+      "get": {
+        "tags": [
+          "routes::var"
+        ],
+        "operationId": "get_star_var",
+        "parameters": [
+          {
+            "name": "galaxy_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "star_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "variable_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SpecificStarVariable"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizeResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundResponse"
+          },
+          "409": {
+            "$ref": "#/components/responses/AlreadyExistsResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalErrorResponse"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "routes::var"
+        ],
+        "operationId": "update_star_var",
+        "parameters": [
+          {
+            "name": "galaxy_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "star_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "variable_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "data for updating the star",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStarData"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/StarVariableUpdated"
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizeResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundResponse"
+          },
+          "409": {
+            "$ref": "#/components/responses/AlreadyExistsResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalErrorResponse"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "routes::var"
+        ],
+        "operationId": "delete_star_var",
+        "parameters": [
+          {
+            "name": "galaxy_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "star_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "variable_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/StarVariableDeleted"
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizeResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFoundResponse"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalErrorResponse"
+          }
+        }
+      }
+    },
     "/users/me": {
       "get": {
         "tags": [
@@ -855,7 +1126,9 @@
         "required": [
           "name",
           "nebula",
-          "public_domain"
+          "public_domain",
+          "private_domain",
+          "port"
         ],
         "properties": {
           "name": {
@@ -866,8 +1139,34 @@
             "type": "string",
             "format": "uri"
           },
+          "port": {
+            "type": "integer",
+            "format": "int32",
+            "maximum": 65535,
+            "minimum": 1
+          },
+          "private_domain": {
+            "$ref": "#/components/schemas/DomainName"
+          },
           "public_domain": {
-            "$ref": "#/components/schemas/PublicDomain"
+            "$ref": "#/components/schemas/DomainName"
+          }
+        }
+      },
+      "CreateVariableData": {
+        "type": "object",
+        "required": [
+          "name",
+          "value"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "value": {
+            "type": "string",
+            "minLength": 1
           }
         }
       },
@@ -888,6 +1187,16 @@
             }
           }
         ]
+      },
+      "DomainName": {
+        "type": "object",
+        "properties": {
+          "subdomain": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1
+          }
+        }
       },
       "ErrorMessage": {
         "type": "object",
@@ -978,22 +1287,13 @@
           }
         }
       },
-      "PublicDomain": {
-        "type": "object",
-        "properties": {
-          "subdomain": {
-            "type": "string",
-            "nullable": true,
-            "minLength": 1
-          }
-        }
-      },
       "Star": {
         "type": "object",
         "required": [
           "id",
           "name",
           "nebula",
+          "port",
           "galaxy_id"
         ],
         "properties": {
@@ -1012,6 +1312,17 @@
           "nebula": {
             "type": "string",
             "format": "uri"
+          },
+          "port": {
+            "type": "integer",
+            "format": "int32",
+            "maximum": 65535,
+            "minimum": 0
+          },
+          "private_domain": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1
           },
           "public_domain": {
             "type": "string",
@@ -1105,13 +1416,43 @@
             "format": "uri",
             "nullable": true
           },
-          "public_domain": {
+          "port": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "maximum": 65535,
+            "minimum": 1
+          },
+          "private_domain": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/PublicDomain"
+                "$ref": "#/components/schemas/DomainName"
               }
             ],
             "nullable": true
+          },
+          "public_domain": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DomainName"
+              }
+            ],
+            "nullable": true
+          }
+        }
+      },
+      "UpdateVariableData": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1
+          },
+          "value": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1
           }
         }
       },
@@ -1128,6 +1469,33 @@
           },
           "name": {
             "type": "string"
+          }
+        }
+      },
+      "Variable": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "value",
+          "star_id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "star_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "value": {
+            "type": "string",
+            "minLength": 1
           }
         }
       }
@@ -1332,6 +1700,16 @@
           }
         }
       },
+      "SpecificStarVariable": {
+        "description": "specific star variable",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Variable"
+            }
+          }
+        }
+      },
       "StarCreated": {
         "description": "star successfully created",
         "content": {
@@ -1358,6 +1736,49 @@
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/Star"
+            }
+          }
+        }
+      },
+      "StarVariableCreated": {
+        "description": "star variable successfully created",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Variable"
+            }
+          }
+        }
+      },
+      "StarVariableDeleted": {
+        "description": "star variable successfully deleted",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Variable"
+            }
+          }
+        }
+      },
+      "StarVariableUpdated": {
+        "description": "star variable successfully updated",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Variable"
+            }
+          }
+        }
+      },
+      "StarVariablesList": {
+        "description": "all variables of a star",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Variable"
+              }
             }
           }
         }

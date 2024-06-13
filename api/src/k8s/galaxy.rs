@@ -107,7 +107,8 @@ impl ResourceBind for Galaxy {
       .create(&Default::default(), &Secret::from(self))
       .await?;
 
-    let net_policies: Api<NetworkPolicy> = Api::namespaced(client, &format!("galaxy-{}", self.id));
+    let net_policies: Api<NetworkPolicy> =
+      Api::namespaced(client.clone(), &format!("galaxy-{}", self.id));
 
     let _ = net_policies
       .create(&Default::default(), &NetworkPolicy::from(self))
@@ -144,7 +145,7 @@ impl ResourceBind for Galaxy {
       .delete("stars-tls-secret-replica", &Default::default())
       .await?;
 
-    let net_policies: Api<NetworkPolicy> = Api::namespaced(client, &name);
+    let net_policies: Api<NetworkPolicy> = Api::namespaced(client.clone(), &name);
 
     let _ = net_policies
       .delete(

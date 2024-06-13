@@ -3,9 +3,11 @@ use kube::Result;
 mod galaxy;
 mod planet;
 mod star;
+mod var;
 
-pub use star::StarRequestResolver;
 pub use planet::PlanetRequestResolver;
+pub use star::StarRequestResolver;
+pub use var::VariableRequestResolver;
 
 pub trait ResourceBind: Sized {
   type RequestResolver;

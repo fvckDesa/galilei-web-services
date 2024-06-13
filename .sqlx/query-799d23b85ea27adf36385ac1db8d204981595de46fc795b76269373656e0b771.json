@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "\n      UPDATE stars\n      SET name = COALESCE($1, name),\n        nebula = COALESCE($2, nebula),\n        public_domain = (CASE WHEN $3 = true THEN $4 ELSE public_domain END)\n      WHERE galaxy_id = $5 AND id = $6\n      RETURNING *\n    ",
+  "query": "UPDATE variables\n      SET name = COALESCE($1, name), value = COALESCE($2, value)\n      WHERE star_id = $3 AND id = $4\n      RETURNING *",
   "describe": {
     "columns": [
       {
@@ -15,25 +15,18 @@
       },
       {
         "ordinal": 2,
-        "name": "nebula",
+        "name": "value",
         "type_info": "Text"
       },
       {
         "ordinal": 3,
-        "name": "public_domain",
-        "type_info": "Text"
-      },
-      {
-        "ordinal": 4,
-        "name": "galaxy_id",
+        "name": "star_id",
         "type_info": "Uuid"
       }
     ],
     "parameters": {
       "Left": [
         "Text",
-        "Text",
-        "Bool",
         "Text",
         "Uuid",
         "Uuid"
@@ -43,9 +36,8 @@
       false,
       false,
       false,
-      true,
       false
     ]
   },
-  "hash": "0844a67fe3a5eb4b76a212df55c5bfc0845ee8ef6624b6f8ca65402e0bc44a12"
+  "hash": "799d23b85ea27adf36385ac1db8d204981595de46fc795b76269373656e0b771"
 }

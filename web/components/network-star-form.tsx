@@ -16,11 +16,11 @@ import { Button } from "./ui/button";
 import { z } from "zod";
 import { updateStar } from "@/lib/actions";
 import CopyBtn from "./copy-btn";
-import { Label } from "./ui/label";
-import { ScrollArea, ScrollBar } from "./ui/scroll-area";
 
 const NetworkStarDataSchema = StarDataSchema.pick({
   public_domain: true,
+  private_domain: true,
+  port: true,
 });
 
 type NetworkStarData = z.infer<typeof NetworkStarDataSchema>;
@@ -44,8 +44,6 @@ export default function NetworkStarForm({
   async function onSubmit(data: NetworkStarData) {
     await updateStar(galaxyId, starId, data);
   }
-
-  const privateDomain = `star-${starId}.galaxy-${galaxyId}.svc.cluster.local`;
 
   return (
     <Form {...form}>
@@ -74,16 +72,43 @@ export default function NetworkStarForm({
             </FormItem>
           )}
         />
-        <div className="space-y-2">
-          <Label>Private Domain</Label>
-          <div className="flex items-center gap-4">
-            <ScrollArea className="flex-1 px-2 py-1">
-              <span className="text-nowrap">{privateDomain}</span>
-              <ScrollBar orientation="horizontal" />
-            </ScrollArea>
-            <CopyBtn text={privateDomain} />
-          </div>
-        </div>
+        <FormField
+          control={form.control}
+          name="private_domain"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Private Domain</FormLabel>
+              <div className="flex items-center gap-4">
+                <FormControl>
+                  <Input
+                    type="text"
+                    autoComplete="off"
+                    className="flex-1"
+                    {...field}
+                  />
+                </FormControl>
+                <CopyBtn
+                  text={`${field.value}.gws.internal`}
+                  disabled={field.value.length === 0}
+                />
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="port"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Internal port</FormLabel>
+              <FormControl>
+                <Input type="number" autoComplete="off" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <Button
           type="submit"
           className="w-full"

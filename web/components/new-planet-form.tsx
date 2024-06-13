@@ -28,11 +28,16 @@ import { DialogFooter } from "./ui/dialog";
 interface PlanetFormProps {
   galaxyId: string;
   stars: Star[];
+  afterSubmit?: () => void;
 }
 
 const DISCONNECTED_VALUE = "disconected" as const;
 
-export default function NewPlanetForm({ galaxyId, stars }: PlanetFormProps) {
+export default function NewPlanetForm({
+  galaxyId,
+  stars,
+  afterSubmit,
+}: PlanetFormProps) {
   const form = useForm<PlanetData>({
     resolver: zodResolver(PlanetDataSchema),
     defaultValues: {
@@ -45,11 +50,12 @@ export default function NewPlanetForm({ galaxyId, stars }: PlanetFormProps) {
 
   async function onSubmit(data: PlanetData) {
     await newPlanet(galaxyId, data);
+    afterSubmit?.();
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 px-4">
         <FormField
           control={form.control}
           name="name"

@@ -15,6 +15,8 @@ import {
   UpdateStarDataSchema,
   UpdatePlanetData,
   UpdatePlanetDataSchema,
+  StarVariableData,
+  StarVariableDataSchema,
 } from "./schema";
 import { api } from "./api";
 import { revalidateTag } from "next/cache";
@@ -101,7 +103,7 @@ export async function deleteGalaxy(galaxy_id: string) {
 export async function newStar(galaxyId: string, data: StarData) {
   const starData = StarDataSchema.parse(data);
 
-  const { public_domain, ...rest } = starData;
+  const { public_domain, private_domain, ...rest } = starData;
 
   const { error, data: star } = await api.POST("/galaxies/{galaxy_id}/stars", {
     params: {
@@ -111,6 +113,9 @@ export async function newStar(galaxyId: string, data: StarData) {
       ...rest,
       public_domain: {
         subdomain: public_domain.length === 0 ? null : public_domain,
+      },
+      private_domain: {
+        subdomain: private_domain.length === 0 ? null : private_domain,
       },
     },
   });
@@ -130,7 +135,7 @@ export async function updateStar(
 ) {
   const starData = UpdateStarDataSchema.parse(data);
 
-  const { public_domain, ...rest } = starData;
+  const { public_domain, private_domain, ...rest } = starData;
 
   const { error } = await api.PUT("/galaxies/{galaxy_id}/stars/{star_id}", {
     params: {
@@ -142,6 +147,12 @@ export async function updateStar(
         public_domain != undefined
           ? {
               subdomain: public_domain.length === 0 ? null : public_domain,
+            }
+          : null,
+      private_domain:
+        private_domain != undefined
+          ? {
+              subdomain: private_domain.length === 0 ? null : private_domain,
             }
           : null,
     },
@@ -170,6 +181,55 @@ export async function deleteStar(galaxyId: string, starId: string) {
 
   revalidateTag("galaxy");
   redirect(`/galaxies/${galaxyId}`);
+}
+
+export async function addStarVariable(
+  galaxyId: string,
+  starId: string,
+  data: StarVariableData
+) {
+  const varData = StarVariableDataSchema.parse(data);
+
+  const { error } = await api.POST(
+    "/galaxies/{galaxy_id}/stars/{star_id}/vars",
+    {
+      params: {
+        path: {
+          galaxy_id: galaxyId,
+          star_id: starId,
+        },
+      },
+      body: varData,
+    }
+  );
+
+  if (error) {
+    throw new ApiError(error);
+  }
+
+  revalidateTag("enviroment");
+}
+
+export async function deleteStarVariable(
+  galaxyId: string,
+  starId: string,
+  varId: string
+) {
+  console.log(varId);
+  const { error } = await api.DELETE(
+    "/galaxies/{galaxy_id}/stars/{star_id}/vars/{variable_id}",
+    {
+      params: {
+        path: { galaxy_id: galaxyId, star_id: starId, variable_id: varId },
+      },
+    }
+  );
+
+  if (error) {
+    throw new ApiError(error);
+  }
+
+  revalidateTag("enviroment");
 }
 
 export async function newPlanet(galaxyId: string, data: PlanetData) {

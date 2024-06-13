@@ -40,6 +40,7 @@ async fn main() -> std::io::Result<()> {
           .configure(api::routes::user::config)
           .configure(api::routes::galaxy::config)
           .configure(api::routes::star::config)
+          .configure(api::routes::var::config)
           .configure(api::routes::planet::config),
       )
       .wrap(Logger::default())

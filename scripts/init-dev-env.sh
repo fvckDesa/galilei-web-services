@@ -2,6 +2,9 @@
 k3d cluster create $CLUSTER_NAME -p "${CLUSTER_HTTP}:80@loadbalancer" -p "${CLUSTER_HTTPS}:443@loadbalancer"
 echo "export KUBECONFIG=\"$(k3d kubeconfig write gws)\"" >> ~/.bashrc
 
+kubectl apply -f k8s/coredns.yaml
+kubectl apply -f k8s/coredns-custom.yaml
+
 helm repo add jetstack https://charts.jetstack.io --force-update
 helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --set installCRDs=true
 kubectl apply -f k8s/cluster-selfsigned-issuer.yaml

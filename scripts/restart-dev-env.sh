@@ -5,6 +5,9 @@ k3d cluster delete $CLUSTER_NAME
 k3d cluster create $CLUSTER_NAME -p "${CLUSTER_HTTP}:80@loadbalancer" -p "${CLUSTER_HTTPS}:443@loadbalancer"
 k3d kubeconfig write gws
 
+kubectl apply -f k8s/coredns.yaml
+kubectl apply -f k8s/coredns-custom.yaml
+
 helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --set installCRDs=true
 kubectl apply -f k8s/cluster-selfsigned-issuer.yaml
 kubectl apply -f k8s/http-to-https-middleware.yaml

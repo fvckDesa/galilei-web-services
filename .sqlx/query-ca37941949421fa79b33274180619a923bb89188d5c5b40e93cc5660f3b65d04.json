@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "SELECT * FROM stars WHERE galaxy_id = $1",
+  "query": "SELECT * FROM variables WHERE star_id = $1",
   "describe": {
     "columns": [
       {
@@ -15,27 +15,12 @@
       },
       {
         "ordinal": 2,
-        "name": "nebula",
+        "name": "value",
         "type_info": "Text"
       },
       {
         "ordinal": 3,
-        "name": "public_domain",
-        "type_info": "Text"
-      },
-      {
-        "ordinal": 4,
-        "name": "private_domain",
-        "type_info": "Text"
-      },
-      {
-        "ordinal": 5,
-        "name": "port",
-        "type_info": "Int4"
-      },
-      {
-        "ordinal": 6,
-        "name": "galaxy_id",
+        "name": "star_id",
         "type_info": "Uuid"
       }
     ],
@@ -48,11 +33,8 @@
       false,
       false,
       false,
-      true,
-      true,
-      false,
       false
     ]
   },
-  "hash": "8b312170cbb0e2aa7a2f8ac73538108f16a95ec181f4c64016a11a0b8ecdd5ce"
+  "hash": "ca37941949421fa79b33274180619a923bb89188d5c5b40e93cc5660f3b65d04"
 }

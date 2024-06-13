@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns-custom
+  namespace: kube-system
+data:
+  metadata.override: |
+    metadata gws.internal
+  log.override: |
+    log

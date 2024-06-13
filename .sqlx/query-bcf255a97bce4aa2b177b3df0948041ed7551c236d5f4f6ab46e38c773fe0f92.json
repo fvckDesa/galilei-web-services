@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "DELETE FROM stars WHERE galaxy_id = $1 AND id = $2 RETURNING *",
+  "query": "DELETE FROM variables WHERE star_id = $1 AND id = $2 RETURNING *",
   "describe": {
     "columns": [
       {
@@ -15,27 +15,12 @@
       },
       {
         "ordinal": 2,
-        "name": "nebula",
+        "name": "value",
         "type_info": "Text"
       },
       {
         "ordinal": 3,
-        "name": "public_domain",
-        "type_info": "Text"
-      },
-      {
-        "ordinal": 4,
-        "name": "private_domain",
-        "type_info": "Text"
-      },
-      {
-        "ordinal": 5,
-        "name": "port",
-        "type_info": "Int4"
-      },
-      {
-        "ordinal": 6,
-        "name": "galaxy_id",
+        "name": "star_id",
         "type_info": "Uuid"
       }
     ],
@@ -49,11 +34,8 @@
       false,
       false,
       false,
-      true,
-      true,
-      false,
       false
     ]
   },
-  "hash": "09331967f53e521a0a450fa3316fb67c82b0589fb35a375b74b98f584ee7dedb"
+  "hash": "bcf255a97bce4aa2b177b3df0948041ed7551c236d5f4f6ab46e38c773fe0f92"
 }

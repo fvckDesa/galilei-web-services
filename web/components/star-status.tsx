@@ -46,7 +46,7 @@ export default function StarStatus({
   }, [galaxy_id, star_id]);
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-4 px-2">
       <div className="relative flex size-3">
         <div
           className={cn(

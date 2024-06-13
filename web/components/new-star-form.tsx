@@ -18,25 +18,32 @@ import { DialogFooter } from "./ui/dialog";
 
 export interface NewStarFormProps {
   galaxyId: string;
+  afterSubmit?: () => void;
 }
 
-export default function NewStarForm({ galaxyId }: NewStarFormProps) {
+export default function NewStarForm({
+  galaxyId,
+  afterSubmit,
+}: NewStarFormProps) {
   const form = useForm<StarData>({
     resolver: zodResolver(StarDataSchema),
     defaultValues: {
       name: "",
       nebula: "",
       public_domain: "",
+      private_domain: "",
+      port: 80,
     },
   });
 
   async function onSubmit(data: StarData) {
     await newStar(galaxyId, data);
+    afterSubmit?.();
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 px-4">
         <FormField
           control={form.control}
           name="name"
@@ -71,6 +78,32 @@ export default function NewStarForm({ galaxyId }: NewStarFormProps) {
               <FormLabel>Public Domain</FormLabel>
               <FormControl>
                 <Input type="text" autoComplete="off" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="private_domain"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Private Domain</FormLabel>
+              <FormControl>
+                <Input type="text" autoComplete="off" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="port"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Internal port</FormLabel>
+              <FormControl>
+                <Input type="number" autoComplete="off" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

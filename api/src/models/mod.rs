@@ -7,6 +7,7 @@ pub mod planet;
 pub mod session;
 pub mod star;
 pub mod user;
+pub mod var;
 
 #[async_trait]
 pub trait CrudOperations: Sized {

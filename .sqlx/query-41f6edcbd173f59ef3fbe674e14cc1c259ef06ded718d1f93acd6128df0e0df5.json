@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "INSERT INTO stars(name, nebula, public_domain, galaxy_id) VALUES ($1, $2, $3, $4) RETURNING *",
+  "query": "INSERT INTO stars(\n        name,\n        nebula,\n        public_domain,\n        private_domain,\n        port,\n        galaxy_id\n      ) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
   "describe": {
     "columns": [
       {
@@ -25,6 +25,16 @@
       },
       {
         "ordinal": 4,
+        "name": "private_domain",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 5,
+        "name": "port",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 6,
         "name": "galaxy_id",
         "type_info": "Uuid"
       }
@@ -34,6 +44,8 @@
         "Text",
         "Text",
         "Text",
+        "Text",
+        "Int4",
         "Uuid"
       ]
     },
@@ -42,8 +54,10 @@
       false,
       false,
       true,
+      true,
+      false,
       false
     ]
   },
-  "hash": "2bae51798b9520b9810a19fe71b625b0b1683c00a9fe939637bd0502c06a468c"
+  "hash": "41f6edcbd173f59ef3fbe674e14cc1c259ef06ded718d1f93acd6128df0e0df5"
 }

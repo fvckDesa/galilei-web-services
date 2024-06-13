@@ -1,6 +1,10 @@
-use k8s_openapi::api::{apps::v1::Deployment, core::v1::Service, networking::v1::Ingress};
+use k8s_openapi::api::{
+  apps::v1::Deployment,
+  core::v1::{ConfigMap, Secret, Service},
+  networking::v1::Ingress,
+};
 use kube::{
-  api::{DeleteParams, PostParams},
+  api::{DeleteParams, Patch, PatchParams, PostParams},
   Api, Client, Result,
 };
 use serde_json::json;
@@ -11,9 +15,11 @@ use crate::models::star::Star;
 use super::ResourceBind;
 
 pub struct StarRequestResolver {
+  secret: Api<Secret>,
   deploy: Api<Deployment>,
   svc: Api<Service>,
   ingress: Api<Ingress>,
+  coredns_custom: Api<ConfigMap>,
 }
 
 impl StarRequestResolver {
@@ -22,14 +28,30 @@ impl StarRequestResolver {
     let galaxy_ns = format!("galaxy-{}", galaxy_id);
 
     Ok(Self {
+      secret: Api::namespaced(client.clone(), &galaxy_ns),
       deploy: Api::namespaced(client.clone(), &galaxy_ns),
       svc: Api::namespaced(client.clone(), &galaxy_ns),
-      ingress: Api::namespaced(client, &galaxy_ns),
+      ingress: Api::namespaced(client.clone(), &galaxy_ns),
+      coredns_custom: Api::namespaced(client, "kube-system"),
     })
   }
 }
 
-const PORT: i32 = 80;
+impl From<&Star> for Secret {
+  fn from(star: &Star) -> Self {
+    let secret = json!({
+      "apiVersion": "v1",
+      "kind": "Secret",
+      "metadata": {
+        "name": format!("star-{}-vars", star.id),
+        "namespace": format!("galaxy-{}", star.galaxy_id),
+      },
+      "stringData": {}
+    });
+
+    serde_json::from_value(secret).expect("Invalid secret")
+  }
+}
 
 impl From<&Star> for Deployment {
   fn from(star: &Star) -> Self {
@@ -60,6 +82,7 @@ impl From<&Star> for Deployment {
             "labels": {
               "star_name": star.name,
               "star_id": star.id,
+              "galaxy_id": star.galaxy_id
             },
           },
           "spec": {
@@ -75,12 +98,19 @@ impl From<&Star> for Deployment {
                   },
                   {
                     "name": "PORT",
-                    "value": PORT.to_string()
+                    "value": star.port.to_string()
+                  }
+                ],
+                "envFrom": [
+                  {
+                    "secretRef": {
+                      "name": format!("star-{}-vars", star.id)
+                    }
                   }
                 ],
                 "ports": [
                   {
-                    "containerPort": PORT
+                    "containerPort": star.port
                   }
                 ]
               }
@@ -114,14 +144,45 @@ impl From<&Star> for Service {
         },
         "ports": [
           {
-            "port": PORT,
-            "targetPort": PORT,
+            "port": star.port,
+            "targetPort": star.port,
           },
         ],
       },
     });
 
     serde_json::from_value(svc).expect("Invalid service")
+  }
+}
+
+impl From<&Star> for ConfigMap {
+  fn from(star: &Star) -> Self {
+    let private_domain = star
+      .private_domain
+      .as_ref()
+      .expect("Private domain not found when creating coredns config map");
+
+    let custom_dns = json!({
+      "apiVersion": "v1",
+      "kind": "ConfigMap",
+      "metadata": {
+        "name": "coredns-custom",
+        "namespace": "kube-system"
+      },
+      "data": {
+        format!("star-{}.override", star.id): format!(
+          r#"template IN ANY {}.gws.internal {{
+              match "^{}\.gws\.internal\.$"
+              answer "{{{{ .Name }}}} 60 IN CNAME star-{}.{{{{ .Meta \"kubernetes/client-namespace\" }}}}.svc.cluster.local"
+            }}"#,
+          private_domain,
+          private_domain,
+          star.id,
+        )
+      }
+    });
+
+    serde_json::from_value(custom_dns).expect("Invalid coredns configmap")
   }
 }
 
@@ -169,7 +230,7 @@ impl From<&Star> for Ingress {
                     "service": {
                       "name": format!("star-{}", star.id),
                       "port": {
-                        "number": PORT
+                        "number": star.port,
                       }
                     }
                   }
@@ -189,6 +250,12 @@ impl ResourceBind for Star {
   type RequestResolver = StarRequestResolver;
 
   async fn create(&self, api: Self::RequestResolver) -> Result<()> {
+    // create env variables secret
+    let _ = api
+      .secret
+      .create(&Default::default(), &Secret::from(self))
+      .await?;
+
     let _ = api
       .deploy
       .create(&Default::default(), &Deployment::from(self))
@@ -203,6 +270,17 @@ impl ResourceBind for Star {
       let _ = api
         .ingress
         .create(&Default::default(), &Ingress::from(self))
+        .await?;
+    }
+
+    if self.private_domain.is_some() {
+      let _ = api
+        .coredns_custom
+        .patch(
+          "coredns-custom",
+          &PatchParams::apply("gws-api"),
+          &Patch::Apply(ConfigMap::from(self)),
+        )
         .await?;
     }
 
@@ -241,6 +319,24 @@ impl ResourceBind for Star {
       }
     }
 
+    let pp = PatchParams::apply("gws-api");
+    let patch = Patch::Apply(if self.private_domain.is_some() {
+      ConfigMap::from(self)
+    } else {
+      let mut coredns_custom = api.coredns_custom.get("coredns-custom").await?;
+
+      if let Some(data) = coredns_custom.data.as_mut() {
+        let _ = data.remove(&format!("star-{}.override", self.id));
+      }
+
+      coredns_custom
+    });
+
+    let _ = api
+      .coredns_custom
+      .patch("coredns-custom", &pp, &patch)
+      .await?;
+
     Ok(())
   }
 
@@ -248,11 +344,29 @@ impl ResourceBind for Star {
     let k8s_name = format!("star-{}", self.id.to_string());
     let dp = DeleteParams::default();
 
+    let _ = api
+      .secret
+      .delete(&format!("star-{}-vars", self.id), &dp)
+      .await?;
+
     let _ = api.deploy.delete(&k8s_name, &dp).await?;
 
     let _ = api.svc.delete(&k8s_name, &dp).await?;
 
-    let _ = api.ingress.delete(&k8s_name, &dp).await?;
+    if api.ingress.get_opt(&k8s_name).await?.is_some() {
+      let _ = api.ingress.delete(&k8s_name, &dp).await?;
+    }
+
+    let mut coredns_custom = api.coredns_custom.get("coredns-custom").await?;
+
+    if let Some(data) = coredns_custom.data.as_mut() {
+      let _ = data.remove(&format!("star-{}.override", self.id));
+    }
+
+    let _ = api
+      .coredns_custom
+      .replace("coredns-custom", &Default::default(), &coredns_custom)
+      .await?;
 
     Ok(())
   }

@@ -141,12 +141,12 @@ FormDescription.displayName = "FormDescription";
 
 const FormMessage = React.forwardRef<
   HTMLParagraphElement,
-  React.HTMLAttributes<HTMLParagraphElement>
->(({ className, children, ...props }, ref) => {
+  React.HTMLAttributes<HTMLParagraphElement> & { fixed?: boolean }
+>(({ fixed = false, className, children, ...props }, ref) => {
   const { error, formMessageId } = useFormField();
   const body = error ? String(error?.message) : children;
 
-  if (!body) {
+  if (!body && !fixed) {
     return null;
   }
 
@@ -154,10 +154,14 @@ const FormMessage = React.forwardRef<
     <p
       ref={ref}
       id={formMessageId}
-      className={cn("text-destructive text-sm font-medium", className)}
+      className={cn(
+        "text-destructive text-sm font-medium",
+        fixed && (body ? "visible" : "invisible"),
+        className
+      )}
       {...props}
     >
-      {body}
+      {body ?? "hidden"}
     </p>
   );
 });

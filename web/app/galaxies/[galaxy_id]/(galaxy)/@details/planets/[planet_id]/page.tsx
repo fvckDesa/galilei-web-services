@@ -6,7 +6,7 @@ import { deletePlanet } from "@/lib/actions";
 import { api } from "@/lib/api";
 import { Page } from "@/lib/types";
 import { ApiError } from "api-client";
-import { Earth } from "lucide-react";
+import { Earth, Trash2 } from "lucide-react";
 
 type PlanetPageProps = Page<{ galaxy_id: string; planet_id: string }>;
 
@@ -37,9 +37,18 @@ export default async function PlanetPage({
 
   return (
     <div className="flex size-full flex-col gap-4">
-      <header className="flex items-center gap-4">
-        <Earth />
-        <h1 className="text-2xl font-bold">{planet.name}</h1>
+      <header className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Earth />
+          <h1 className="text-2xl font-bold">{planet.name}</h1>
+        </div>
+        <ActionBtn
+          variant="destructive"
+          size="icon"
+          action={deletePlanet.bind(null, galaxy_id, planet_id)}
+        >
+          <Trash2 />
+        </ActionBtn>
       </header>
       <Tabs defaultValue="generic">
         <TabsList className="w-full">
@@ -69,13 +78,6 @@ export default async function PlanetPage({
           />
         </TabsContent>
       </Tabs>
-      <ActionBtn
-        variant="destructive"
-        className="mt-auto"
-        action={deletePlanet.bind(null, galaxy_id, planet_id)}
-      >
-        Delete Planet
-      </ActionBtn>
     </div>
   );
 }

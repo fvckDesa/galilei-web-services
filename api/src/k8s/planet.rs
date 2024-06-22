@@ -1,4 +1,12 @@
-use k8s_openapi::api::{apps::v1::Deployment, core::v1::PersistentVolumeClaim};
+use std::collections::BTreeMap;
+
+use k8s_openapi::{
+  api::{
+    apps::v1::Deployment,
+    core::v1::{PersistentVolumeClaim, PersistentVolumeClaimSpec, VolumeResourceRequirements},
+  },
+  apimachinery::pkg::api::resource::Quantity,
+};
 use kube::{
   api::{Patch, PatchParams},
   Api, Client, Result,
@@ -6,6 +14,7 @@ use kube::{
 use serde_json::json;
 use uuid::Uuid;
 
+use crate::config::CONFIG;
 use crate::models::planet::Planet;
 
 use super::ResourceBind;
@@ -31,6 +40,18 @@ impl From<&Planet> for PersistentVolumeClaim {
   fn from(planet: &Planet) -> Self {
     //! provisioner rancher.io/local-path not allow volume expansion
     //! fix generate different pvc based on provisioner
+
+    let is_dynamic_storage_active = CONFIG
+      .get()
+      .map(|config| config.dynamic_storage_active)
+      .unwrap_or(false);
+
+    let storage = if is_dynamic_storage_active {
+      planet.capacity
+    } else {
+      500 // hardcoded 500 MB storage for local-path
+    };
+
     let pvc = json!({
       "apiVersion": "v1",
       "kind": "PersistentVolumeClaim",
@@ -49,7 +70,7 @@ impl From<&Planet> for PersistentVolumeClaim {
         "storageClassName": "local-path",
         "resources": {
           "requests": {
-            "storage": "1G" // hardcoded storage for local-path
+            "storage": format!("{}M", storage)
           }
         }
       }
@@ -74,8 +95,26 @@ impl From<&Planet> for Patch<PersistentVolumeClaim> {
       }
     });
 
-    let pvc: PersistentVolumeClaim =
+    let mut pvc: PersistentVolumeClaim =
       serde_json::from_value(pvc).expect("Invalid Persistent Volume Claim format");
+
+    let is_dynamic_storage_active = CONFIG
+      .get()
+      .map(|config| config.dynamic_storage_active)
+      .unwrap_or(false);
+
+    if is_dynamic_storage_active {
+      pvc.spec = Some(PersistentVolumeClaimSpec {
+        resources: Some(VolumeResourceRequirements {
+          requests: Some(BTreeMap::from([(
+            String::from("storage"),
+            Quantity(format!("{}M", planet.capacity)),
+          )])),
+          ..Default::default()
+        }),
+        ..Default::default()
+      })
+    }
 
     Patch::Apply(pvc)
   }

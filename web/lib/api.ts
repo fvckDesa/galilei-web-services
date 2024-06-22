@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { parse as parseSetCookies } from "set-cookie-parser";
 import { ApiClient } from "api-client";
 
-const SAME_SITE_VALUE = ["lax", "strict", "none"] as const;
+const SAME_SITE_VALUE = ["Lax", "Strict", "None"] as const;
 
 type SameSite = (typeof SAME_SITE_VALUE)[number];
 
@@ -10,7 +10,7 @@ function isSameSite(str: string): str is SameSite {
   return SAME_SITE_VALUE.some((v) => v === str);
 }
 
-export const api = new ApiClient({ baseUrl: "http://localhost:8080" });
+export const api = new ApiClient({ baseUrl: process.env.API_URL ?? "http://localhost:8080" });
 
 api.client.use({
   onRequest(req) {
@@ -21,9 +21,11 @@ api.client.use({
   onResponse(res) {
     let resCookies = parseSetCookies(res.headers.getSetCookie());
 
+    console.log(resCookies);
+
     for (const { name, value, sameSite, ...options } of resCookies) {
       if (sameSite && isSameSite(sameSite)) {
-        cookies().set(name, value, { sameSite, ...options });
+        cookies().set(name, value, { sameSite: sameSite.toLowerCase() as Lowercase<SameSite>, ...options });
       } else if (!sameSite) {
         cookies().set(name, value, options);
       } else {

@@ -21,7 +21,7 @@ export default function StarStatus({
 
   useEffect(() => {
     const evtSource = new EventSource(
-      `http://localhost:8080/galaxies/${galaxy_id}/stars/${star_id}?watch=true`,
+      `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080"}/galaxies/${galaxy_id}/stars/${star_id}?watch=true`,
       { withCredentials: true }
     );
 

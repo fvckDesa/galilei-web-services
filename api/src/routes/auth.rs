@@ -1,5 +1,5 @@
 use actix_web::{
-  cookie::{time::OffsetDateTime, Cookie},
+  cookie::{time::OffsetDateTime, Cookie, SameSite},
   delete, get, post,
   web::{Json, ServiceConfig},
   HttpRequest, HttpResponse, Responder,
@@ -8,14 +8,17 @@ use chrono::{Days, NaiveDateTime, Utc};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
-use crate::error::{
-  AlreadyExistsResponse, ApiResult, InternalErrorResponse, NotFoundResponse, ValidationResponse,
-};
 use crate::models::{
   session::Session,
   user::{Credentials, User},
 };
 use crate::{auth::Token, error::ApiError};
+use crate::{
+  config::CONFIG,
+  error::{
+    AlreadyExistsResponse, ApiResult, InternalErrorResponse, NotFoundResponse, ValidationResponse,
+  },
+};
 use crate::{
   database::{DbResult, Transaction},
   error::UnauthorizeResponse,
@@ -81,9 +84,14 @@ impl Responder for AuthResponse {
       token,
     } = self;
 
+    let config = CONFIG.get().expect("Config not initialized");
+
     let session_cookie = Cookie::build("session", token.value())
       .expires(expires)
       .http_only(true)
+      .domain(&config.cookie_domain)
+      .path("/")
+      .same_site(SameSite::Lax)
       .finish();
 
     HttpResponse::Ok().cookie(session_cookie).json(user)

@@ -10,7 +10,7 @@ use kube::{
 use serde_json::json;
 use uuid::Uuid;
 
-use crate::models::star::Star;
+use crate::{config::CONFIG, models::star::Star};
 
 use super::ResourceBind;
 
@@ -193,6 +193,11 @@ impl From<&Star> for Ingress {
       .as_ref()
       .expect("Public domain not found when creating ingress");
 
+    let host_domain = CONFIG
+      .get()
+      .map(|config| config.host_domain.as_str())
+      .unwrap_or("localhost");
+
     let ingress = json!({
       "apiVersion": "networking.k8s.io/v1",
       "kind": "Ingress",
@@ -213,14 +218,14 @@ impl From<&Star> for Ingress {
         "tls": [
           {
             "hosts": [
-              format!("{}.localhost", public_domain),
+              format!("{}.{}", public_domain, host_domain),
             ],
             "secretName": "stars-tls-secret-replica"
           }
         ],
         "rules": [
           {
-            "host": format!("{}.localhost", public_domain),
+            "host": format!("{}.{}", public_domain, host_domain),
             "http": {
               "paths": [
                 {

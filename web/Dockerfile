@@ -1,5 +1,6 @@
 FROM node:18-alpine AS base
 RUN corepack enable pnpm
+RUN apk add openssl
 
 # Install dependencies only when needed
 FROM base AS deps
@@ -27,7 +28,7 @@ COPY . .
 # Uncomment the following line in case you want to disable telemetry during the build.
 # ENV NEXT_TELEMETRY_DISABLED 1
 
-RUN NEXT_PUBLIC_API_URL="https://api.localhost" pnpm run build
+RUN NEXT_PUBLIC_API_URL="https://api.galilei-web-services.local" pnpm run build
 
 # Production image, copy all the files and run next
 FROM base AS runner

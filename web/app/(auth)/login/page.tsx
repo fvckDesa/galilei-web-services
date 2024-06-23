@@ -87,7 +87,7 @@ export default function LoginPage() {
                 <div className="relative">
                   <FormControl>
                     <Input
-                      type="password"
+                      type={isPasswordHidden ? "password" : "text"}
                       autoComplete="off"
                       className="pr-10"
                       {...field}

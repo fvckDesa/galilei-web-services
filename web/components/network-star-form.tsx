@@ -16,6 +16,7 @@ import { Button } from "./ui/button";
 import { z } from "zod";
 import { updateStar } from "@/lib/actions";
 import CopyBtn from "./copy-btn";
+import { env } from "next-runtime-env";
 
 const NetworkStarDataSchema = StarDataSchema.pick({
   public_domain: true,
@@ -41,6 +42,8 @@ export default function NetworkStarForm({
     defaultValues: { ...networkData },
   });
 
+  const HOST_DOMAIN = env("NEXT_PUBLIC_HOST_DOMAIN") ?? "localhost";
+
   async function onSubmit(data: NetworkStarData) {
     await updateStar(galaxyId, starId, data);
   }
@@ -64,7 +67,7 @@ export default function NetworkStarForm({
                   />
                 </FormControl>
                 <CopyBtn
-                  text={`${field.value}.localhost`}
+                  text={`${field.value}.${HOST_DOMAIN}`}
                   disabled={field.value.length === 0}
                 />
               </div>

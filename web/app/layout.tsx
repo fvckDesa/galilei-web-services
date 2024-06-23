@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ReactNode } from "react";
+import { PublicEnvScript } from "next-runtime-env";
 import { cn } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -18,6 +19,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <PublicEnvScript />
+      </head>
       <body className={cn(inter.className, "w-screen h-screen")}>
         {children}
       </body>

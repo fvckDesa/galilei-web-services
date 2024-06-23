@@ -4,6 +4,8 @@ metadata:
   name: web
 data:
   API_URL: http://api.default.svc.cluster.local
+  NEXT_PUBLIC_HOST_DOMAIN: gws.local
+  NEXT_PUBLIC_API_URL: https://api.galilei-web-services.local
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -22,14 +24,14 @@ spec:
         app: web
     spec:
       containers:
-      - name: web
-        image: fvckdesa/gws-web
-        imagePullPolicy: Always
-        envFrom:
-          - configMapRef:
-              name: web
-        ports:
-        - containerPort: 80
+        - name: web
+          image: fvckdesa/gws-web
+          imagePullPolicy: Always
+          envFrom:
+            - configMapRef:
+                name: web
+          ports:
+            - containerPort: 80
 ---
 apiVersion: v1
 kind: Service

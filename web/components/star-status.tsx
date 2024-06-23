@@ -3,6 +3,7 @@
 import { StarStatus as StarStatusType } from "@/lib/schema";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
+import { env } from "next-runtime-env";
 
 export interface StarStatusProps {
   galaxy_id: string;
@@ -20,8 +21,11 @@ export default function StarStatus({
   const [status, setStatus] = useState<StarStatusState>("Unknown");
 
   useEffect(() => {
+    const PUBLIC_API_URL =
+      env("NEXT_PUBLIC_API_URL") ?? "http://localhost:8080";
+
     const evtSource = new EventSource(
-      `${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080"}/galaxies/${galaxy_id}/stars/${star_id}?watch=true`,
+      `${PUBLIC_API_URL}/galaxies/${galaxy_id}/stars/${star_id}?watch=true`,
       { withCredentials: true }
     );
 

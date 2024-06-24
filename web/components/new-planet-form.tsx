@@ -24,6 +24,7 @@ import {
 } from "./ui/select";
 import { newPlanet } from "@/lib/actions";
 import { DialogFooter } from "./ui/dialog";
+import { ApiErrorType } from "api-client";
 
 interface PlanetFormProps {
   galaxyId: string;
@@ -49,8 +50,25 @@ export default function NewPlanetForm({
   });
 
   async function onSubmit(data: PlanetData) {
-    await newPlanet(galaxyId, data);
-    afterSubmit?.();
+    const res = await newPlanet(galaxyId, data);
+
+    if (res && "error" in res) {
+      switch (res.error.status_code) {
+        case ApiErrorType.AlreadyExists:
+          form.setError("root", {
+            type: "response",
+            message: "Invalid name or path",
+          });
+          break;
+        default:
+          form.setError("root", {
+            type: "response",
+            message: "Oops.. Something went wrong",
+          });
+      }
+    } else {
+      afterSubmit?.();
+    }
   }
 
   return (
@@ -133,6 +151,9 @@ export default function NewPlanetForm({
             Create
           </Button>
         </DialogFooter>
+        <p className="text-sm font-medium text-destructive">
+          {form.formState.errors.root?.message}
+        </p>
       </form>
     </Form>
   );

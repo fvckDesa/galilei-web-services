@@ -15,6 +15,7 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { newStar } from "@/lib/actions";
 import { DialogFooter } from "./ui/dialog";
+import { ApiErrorType } from "api-client";
 
 export interface NewStarFormProps {
   galaxyId: string;
@@ -37,8 +38,25 @@ export default function NewStarForm({
   });
 
   async function onSubmit(data: StarData) {
-    await newStar(galaxyId, data);
-    afterSubmit?.();
+    const res = await newStar(galaxyId, data);
+
+    if (res && "error" in res) {
+      switch (res.error.status_code) {
+        case ApiErrorType.AlreadyExists:
+          form.setError("root", {
+            type: "response",
+            message: "Invalid name or public domain or private domain",
+          });
+          break;
+        default:
+          form.setError("root", {
+            type: "response",
+            message: "Oops.. Something went wrong",
+          });
+      }
+    } else {
+      afterSubmit?.();
+    }
   }
 
   return (
@@ -114,6 +132,9 @@ export default function NewStarForm({
             Create
           </Button>
         </DialogFooter>
+        <p className="text-sm font-medium text-destructive">
+          {form.formState.errors.root?.message}
+        </p>
       </form>
     </Form>
   );

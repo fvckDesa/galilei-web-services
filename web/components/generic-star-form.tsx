@@ -15,6 +15,7 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { z } from "zod";
 import { updateStar } from "@/lib/actions";
+import { ApiErrorType } from "api-client";
 
 const GenericStarDataSchema = StarDataSchema.pick({
   name: true,
@@ -40,7 +41,23 @@ export default function GenericStarForm({
   });
 
   async function onSubmit(data: GenericStarData) {
-    await updateStar(galaxyId, starId, data);
+    const res = await updateStar(galaxyId, starId, data);
+
+    if (res && "error" in res) {
+      switch (res.error.status_code) {
+        case ApiErrorType.AlreadyExists:
+          form.setError("name", {
+            type: "response",
+            message: "Name already used",
+          });
+          break;
+        default:
+          form.setError("root", {
+            type: "response",
+            message: "Oops.. Something went wrong",
+          });
+      }
+    }
   }
 
   return (
@@ -79,6 +96,9 @@ export default function GenericStarForm({
         >
           Update
         </Button>
+        <p className="text-sm font-medium text-destructive">
+          {form.formState.errors.root?.message}
+        </p>
       </form>
     </Form>
   );

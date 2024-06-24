@@ -21,59 +21,59 @@ import {
 import { api } from "./api";
 import { revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
-import { ApiError } from "api-client";
+import { components } from "api-client";
 
-export async function login(data: Login) {
+export type ActionResult<T = never> =
+  | { data: T }
+  | { error: components["schemas"]["ErrorMessage"] }
+  | void;
+
+export async function login(data: Login): Promise<ActionResult> {
   const loginData = LoginSchema.parse(data);
 
   const { error } = await api.POST("/auth/login", { body: loginData });
 
-  if (error) {
-    throw new ApiError(error);
-  }
+  if (error) return { error };
 
   redirect("/galaxies");
 }
 
-export async function register(data: Register) {
+export async function register(data: Register): Promise<ActionResult> {
   const registerData = RegisterSchema.parse(data);
 
   const { error } = await api.POST("/auth/register", { body: registerData });
 
-  if (error) {
-    throw new ApiError(error);
-  }
+  if (error) return { error };
 
   redirect("/galaxies");
 }
 
-export async function logout() {
+export async function logout(): Promise<ActionResult> {
   const { error } = await api.DELETE("/auth/logout", {
     method: "DELETE",
   });
 
-  if (error) {
-    throw new ApiError(error);
-  }
+  if (error) return { error };
 
   redirect("/login");
 }
 
-export async function newGalaxy(data: GalaxyData) {
+export async function newGalaxy(data: GalaxyData): Promise<ActionResult> {
   const galaxyData = GalaxyDataSchema.parse(data);
 
   const { error, data: galaxy } = await api.POST("/galaxies", {
     body: galaxyData,
   });
 
-  if (error) {
-    throw new ApiError(error);
-  }
+  if (error) return { error };
 
   redirect(`/galaxies/${galaxy.id}`);
 }
 
-export async function updateGalaxy(galaxy_id: string, data: GalaxyData) {
+export async function updateGalaxy(
+  galaxy_id: string,
+  data: GalaxyData
+): Promise<ActionResult> {
   const galaxyData = GalaxyDataSchema.parse(data);
 
   const { error, data: galaxy } = await api.PUT("/galaxies/{galaxy_id}", {
@@ -81,26 +81,25 @@ export async function updateGalaxy(galaxy_id: string, data: GalaxyData) {
     body: galaxyData,
   });
 
-  if (error) {
-    throw new ApiError(error);
-  }
+  if (error) return { error };
 
   redirect(`/galaxies/${galaxy.id}`);
 }
 
-export async function deleteGalaxy(galaxy_id: string) {
+export async function deleteGalaxy(galaxy_id: string): Promise<ActionResult> {
   const { error } = await api.DELETE("/galaxies/{galaxy_id}", {
     params: { path: { galaxy_id } },
   });
 
-  if (error) {
-    throw new ApiError(error);
-  }
+  if (error) return { error };
 
   redirect("/galaxies");
 }
 
-export async function newStar(galaxyId: string, data: StarData) {
+export async function newStar(
+  galaxyId: string,
+  data: StarData
+): Promise<ActionResult> {
   const starData = StarDataSchema.parse(data);
 
   const { public_domain, private_domain, ...rest } = starData;
@@ -120,9 +119,7 @@ export async function newStar(galaxyId: string, data: StarData) {
     },
   });
 
-  if (error) {
-    throw new ApiError(error);
-  }
+  if (error) return { error };
 
   revalidateTag("galaxy");
   redirect(`/galaxies/${star.galaxy_id}/stars/${star.id}`);
@@ -132,7 +129,7 @@ export async function updateStar(
   galaxyId: string,
   starId: string,
   data: UpdateStarData
-) {
+): Promise<ActionResult> {
   const starData = UpdateStarDataSchema.parse(data);
 
   const { public_domain, private_domain, ...rest } = starData;
@@ -158,14 +155,15 @@ export async function updateStar(
     },
   });
 
-  if (error) {
-    throw new ApiError(error);
-  }
+  if (error) return { error };
 
   revalidateTag("galaxy");
 }
 
-export async function deleteStar(galaxyId: string, starId: string) {
+export async function deleteStar(
+  galaxyId: string,
+  starId: string
+): Promise<ActionResult> {
   const { error } = await api.DELETE("/galaxies/{galaxy_id}/stars/{star_id}", {
     params: {
       path: {
@@ -175,9 +173,7 @@ export async function deleteStar(galaxyId: string, starId: string) {
     },
   });
 
-  if (error) {
-    throw new ApiError(error);
-  }
+  if (error) return { error };
 
   revalidateTag("galaxy");
   redirect(`/galaxies/${galaxyId}`);
@@ -187,7 +183,7 @@ export async function addStarVariable(
   galaxyId: string,
   starId: string,
   data: StarVariableData
-) {
+): Promise<ActionResult> {
   const varData = StarVariableDataSchema.parse(data);
 
   const { error } = await api.POST(
@@ -203,9 +199,7 @@ export async function addStarVariable(
     }
   );
 
-  if (error) {
-    throw new ApiError(error);
-  }
+  if (error) return { error };
 
   revalidateTag("enviroment");
 }
@@ -214,7 +208,7 @@ export async function deleteStarVariable(
   galaxyId: string,
   starId: string,
   varId: string
-) {
+): Promise<ActionResult> {
   console.log(varId);
   const { error } = await api.DELETE(
     "/galaxies/{galaxy_id}/stars/{star_id}/vars/{variable_id}",
@@ -225,14 +219,15 @@ export async function deleteStarVariable(
     }
   );
 
-  if (error) {
-    throw new ApiError(error);
-  }
+  if (error) return { error };
 
   revalidateTag("enviroment");
 }
 
-export async function newPlanet(galaxyId: string, data: PlanetData) {
+export async function newPlanet(
+  galaxyId: string,
+  data: PlanetData
+): Promise<ActionResult> {
   const { star_id, ...rest } = PlanetDataSchema.parse(data);
 
   const { error, data: planet } = await api.POST(
@@ -245,9 +240,7 @@ export async function newPlanet(galaxyId: string, data: PlanetData) {
     }
   );
 
-  if (error) {
-    throw new ApiError(error);
-  }
+  if (error) return { error };
 
   revalidateTag("galaxy");
   redirect(`/galaxies/${planet.galaxy_id}/planets/${planet.id}`);
@@ -257,7 +250,7 @@ export async function updatePlanet(
   galaxyId: string,
   planetId: string,
   data: UpdatePlanetData
-) {
+): Promise<ActionResult> {
   const { star_id, ...rest } = UpdatePlanetDataSchema.parse(data);
 
   const { error } = await api.PUT("/galaxies/{galaxy_id}/planets/{planet_id}", {
@@ -273,14 +266,15 @@ export async function updatePlanet(
     },
   });
 
-  if (error) {
-    throw new ApiError(error);
-  }
+  if (error) return { error };
 
   revalidateTag("galaxy");
 }
 
-export async function deletePlanet(galaxyId: string, planetId: string) {
+export async function deletePlanet(
+  galaxyId: string,
+  planetId: string
+): Promise<ActionResult> {
   const { error } = await api.DELETE(
     "/galaxies/{galaxy_id}/planets/{planet_id}",
     {
@@ -293,9 +287,7 @@ export async function deletePlanet(galaxyId: string, planetId: string) {
     }
   );
 
-  if (error) {
-    throw new ApiError(error);
-  }
+  if (error) return { error };
 
   revalidateTag("galaxy");
   redirect(`/galaxies/${galaxyId}`);

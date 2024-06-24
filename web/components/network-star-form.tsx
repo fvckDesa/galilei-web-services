@@ -17,6 +17,7 @@ import { z } from "zod";
 import { updateStar } from "@/lib/actions";
 import CopyBtn from "./copy-btn";
 import { env } from "next-runtime-env";
+import { ApiErrorType } from "api-client";
 
 const NetworkStarDataSchema = StarDataSchema.pick({
   public_domain: true,
@@ -45,7 +46,23 @@ export default function NetworkStarForm({
   const HOST_DOMAIN = env("NEXT_PUBLIC_HOST_DOMAIN") ?? "localhost";
 
   async function onSubmit(data: NetworkStarData) {
-    await updateStar(galaxyId, starId, data);
+    const res = await updateStar(galaxyId, starId, data);
+
+    if (res && "error" in res) {
+      switch (res.error.status_code) {
+        case ApiErrorType.AlreadyExists:
+          form.setError("root", {
+            type: "response",
+            message: "Private or public domain already used",
+          });
+          break;
+        default:
+          form.setError("root", {
+            type: "response",
+            message: "Oops.. Something went wrong",
+          });
+      }
+    }
   }
 
   return (
@@ -119,6 +136,9 @@ export default function NetworkStarForm({
         >
           Update
         </Button>
+        <p className="text-sm font-medium text-destructive">
+          {form.formState.errors.root?.message}
+        </p>
       </form>
     </Form>
   );

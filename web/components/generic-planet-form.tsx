@@ -24,6 +24,7 @@ import {
 } from "./ui/select";
 import { z } from "zod";
 import { updatePlanet } from "@/lib/actions";
+import { ApiErrorType } from "api-client";
 
 const GenericPlanetDataSchema = PlanetDataSchema.pick({
   name: true,
@@ -53,7 +54,23 @@ export default function GenericPlanetForm({
   });
 
   async function onSubmit(data: GenericPlanetData) {
-    await updatePlanet(galaxyId, planetId, data);
+    const res = await updatePlanet(galaxyId, planetId, data);
+
+    if (res && "error" in res) {
+      switch (res.error.status_code) {
+        case ApiErrorType.AlreadyExists:
+          form.setError("name", {
+            type: "response",
+            message: "Name already used",
+          });
+          break;
+        default:
+          form.setError("root", {
+            type: "response",
+            message: "Oops.. Something went wrong",
+          });
+      }
+    }
   }
 
   return (
@@ -112,6 +129,9 @@ export default function GenericPlanetForm({
         >
           Update
         </Button>
+        <p className="text-sm font-medium text-destructive">
+          {form.formState.errors.root?.message}
+        </p>
       </form>
     </Form>
   );

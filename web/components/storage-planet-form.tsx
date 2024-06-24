@@ -15,6 +15,7 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { z } from "zod";
 import { updatePlanet } from "@/lib/actions";
+import { ApiErrorType } from "api-client";
 
 const StoragePlanetDataSchema = PlanetDataSchema.pick({
   path: true,
@@ -40,7 +41,23 @@ export default function StoragePlanetForm({
   });
 
   async function onSubmit(data: StoragePlanetData) {
-    await updatePlanet(galaxyId, planetId, data);
+    const res = await updatePlanet(galaxyId, planetId, data);
+
+    if (res && "error" in res) {
+      switch (res.error.status_code) {
+        case ApiErrorType.AlreadyExists:
+          form.setError("path", {
+            type: "response",
+            message: "Planet on same star must have different path",
+          });
+          break;
+        default:
+          form.setError("root", {
+            type: "response",
+            message: "Oops.. Something went wrong",
+          });
+      }
+    }
   }
 
   return (

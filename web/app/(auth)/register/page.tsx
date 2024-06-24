@@ -18,6 +18,7 @@ import { register } from "@/lib/actions";
 import Link from "next/link";
 import { Lock, Unlock, User } from "lucide-react";
 import { useState } from "react";
+import { ApiErrorType } from "api-client";
 
 export default function RegisterPage() {
   const [isPasswordHidden, setIsPasswordHidden] = useState(true);
@@ -33,7 +34,23 @@ export default function RegisterPage() {
   });
 
   async function onSubmit(data: Register) {
-    await register(data);
+    const res = await register(data);
+
+    if (res && "error" in res) {
+      switch (res.error.status_code) {
+        case ApiErrorType.AlreadyExists:
+          form.setError("username", {
+            type: "response",
+            message: "Username not aveilable",
+          });
+          break;
+        default:
+          form.setError("root", {
+            type: "response",
+            message: "Oops.. Something went wrong",
+          });
+      }
+    }
   }
 
   function changePasswordVisibility() {
@@ -158,6 +175,9 @@ export default function RegisterPage() {
           >
             Create
           </Button>
+          <p className="text-sm font-medium text-destructive">
+            {form.formState.errors.root?.message}
+          </p>
         </form>
       </Form>
       <footer className="text-sm">

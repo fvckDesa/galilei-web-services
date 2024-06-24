@@ -18,6 +18,7 @@ import { login } from "@/lib/actions";
 import Link from "next/link";
 import { Lock, Unlock, User } from "lucide-react";
 import { useState } from "react";
+import { ApiErrorType } from "api-client";
 
 export default function LoginPage() {
   const [isPasswordHidden, setIsPasswordHidden] = useState(true);
@@ -36,7 +37,23 @@ export default function LoginPage() {
   }
 
   async function onSubmit(data: Login) {
-    await login(data);
+    const res = await login(data);
+
+    if (res && "error" in res) {
+      switch (res.error.status_code) {
+        case ApiErrorType.Unauthorized:
+          form.setError("root", {
+            type: "response",
+            message: "Wrong email or password",
+          });
+          break;
+        default:
+          form.setError("root", {
+            type: "response",
+            message: "Oops.. Something went wrong",
+          });
+      }
+    }
   }
 
   return (
@@ -130,6 +147,9 @@ export default function LoginPage() {
           >
             Submit
           </Button>
+          <p className="text-sm font-medium text-destructive">
+            {form.formState.errors.root?.message}
+          </p>
         </form>
       </Form>
       <footer className="text-sm">

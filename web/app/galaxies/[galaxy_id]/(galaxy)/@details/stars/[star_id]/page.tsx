@@ -94,7 +94,7 @@ export default async function StarPage({
           />
         </TabsContent>
         <TabsContent value="enviroment" className="flex w-full flex-1 flex-col">
-          <EnvStarForm galaxyId={galaxy_id} starId={star_id} vars={vars} />
+          <EnvStarForm galaxyId={galaxy_id} starId={star_id} />
           <ul className="flex w-full flex-1 flex-col gap-2">
             {vars.map(({ id, name, value, star_id }) => (
               <li

@@ -6,6 +6,12 @@ import { deleteGalaxy, updateGalaxy } from "@/lib/actions";
 import { api } from "@/lib/api";
 import { Page } from "@/lib/types";
 import { ApiError } from "api-client";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Settings",
+  description: "Edit a galaxy",
+};
 
 type GalaxySettingsPageProps = Page<{ galaxy_id: string }>;
 

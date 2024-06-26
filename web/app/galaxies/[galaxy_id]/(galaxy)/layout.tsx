@@ -1,12 +1,30 @@
 "use client";
 
-import { Layout } from "@/lib/types";
+import { Layout, Page } from "@/lib/types";
 import {
   ResizablePanelGroup,
   ResizablePanel,
   ResizableHandle,
 } from "@/components/ui/resizable";
 import { useSelectedLayoutSegment } from "next/navigation";
+import type { Metadata } from "next";
+import { api } from "@/lib/api";
+
+export async function generateMetadata({
+  params: { galaxy_id },
+}: Page<{ galaxy_id: string }>): Promise<Metadata> {
+  const { data } = await api.GET("/galaxies/{galaxy_id}", {
+    params: {
+      path: {
+        galaxy_id,
+      },
+    },
+  });
+
+  return {
+    title: data?.galaxy.name,
+  };
+}
 
 export default function GalaxyLayout({ children, details }: Layout<"details">) {
   const segment = useSelectedLayoutSegment("details");

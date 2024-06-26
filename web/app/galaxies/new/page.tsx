@@ -1,5 +1,11 @@
 import GalaxyForm from "@/components/galaxy-form";
 import { newGalaxy } from "@/lib/actions";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "New Galaxy",
+  description: "Create new galaxy",
+};
 
 export default async function NewGalaxyPage() {
   return (

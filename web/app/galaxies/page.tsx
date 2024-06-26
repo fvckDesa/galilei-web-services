@@ -5,6 +5,12 @@ import { api } from "@/lib/api";
 import { ApiError } from "api-client";
 import { Orbit, Plus } from "lucide-react";
 import Link from "next/link";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Galaxies",
+  description: "Your galaxies",
+};
 
 export default async function Galaxies() {
   const { data: galaxies, error } = await api.GET("/galaxies");

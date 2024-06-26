@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: postgresql-client
-  namespace: galaxy-a405fd28-b90f-4592-baf5-3330df7c46b2
+  namespace: galaxy-90d8de3f-426a-459f-9093-a8a6e7268552
   labels:
     app: postgresql-client
 spec:

@@ -19,6 +19,12 @@ import Link from "next/link";
 import { Lock, Unlock, User } from "lucide-react";
 import { useState } from "react";
 import { ApiErrorType } from "api-client";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Register",
+  description: "Register into galilei web services",
+};
 
 export default function RegisterPage() {
   const [isPasswordHidden, setIsPasswordHidden] = useState(true);

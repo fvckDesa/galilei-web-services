@@ -29,7 +29,7 @@ spec:
     spec:
       containers:
         - name: api
-          image: fvckdesa/gws-api
+          image: fvckdesa/gws-api:beta-1
           imagePullPolicy: Always
           envFrom:
             - secretRef:
@@ -56,7 +56,7 @@ metadata:
   annotations:
     traefik.ingress.kubernetes.io/router.middlewares: default-redirect@kubernetescrd
     traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
-    cert-manager.io/cluster-issuer: letsencrypt-staging-issuer
+    cert-manager.io/cluster-issuer: letsencrypt-issuer
     cert-manager.io/common-name: api.dashboard.gwshost.live
     cert-manager.io/subject-organizations: GWS
 spec:

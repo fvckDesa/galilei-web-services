@@ -1,0 +1,17 @@
+{
+  "image": "mcr.microsoft.com/devcontainers/base:bullseye",
+  "features": {
+    "ghcr.io/devcontainers/features/git": {},
+    "ghcr.io/devcontainers/features/docker-in-docker": {},
+    "ghcr.io/rio/features/k3d": {},
+    "ghcr.io/devcontainers/features/kubectl-helm-minikube": {
+      "minikube": "none"
+    },
+    "ghcr.io/devcontainers/features/rust": {},
+    "ghcr.io/devcontainers/features/node": {}
+  },
+  "mounts": [
+    "type=volume,source=global-pnpm-store,target=${containerWorkspaceFolder}/.pnpm-store"
+  ],
+  "postCreateCommand": "sudo chown vscode .pnpm-store && bash -i scripts/post-install.sh"
+}

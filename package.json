@@ -1,0 +1,32 @@
+{
+  "name": "galilei-web-services",
+  "version": "1.0.0",
+  "author": "",
+  "description": "",
+  "keywords": [],
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "start": "turbo run start",
+    "lint": "turbo run lint",
+    "lint:fix": "turbo run lint:fix",
+    "lint:root": "eslint ./scripts/*.ts --max-warnings 0 --cache",
+    "lint:fix:root": "eslint ./scripts/*.ts --max-warnings 0 --cache --fix && cargo clippy",
+    "fmt": "prettier --ignore-unknown --cache --write . && cargo fmt",
+    "setup-dev": "./scripts/setup-dev.ts"
+  },
+  "devDependencies": {
+    "@gws/eslint-config": "workspace:*",
+    "@gws/tsconfig": "workspace:*",
+    "@types/minimist": "^1.2.5",
+    "eslint": "^8",
+    "lefthook": "^1.7.14",
+    "prettier": "^3.3.3",
+    "tsx": "^4.19.0",
+    "turbo": "^2.0.14",
+    "zx": "^8.1.4"
+  },
+  "packageManager": "pnpm@9.9.0"
+}

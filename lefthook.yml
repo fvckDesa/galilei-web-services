@@ -1,0 +1,9 @@
+pre-commit:
+  piped: true
+  commands:
+    lint:
+      glob: "*.{ts,tsx,rs}"
+      run: pnpm lint:fix
+    fmt:
+      glob: "*"
+      run: pnpm fmt

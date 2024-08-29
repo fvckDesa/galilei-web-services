@@ -1,0 +1,22 @@
+{
+  "recommendations": [
+    "usernamehw.errorlens",
+    "formulahendry.auto-rename-tag",
+    "dbaeumer.vscode-eslint",
+    "tamasfe.even-better-toml",
+    "oderwat.indent-rainbow",
+    "PKief.material-icon-theme",
+    "esbenp.prettier-vscode",
+    "rust-lang.rust-analyzer",
+    "bradlc.vscode-tailwindcss",
+    "bourhaouta.tailwindshades",
+    "snyk-security.snyk-vulnerability-scanner",
+    "aaron-bond.better-comments",
+    "streetsidesoftware.code-spell-checker",
+    "ms-azuretools.vscode-docker",
+    "ms-kubernetes-tools.vscode-kubernetes-tools",
+    "inercia.vscode-k3d",
+    "meganrogge.template-string-converter",
+    "Vercel.turbo-vsc"
+  ]
+}

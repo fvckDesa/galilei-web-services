@@ -10,8 +10,21 @@
   "cSpell.useGitignore": true,
   "cSpell.ignorePaths": ["pnpm-lock.json", ".vscode", ".devcontainer"],
   "turbo.useLocalTurbo": true,
-  "cSpell.words": ["clippy", "nothrow"],
+  "cSpell.words": [
+    "actix",
+    "chrono",
+    "clippy",
+    "confique",
+    "nothrow",
+    "openapi",
+    "schemars",
+    "sqlx",
+    "utoipa"
+  ],
   "[toml]": {
     "editor.defaultFormatter": "tamasfe.even-better-toml"
+  },
+  "[sql]": {
+    "editor.defaultFormatter": "inferrinizzard.prettier-sql-vscode"
   }
 }

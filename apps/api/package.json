@@ -4,7 +4,7 @@
   "description": "",
   "license": "MIT",
   "scripts": {
-    "dev": "cargo watch -x run",
+    "dev": "cargo watch -x \"run --bin api\"",
     "build": "cargo build --release",
     "start": "cargo run --release",
     "lint": "cargo clippy"

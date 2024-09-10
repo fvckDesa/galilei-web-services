@@ -1,6 +1,6 @@
 use derive_more::derive::From;
 use serde::{Deserialize, Serialize};
-use utoipa::{IntoResponses, ToSchema};
+use utoipa::{IntoParams, IntoResponses, ToSchema};
 use uuid::Uuid;
 use validator::Validate;
 
@@ -22,6 +22,11 @@ impl_json_response!(Project);
 #[response(status = OK)]
 pub struct ProjectsList(#[to_schema] Vec<Project>);
 impl_json_response!(ProjectsList);
+
+#[derive(Debug, Deserialize, IntoParams)]
+pub struct ProjectPath {
+  pub project_id: Uuid,
+}
 
 partial_schema! {
   PartialProjectSchema,

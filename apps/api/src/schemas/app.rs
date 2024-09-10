@@ -1,6 +1,6 @@
 use derive_more::derive::From;
 use serde::{Deserialize, Serialize};
-use utoipa::{IntoResponses, ToSchema};
+use utoipa::{IntoParams, IntoResponses, ToSchema};
 use uuid::Uuid;
 use validator::Validate;
 
@@ -25,6 +25,12 @@ impl_json_response!(AppService);
 #[response(status = OK)]
 pub struct AppServicesList(#[to_schema] Vec<AppService>);
 impl_json_response!(AppServicesList);
+
+#[derive(Debug, Deserialize, IntoParams)]
+pub struct AppPath {
+  pub project_id: Uuid,
+  pub app_id: Uuid,
+}
 
 partial_schema! {
   PartialAppServiceSchema,

@@ -1,4 +1,3 @@
-mod middleware;
 mod password;
 mod token;
 
@@ -6,7 +5,6 @@ use actix_web::http::header::HeaderName;
 use derive_more::derive::{Display, Error};
 use std::error::Error;
 
-pub use middleware::{auth_middleware as middleware, UserId};
 pub use password::Password;
 pub use token::Token;
 

@@ -11,7 +11,7 @@ use actix_web_validator::JsonConfig;
 use confique::Config;
 
 use crate::{
-  auth,
+  middleware::{project_middleware, session_middleware},
   routes::{app, auth as auth_routes, project},
   ApiError, DatabaseConfig,
 };
@@ -38,13 +38,18 @@ pub fn create_app(
   App::new()
     .app_data(JsonConfig::default().error_handler(|err, _| ApiError::from(err).into()))
     .app_data(Data::new(pool))
-    .wrap(NormalizePath::trim())
+    .wrap(NormalizePath::new(middleware::TrailingSlash::Always))
     .configure(auth_routes::config)
     .service(
-      web::scope("")
-        .wrap(middleware::from_fn(auth::middleware))
-        .configure(project::config)
-        .configure(app::config),
+      web::scope("/projects")
+        .wrap(middleware::from_fn(session_middleware))
+        .configure(project::config_without_id)
+        .service(
+          web::scope("/{project_id}")
+            .wrap(middleware::from_fn(project_middleware))
+            .configure(project::config_with_id)
+            .configure(app::config),
+        ),
     )
 }
 

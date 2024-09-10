@@ -3,41 +3,47 @@ use actix_web::{
   web::{Path, ServiceConfig},
 };
 use actix_web_validator::Json;
-use uuid::Uuid;
 
 use crate::{
-  auth::UserId,
   database::Pool,
   error::{
     AlreadyExistsErrorMessage, BadRequestErrorMessage, InternalServerErrorMessage,
     NotFoundErrorMessage, UnauthorizedErrorMessage,
   },
-  schemas::{PartialProjectSchema, Project, ProjectSchema, ProjectsList},
+  middleware::UserId,
+  schemas::{PartialProjectSchema, Project, ProjectPath, ProjectSchema, ProjectsList},
   ApiResult,
 };
 
-#[utoipa::path(responses(ProjectsList, UnauthorizedErrorMessage, InternalServerErrorMessage))]
-#[get("/projects")]
+const CONTEXT_PATH_WITHOUT_ID: &str = "/projects";
+
+#[utoipa::path(
+  context_path = CONTEXT_PATH_WITHOUT_ID,
+  responses(ProjectsList, UnauthorizedErrorMessage, InternalServerErrorMessage)
+)]
+#[get("/")]
 pub async fn list_projects(pool: Pool, user_id: UserId) -> ApiResult<ProjectsList> {
   let projects = sqlx::query_as!(
     Project,
     "SELECT * FROM projects WHERE user_id = $1",
     *user_id
   )
-  .fetch_all(&**pool)
+  .fetch_all(pool.as_ref())
   .await?;
 
   Ok(ProjectsList::from(projects))
 }
 
-#[utoipa::path(responses(
+#[utoipa::path(
+  context_path = CONTEXT_PATH_WITHOUT_ID,
+  responses(
   Project,
   BadRequestErrorMessage,
   AlreadyExistsErrorMessage,
   UnauthorizedErrorMessage,
   InternalServerErrorMessage
 ))]
-#[post("/projects")]
+#[post("/")]
 pub async fn create_project(
   Json(project): Json<ProjectSchema>,
   pool: Pool,
@@ -49,80 +55,114 @@ pub async fn create_project(
     project.name,
     *user_id
   )
-  .fetch_one(&**pool)
+  .fetch_one(pool.as_ref())
   .await?;
 
   Ok(new_project)
 }
 
-#[utoipa::path(responses(
-  Project,
-  NotFoundErrorMessage,
-  UnauthorizedErrorMessage,
-  InternalServerErrorMessage
-))]
-#[get("/projects/{project_id}")]
-pub async fn get_project(project_id: Path<Uuid>, pool: Pool) -> ApiResult<Project> {
+pub fn config_without_id(cfg: &mut ServiceConfig) {
+  cfg.service(list_projects).service(create_project);
+}
+
+const CONTEXT_PATH_WITH_ID: &str = "/projects/{project_id}";
+
+#[utoipa::path(
+  context_path = CONTEXT_PATH_WITH_ID,
+  params(ProjectPath),
+  responses(
+    Project,
+    NotFoundErrorMessage,
+    UnauthorizedErrorMessage,
+    InternalServerErrorMessage
+  )
+)]
+#[get("/")]
+pub async fn get_project(
+  path: Path<ProjectPath>,
+  pool: Pool,
+  user_id: UserId,
+) -> ApiResult<Project> {
+  let ProjectPath { project_id } = *path;
+
   let project = sqlx::query_as!(
     Project,
-    "SELECT * FROM projects WHERE project_id = $1",
-    *project_id
+    "SELECT * FROM projects WHERE user_id = $1 AND project_id = $2",
+    *user_id,
+    project_id
   )
-  .fetch_one(&**pool)
+  .fetch_one(pool.as_ref())
   .await?;
 
   Ok(project)
 }
 
-#[utoipa::path(responses(
-  Project,
-  BadRequestErrorMessage,
-  NotFoundErrorMessage,
-  AlreadyExistsErrorMessage,
-  UnauthorizedErrorMessage,
-  InternalServerErrorMessage
-))]
-#[patch("/projects/{project_id}")]
+#[utoipa::path(
+  context_path = CONTEXT_PATH_WITH_ID,
+  params(ProjectPath),
+  responses(
+    Project,
+    BadRequestErrorMessage,
+    NotFoundErrorMessage,
+    AlreadyExistsErrorMessage,
+    UnauthorizedErrorMessage,
+    InternalServerErrorMessage
+  )
+)]
+#[patch("/")]
 pub async fn update_project(
-  project_id: Path<Uuid>,
+  path: Path<ProjectPath>,
   Json(project): Json<PartialProjectSchema>,
   pool: Pool,
+  user_id: UserId,
 ) -> ApiResult<Project> {
+  let ProjectPath { project_id } = *path;
+
   let project = sqlx::query_as!(
     Project,
-    "UPDATE projects SET project_name = COALESCE($1, project_name) WHERE project_id = $2 RETURNING *",
+    "UPDATE projects SET project_name = COALESCE($1, project_name) WHERE user_id = $2 AND project_id = $3 RETURNING *",
     project.name,
-    *project_id
+    *user_id,
+    project_id
   )
-  .fetch_one(&**pool)
+  .fetch_one(pool.as_ref())
   .await?;
 
   Ok(project)
 }
 
-#[utoipa::path(responses(
-  Project,
-  NotFoundErrorMessage,
-  UnauthorizedErrorMessage,
-  InternalServerErrorMessage
-))]
-#[delete("/projects/{project_id}")]
-pub async fn delete_project(project_id: Path<Uuid>, pool: Pool) -> ApiResult<Project> {
+#[utoipa::path(
+  context_path = CONTEXT_PATH_WITH_ID,
+  params(ProjectPath),
+  responses(
+    Project,
+    NotFoundErrorMessage,
+    UnauthorizedErrorMessage,
+    InternalServerErrorMessage
+  )
+)]
+#[delete("/")]
+pub async fn delete_project(
+  path: Path<ProjectPath>,
+  pool: Pool,
+  user_id: UserId,
+) -> ApiResult<Project> {
+  let ProjectPath { project_id } = *path;
+
   let project = sqlx::query_as!(
     Project,
-    "DELETE FROM projects WHERE project_id = $1 RETURNING *",
-    *project_id
+    "DELETE FROM projects WHERE user_id = $1 AND project_id = $2 RETURNING *",
+    *user_id,
+    project_id
   )
-  .fetch_one(&**pool)
+  .fetch_one(pool.as_ref())
   .await?;
 
   Ok(project)
 }
 
-pub fn config(cfg: &mut ServiceConfig) {
+pub fn config_with_id(cfg: &mut ServiceConfig) {
   cfg
-    .service(list_projects)
-    .service(create_project)
     .service(get_project)
     .service(update_project)
     .service(delete_project);

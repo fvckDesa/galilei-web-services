@@ -3,7 +3,6 @@ use actix_web::{
   web::{Path, ServiceConfig},
 };
 use actix_web_validator::Json;
-use uuid::Uuid;
 
 use crate::{
   database::Pool,
@@ -11,43 +10,57 @@ use crate::{
     AlreadyExistsErrorMessage, BadRequestErrorMessage, InternalServerErrorMessage,
     NotFoundErrorMessage, UnauthorizedErrorMessage,
   },
-  schemas::{AppService, AppServiceSchema, AppServicesList, PartialAppServiceSchema},
+  schemas::{
+    AppPath, AppService, AppServiceSchema, AppServicesList, PartialAppServiceSchema, ProjectPath,
+  },
   ApiResult,
 };
 
-#[utoipa::path(responses(
-  AppServicesList,
-  NotFoundErrorMessage,
-  UnauthorizedErrorMessage,
-  InternalServerErrorMessage
-))]
-#[get("/projects/{project_id}/apps")]
-pub async fn list_apps(project_id: Path<Uuid>, pool: Pool) -> ApiResult<AppServicesList> {
+const CONTEXT_PATH: &str = "/projects/{project_id}";
+
+#[utoipa::path(
+  context_path = CONTEXT_PATH,
+  params(ProjectPath),
+  responses(
+    AppServicesList,
+    NotFoundErrorMessage,
+    UnauthorizedErrorMessage,
+    InternalServerErrorMessage
+  )
+)]
+#[get("/apps")]
+pub async fn list_apps(path: Path<ProjectPath>, pool: Pool) -> ApiResult<AppServicesList> {
+  let ProjectPath { project_id } = *path;
   let apps = sqlx::query_as!(
     AppService,
     "SELECT * FROM app_services WHERE project_id = $1",
-    *project_id
+    project_id
   )
-  .fetch_all(&**pool)
+  .fetch_all(pool.as_ref())
   .await?;
 
   Ok(AppServicesList::from(apps))
 }
 
-#[utoipa::path(responses(
-  AppService,
-  BadRequestErrorMessage,
-  NotFoundErrorMessage,
-  AlreadyExistsErrorMessage,
-  UnauthorizedErrorMessage,
-  InternalServerErrorMessage
-))]
-#[post("/projects/{project_id}/apps")]
+#[utoipa::path(
+  context_path = CONTEXT_PATH,
+  params(ProjectPath),
+  responses(
+    AppService,
+    BadRequestErrorMessage,
+    NotFoundErrorMessage,
+    AlreadyExistsErrorMessage,
+    UnauthorizedErrorMessage,
+    InternalServerErrorMessage
+  )
+)]
+#[post("/apps")]
 pub async fn create_app(
-  project_id: Path<Uuid>,
+  path: Path<ProjectPath>,
   Json(app): Json<AppServiceSchema>,
   pool: Pool,
 ) -> ApiResult<AppService> {
+  let ProjectPath { project_id } = *path;
   let AppServiceSchema {
     name,
     replicas,
@@ -62,23 +75,27 @@ pub async fn create_app(
     replicas,
     image,
     port,
-    *project_id
+    project_id
   )
-  .fetch_one(&**pool)
+  .fetch_one(pool.as_ref())
   .await?;
 
   Ok(app)
 }
 
-#[utoipa::path(responses(
-  AppService,
-  NotFoundErrorMessage,
-  UnauthorizedErrorMessage,
-  InternalServerErrorMessage
-))]
-#[get("/projects/{project_id}/apps/{app_id}")]
-pub async fn get_app(path: Path<(Uuid, Uuid)>, pool: Pool) -> ApiResult<AppService> {
-  let (project_id, app_id) = path.into_inner();
+#[utoipa::path(
+  context_path = CONTEXT_PATH,
+  params(AppPath),
+  responses(
+    AppService,
+    NotFoundErrorMessage,
+    UnauthorizedErrorMessage,
+    InternalServerErrorMessage
+  )
+)]
+#[get("/apps/{app_id}")]
+pub async fn get_app(path: Path<AppPath>, pool: Pool) -> ApiResult<AppService> {
+  let AppPath { project_id, app_id } = *path;
 
   let app = sqlx::query_as!(
     AppService,
@@ -86,27 +103,31 @@ pub async fn get_app(path: Path<(Uuid, Uuid)>, pool: Pool) -> ApiResult<AppServi
     project_id,
     app_id
   )
-  .fetch_one(&**pool)
+  .fetch_one(pool.as_ref())
   .await?;
 
   Ok(app)
 }
 
-#[utoipa::path(responses(
-  AppService,
-  BadRequestErrorMessage,
-  NotFoundErrorMessage,
-  AlreadyExistsErrorMessage,
-  UnauthorizedErrorMessage,
-  InternalServerErrorMessage
-))]
-#[patch("/projects/{project_id}/apps/{app_id}")]
+#[utoipa::path(
+  context_path = CONTEXT_PATH,
+  params(AppPath),
+  responses(
+    AppService,
+    BadRequestErrorMessage,
+    NotFoundErrorMessage,
+    AlreadyExistsErrorMessage,
+    UnauthorizedErrorMessage,
+    InternalServerErrorMessage
+  )
+)]
+#[patch("/apps/{app_id}")]
 pub async fn update_app(
-  path: Path<(Uuid, Uuid)>,
+  path: Path<AppPath>,
   Json(app): Json<PartialAppServiceSchema>,
   pool: Pool,
 ) -> ApiResult<AppService> {
-  let (project_id, app_id) = path.into_inner();
+  let AppPath { project_id, app_id } = *path;
   let PartialAppServiceSchema {
     name,
     replicas,
@@ -132,21 +153,25 @@ pub async fn update_app(
     project_id,
     app_id
   )
-  .fetch_one(&**pool)
+  .fetch_one(pool.as_ref())
   .await?;
 
   Ok(app)
 }
 
-#[utoipa::path(responses(
-  AppService,
-  NotFoundErrorMessage,
-  UnauthorizedErrorMessage,
-  InternalServerErrorMessage
-))]
-#[delete("/projects/{project_id}/apps/{app_id}")]
-pub async fn delete_app(path: Path<(Uuid, Uuid)>, pool: Pool) -> ApiResult<AppService> {
-  let (project_id, app_id) = path.into_inner();
+#[utoipa::path(
+  context_path = CONTEXT_PATH,
+  params(AppPath),
+  responses(
+    AppService,
+    NotFoundErrorMessage,
+    UnauthorizedErrorMessage,
+    InternalServerErrorMessage
+  )
+)]
+#[delete("/apps/{app_id}")]
+pub async fn delete_app(path: Path<AppPath>, pool: Pool) -> ApiResult<AppService> {
+  let AppPath { project_id, app_id } = *path;
 
   let app = sqlx::query_as!(
     AppService,
@@ -154,7 +179,7 @@ pub async fn delete_app(path: Path<(Uuid, Uuid)>, pool: Pool) -> ApiResult<AppSe
     project_id,
     app_id,
   )
-  .fetch_one(&**pool)
+  .fetch_one(pool.as_ref())
   .await?;
 
   Ok(app)

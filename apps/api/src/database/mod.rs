@@ -1,7 +1,15 @@
+use actix_web::web::Data;
 use confique::Config;
-use sqlx::postgres::{PgPool, PgPoolOptions};
+use sqlx::{
+  migrate::Migrator,
+  postgres::{PgPool, PgPoolOptions},
+};
 
 pub mod entities;
+
+pub type Pool = Data<PgPool>;
+
+pub static MIGRATOR: Migrator = sqlx::migrate!("./migrations");
 
 #[derive(Config)]
 pub struct DatabaseConfig {
@@ -26,10 +34,7 @@ impl DatabaseConfig {
 
     log::info!("Connected with database {}", self.url);
 
-    sqlx::migrate!("./migrations")
-      .run(&pool)
-      .await
-      .map_err(sqlx::Error::from)?;
+    MIGRATOR.run(&pool).await.map_err(sqlx::Error::from)?;
 
     Ok(pool)
   }

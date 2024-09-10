@@ -7,6 +7,8 @@ use serde::Serialize;
 use utoipa::{IntoResponses, ToSchema};
 use validator::ValidationErrors;
 
+use crate::auth;
+
 pub type ApiResult<T, E = ApiError> = Result<T, E>;
 
 #[derive(Debug, Display, Error)]
@@ -15,18 +17,10 @@ pub enum ApiError {
   BadRequest { message: String },
   #[display("{errors}")]
   Validation { errors: ValidationErrors },
-  #[display("Resource {resource} with {field} {value} already exists")]
-  AlreadyExists {
-    resource: String,
-    field: String,
-    value: String,
-  },
-  #[display("Resource {resource} with {field} {value} not found")]
-  NotFound {
-    resource: String,
-    field: String,
-    value: String,
-  },
+  #[display("Resource already exists")]
+  AlreadyExists,
+  #[display("Resource not found")]
+  NotFound,
   #[display("User not authorized")]
   Unauthorized,
   #[display("Internal server error occurred")]
@@ -54,12 +48,41 @@ impl ResponseError for ApiError {
 }
 
 impl From<actix_web_validator::Error> for ApiError {
-  fn from(value: actix_web_validator::Error) -> Self {
-    match value {
+  fn from(err: actix_web_validator::Error) -> Self {
+    log::error!("Validation error: {}", err.to_string());
+
+    match err {
       actix_web_validator::Error::Validate(errors) => ApiError::Validation { errors },
       err => ApiError::BadRequest {
         message: err.to_string(),
       },
+    }
+  }
+}
+
+impl From<sqlx::Error> for ApiError {
+  fn from(err: sqlx::Error) -> Self {
+    log::error!("Database error: {}", err.to_string());
+
+    match err {
+      sqlx::Error::RowNotFound => ApiError::NotFound,
+      sqlx::Error::Database(err) => match err.kind() {
+        sqlx::error::ErrorKind::UniqueViolation => ApiError::AlreadyExists,
+        sqlx::error::ErrorKind::ForeignKeyViolation => ApiError::NotFound,
+        _ => ApiError::InternalError,
+      },
+      _ => ApiError::InternalError,
+    }
+  }
+}
+
+impl From<auth::AuthError> for ApiError {
+  fn from(err: auth::AuthError) -> Self {
+    log::error!("Auth error: {}", err.to_string());
+
+    match err {
+      auth::AuthError::Invalid => ApiError::Unauthorized,
+      auth::AuthError::Other(_) => ApiError::InternalError,
     }
   }
 }

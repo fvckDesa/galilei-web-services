@@ -6,6 +6,7 @@ edition = "2021"
 [dependencies]
 actix-web = { version = "4.9.0", features = ["secure-cookies"] }
 utoipa = { workspace = true }
+anyhow = { workspace = true }
 log = "0.4.22"
 env_logger = "0.11.5"
 derive_more = { version = "1.0.0", features = ["full"] }
@@ -25,3 +26,7 @@ chrono = { version = "0.4.38", features = ["serde"] }
 validator = { version = "0.18.1", features = ["derive"] }
 actix-web-validator = "6.0.0"
 confique = "0.2.5"
+argon2 = { version = "0.5.3", features = ["std"] }
+sha2 = "0.10.8"
+getrandom = "0.2.15"
+hex = "0.4.3"

@@ -15,10 +15,12 @@ pub struct User {
 #[derive(Debug, Default, Serialize, ToSchema)]
 pub struct Session {
   #[serde(skip)]
+  #[allow(dead_code)]
   pub session_id: Uuid,
   pub token: String,
-  pub expires: NaiveDateTime,
+  pub expires: Option<NaiveDateTime>,
   #[serde(skip)]
+  #[allow(dead_code)]
   pub user_id: Uuid,
 }
 

@@ -6,4 +6,4 @@ resolver = "2"
 
 [workspace.dependencies]
 utoipa = { version = "4.2.3", features = ["uuid", "chrono", "actix_extras"] }
-schemars = { version = "0.8.21", features = ["chrono"] }
+anyhow = "1.0.87"

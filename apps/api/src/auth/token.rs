@@ -2,13 +2,15 @@ use getrandom::getrandom;
 use hex::FromHex;
 use serde::Serialize;
 use sha2::{Digest, Sha256};
+use utoipa::ToSchema;
 
 use crate::utils;
 
 use super::{AuthError, AuthResult, AuthSecurity};
 
-#[derive(Serialize)]
+#[derive(Serialize, ToSchema)]
 #[serde(transparent)]
+#[schema(value_type = String)]
 pub struct Token(#[serde(serialize_with = "utils::as_hex")] [u8; Self::LENGTH]);
 
 impl Token {

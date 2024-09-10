@@ -1,31 +1,19 @@
 use actix_web::{
-  delete, get, post, put,
+  delete, get, patch, post,
   web::{Path, ServiceConfig},
 };
 use actix_web_validator::Json;
-use serde::{Deserialize, Serialize};
-use utoipa::{IntoResponses, ToSchema};
 use uuid::Uuid;
-use validator::Validate;
 
 use crate::{
-  database::entities,
+  database::Pool,
   error::{
     AlreadyExistsErrorMessage, BadRequestErrorMessage, InternalServerErrorMessage,
     NotFoundErrorMessage, UnauthorizedErrorMessage,
   },
-  impl_json_response, ApiResult,
+  schemas::{AppService, AppServiceSchema, AppServicesList, PartialAppServiceSchema},
+  ApiResult,
 };
-
-#[derive(Debug, Default, Serialize, IntoResponses)]
-#[response(status = OK)]
-struct AppService(#[to_schema] entities::AppService);
-impl_json_response!(AppService);
-
-#[derive(Debug, Default, Serialize, IntoResponses)]
-#[response(status = OK)]
-struct AppServicesList(#[to_schema] Vec<entities::AppService>);
-impl_json_response!(AppServicesList);
 
 #[utoipa::path(responses(
   AppServicesList,
@@ -34,20 +22,16 @@ impl_json_response!(AppServicesList);
   InternalServerErrorMessage
 ))]
 #[get("/projects/{project_id}/apps")]
-pub async fn list_apps(_path: Path<Uuid>) -> ApiResult<AppServicesList> {
-  Ok(AppServicesList::default())
-}
+pub async fn list_apps(project_id: Path<Uuid>, pool: Pool) -> ApiResult<AppServicesList> {
+  let apps = sqlx::query_as!(
+    AppService,
+    "SELECT * FROM app_services WHERE project_id = $1",
+    *project_id
+  )
+  .fetch_all(&**pool)
+  .await?;
 
-#[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
-pub struct AppServiceSpec {
-  #[validate(length(min = 1))]
-  name: String,
-  #[validate(range(min = 0))]
-  replicas: i32,
-  #[validate(length(min = 1))]
-  image: String,
-  #[validate(range(min = 1, max = 65535))]
-  port: i32,
+  Ok(AppServicesList::from(apps))
 }
 
 #[utoipa::path(responses(
@@ -60,10 +44,30 @@ pub struct AppServiceSpec {
 ))]
 #[post("/projects/{project_id}/apps")]
 pub async fn create_app(
-  _path: Path<Uuid>,
-  Json(_spec): Json<AppServiceSpec>,
+  project_id: Path<Uuid>,
+  Json(app): Json<AppServiceSchema>,
+  pool: Pool,
 ) -> ApiResult<AppService> {
-  Ok(AppService::default())
+  let AppServiceSchema {
+    name,
+    replicas,
+    image,
+    port,
+  } = app;
+
+  let app = sqlx::query_as!(
+    AppService,
+    "INSERT INTO app_services(app_name, replicas, image, port, project_id) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+    name,
+    replicas,
+    image,
+    port,
+    *project_id
+  )
+  .fetch_one(&**pool)
+  .await?;
+
+  Ok(app)
 }
 
 #[utoipa::path(responses(
@@ -73,8 +77,19 @@ pub async fn create_app(
   InternalServerErrorMessage
 ))]
 #[get("/projects/{project_id}/apps/{app_id}")]
-pub async fn get_app(_path: Path<(Uuid, Uuid)>) -> ApiResult<AppService> {
-  Ok(AppService::default())
+pub async fn get_app(path: Path<(Uuid, Uuid)>, pool: Pool) -> ApiResult<AppService> {
+  let (project_id, app_id) = path.into_inner();
+
+  let app = sqlx::query_as!(
+    AppService,
+    "SELECT * FROM app_services WHERE project_id = $1 AND app_id = $2",
+    project_id,
+    app_id
+  )
+  .fetch_one(&**pool)
+  .await?;
+
+  Ok(app)
 }
 
 #[utoipa::path(responses(
@@ -85,12 +100,42 @@ pub async fn get_app(_path: Path<(Uuid, Uuid)>) -> ApiResult<AppService> {
   UnauthorizedErrorMessage,
   InternalServerErrorMessage
 ))]
-#[put("/projects/{project_id}/apps/{app_id}")]
+#[patch("/projects/{project_id}/apps/{app_id}")]
 pub async fn update_app(
-  _path: Path<(Uuid, Uuid)>,
-  Json(_app): Json<AppServiceSpec>,
+  path: Path<(Uuid, Uuid)>,
+  Json(app): Json<PartialAppServiceSchema>,
+  pool: Pool,
 ) -> ApiResult<AppService> {
-  Ok(AppService::default())
+  let (project_id, app_id) = path.into_inner();
+  let PartialAppServiceSchema {
+    name,
+    replicas,
+    image,
+    port,
+  } = app;
+
+  let app = sqlx::query_as!(
+    AppService,
+    r#"
+    UPDATE app_services
+    SET app_name = COALESCE($1, app_name),
+      replicas = COALESCE($2, replicas),
+      image = COALESCE($3, image),
+      port = COALESCE($4, port)
+    WHERE project_id = $5 AND app_id = $6
+    RETURNING *
+    "#,
+    name,
+    replicas,
+    image,
+    port,
+    project_id,
+    app_id
+  )
+  .fetch_one(&**pool)
+  .await?;
+
+  Ok(app)
 }
 
 #[utoipa::path(responses(
@@ -100,8 +145,19 @@ pub async fn update_app(
   InternalServerErrorMessage
 ))]
 #[delete("/projects/{project_id}/apps/{app_id}")]
-pub async fn delete_app(_path: Path<(Uuid, Uuid)>) -> ApiResult<AppService> {
-  Ok(AppService::default())
+pub async fn delete_app(path: Path<(Uuid, Uuid)>, pool: Pool) -> ApiResult<AppService> {
+  let (project_id, app_id) = path.into_inner();
+
+  let app = sqlx::query_as!(
+    AppService,
+    "DELETE FROM app_services WHERE project_id = $1 AND app_id = $2 RETURNING *",
+    project_id,
+    app_id,
+  )
+  .fetch_one(&**pool)
+  .await?;
+
+  Ok(app)
 }
 
 pub fn config(cfg: &mut ServiceConfig) {

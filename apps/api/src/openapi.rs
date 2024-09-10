@@ -1,7 +1,7 @@
-use crate::auth::API_KEY;
-use crate::database::entities;
+use crate::auth::{Password, Token, API_KEY};
 use crate::error;
 use crate::routes::*;
+use crate::schemas;
 use utoipa::openapi::security::ApiKey;
 use utoipa::openapi::security::ApiKeyValue;
 use utoipa::openapi::security::SecurityScheme;
@@ -27,12 +27,16 @@ use utoipa::OpenApi;
     app::delete_app,
   ),
   components(schemas(
+    error::ApiError,
     error::ErrorMessage,
-    entities::User,
-    entities::Session,
-    auth::AuthData,
-    project::ProjectSpec,
-    app::AppServiceSpec
+    Password,
+    Token,
+    schemas::User,
+    schemas::AuthData,
+    schemas::ProjectSchema,
+    schemas::PartialProjectSchema,
+    schemas::AppServiceSchema,
+    schemas::PartialAppServiceSchema,
   ))
 )]
 pub struct OpenApiSpec;

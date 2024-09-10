@@ -11,12 +11,19 @@ use crate::auth;
 
 pub type ApiResult<T, E = ApiError> = Result<T, E>;
 
-#[derive(Debug, Display, Error)]
+#[derive(Debug, Display, Error, Clone, Serialize, ToSchema)]
+#[serde(tag = "kind")]
 pub enum ApiError {
   #[display("{message}")]
-  BadRequest { message: String },
+  BadRequest {
+    #[serde(skip)]
+    message: String,
+  },
   #[display("{errors}")]
-  Validation { errors: ValidationErrors },
+  Validation {
+    #[serde(skip)]
+    errors: ValidationErrors,
+  },
   #[display("Resource already exists")]
   AlreadyExists,
   #[display("Resource not found")]
@@ -29,21 +36,23 @@ pub enum ApiError {
 
 impl ResponseError for ApiError {
   fn error_response(&self) -> HttpResponse {
-    let (status_code, err_type) = match self {
-      ApiError::BadRequest { .. } => (StatusCode::BAD_REQUEST, "BadRequest"),
-      ApiError::Validation { .. } => (StatusCode::BAD_REQUEST, "Validation"),
-      ApiError::NotFound { .. } => (StatusCode::NOT_FOUND, "NotFound"),
-      ApiError::AlreadyExists { .. } => (StatusCode::CONFLICT, "AlreadyExists"),
-      ApiError::Unauthorized => (StatusCode::UNAUTHORIZED, "Unauthorized"),
-      ApiError::InternalError => (StatusCode::INTERNAL_SERVER_ERROR, "InternalError"),
-    };
-
-    HttpResponse::build(status_code)
+    HttpResponse::build(self.status_code())
       .append_header(header::ContentType::json())
       .json(ErrorMessage {
-        r#type: err_type.to_string(),
+        kind: self.clone(),
         message: self.to_string(),
       })
+  }
+
+  fn status_code(&self) -> StatusCode {
+    match self {
+      ApiError::BadRequest { .. } => StatusCode::BAD_REQUEST,
+      ApiError::Validation { .. } => StatusCode::BAD_REQUEST,
+      ApiError::NotFound { .. } => StatusCode::NOT_FOUND,
+      ApiError::AlreadyExists { .. } => StatusCode::CONFLICT,
+      ApiError::Unauthorized => StatusCode::UNAUTHORIZED,
+      ApiError::InternalError => StatusCode::INTERNAL_SERVER_ERROR,
+    }
   }
 }
 
@@ -89,7 +98,8 @@ impl From<auth::AuthError> for ApiError {
 
 #[derive(Debug, Serialize, ToSchema)]
 pub struct ErrorMessage {
-  r#type: String,
+  #[serde(flatten)]
+  kind: ApiError,
   message: String,
 }
 

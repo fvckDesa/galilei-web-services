@@ -1,46 +1,19 @@
 use actix_web::{post, web::ServiceConfig, HttpRequest, HttpResponse};
 use actix_web_validator::Json;
-use chrono::{naive::serde::ts_seconds_option, Duration, NaiveDateTime, Utc};
-use derive_more::derive::{Constructor, Debug};
+use chrono::{Duration, NaiveDateTime, Utc};
 use hex::FromHex;
-use serde::{Deserialize, Serialize};
-use std::ops::DerefMut;
-use utoipa::{IntoResponses, ToSchema};
 use uuid::Uuid;
-use validator::Validate;
 
 use crate::{
-  auth::{AuthSecurity, Password, Token, API_KEY},
-  database::{entities::User, Pool},
+  auth::{AuthSecurity, Token, API_KEY},
+  database::Pool,
   error::{
     AlreadyExistsErrorMessage, BadRequestErrorMessage, InternalServerErrorMessage,
     UnauthorizedErrorMessage,
   },
-  impl_json_response, utils, ApiError, ApiResult,
+  schemas::{AuthData, AuthResponse, User},
+  ApiError, ApiResult,
 };
-
-#[derive(Debug, Serialize, Constructor, IntoResponses)]
-#[response(status = StatusCode::OK)]
-pub struct AuthResponse {
-  user: User,
-  #[debug(skip)]
-  token: Token,
-  #[serde(with = "ts_seconds_option")]
-  expires: Option<NaiveDateTime>,
-}
-impl_json_response!(AuthResponse);
-
-#[derive(Debug, Deserialize, Validate, ToSchema)]
-pub struct AuthData {
-  #[validate(length(min = 1))]
-  #[serde(deserialize_with = "utils::trim_string")]
-  username: String,
-  #[debug(skip)]
-  #[validate(nested)]
-  #[serde(flatten)]
-  password: Password,
-  remember: bool,
-}
 
 #[utoipa::path(
   responses(
@@ -69,10 +42,10 @@ pub async fn register(Json(auth_ata): Json<AuthData>, pool: Pool) -> ApiResult<A
     username,
     password.hash()?
   )
-  .fetch_one(tx.deref_mut())
+  .fetch_one(&mut *tx)
   .await?;
 
-  let (token, expires) = create_session(tx.deref_mut(), &user.user_id, remember).await?;
+  let (token, expires) = create_session(&mut tx, &user.user_id, remember).await?;
 
   tx.commit().await?;
 
@@ -101,12 +74,12 @@ pub async fn login(Json(auth_ata): Json<AuthData>, pool: Pool) -> ApiResult<Auth
   let mut tx = pool.begin().await?;
 
   let user = sqlx::query_as!(User, "SELECT * FROM users WHERE username = $1", username)
-    .fetch_one(tx.deref_mut())
+    .fetch_one(&mut *tx)
     .await?;
 
   password.verify(&user.password)?;
 
-  let (token, expires) = create_session(tx.deref_mut(), &user.user_id, remember).await?;
+  let (token, expires) = create_session(&mut tx, &user.user_id, remember).await?;
 
   tx.commit().await?;
 

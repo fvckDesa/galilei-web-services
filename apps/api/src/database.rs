@@ -5,8 +5,6 @@ use sqlx::{
   postgres::{PgPool, PgPoolOptions},
 };
 
-pub mod entities;
-
 pub type Pool = Data<PgPool>;
 
 pub static MIGRATOR: Migrator = sqlx::migrate!("./migrations");

@@ -1,42 +1,33 @@
 use actix_web::{
-  delete, get, post, put,
+  delete, get, patch, post,
   web::{Path, ServiceConfig},
 };
 use actix_web_validator::Json;
-use serde::{Deserialize, Serialize};
-use utoipa::{IntoResponses, ToSchema};
 use uuid::Uuid;
-use validator::Validate;
 
 use crate::{
-  database::entities,
+  auth::UserId,
+  database::Pool,
   error::{
     AlreadyExistsErrorMessage, BadRequestErrorMessage, InternalServerErrorMessage,
     NotFoundErrorMessage, UnauthorizedErrorMessage,
   },
-  impl_json_response, ApiResult,
+  schemas::{PartialProjectSchema, Project, ProjectSchema, ProjectsList},
+  ApiResult,
 };
-
-#[derive(Debug, Default, Serialize, IntoResponses)]
-#[response(status = OK)]
-struct Project(#[to_schema] entities::Project);
-impl_json_response!(Project);
-
-#[derive(Debug, Default, Serialize, IntoResponses)]
-#[response(status = OK)]
-struct ProjectsList(#[to_schema] Vec<entities::Project>);
-impl_json_response!(ProjectsList);
 
 #[utoipa::path(responses(ProjectsList, UnauthorizedErrorMessage, InternalServerErrorMessage))]
 #[get("/projects")]
-pub async fn list_projects() -> ApiResult<ProjectsList> {
-  Ok(ProjectsList::default())
-}
+pub async fn list_projects(pool: Pool, user_id: UserId) -> ApiResult<ProjectsList> {
+  let projects = sqlx::query_as!(
+    Project,
+    "SELECT * FROM projects WHERE user_id = $1",
+    *user_id
+  )
+  .fetch_all(&**pool)
+  .await?;
 
-#[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
-pub struct ProjectSpec {
-  #[validate(length(min = 1))]
-  name: String,
+  Ok(ProjectsList::from(projects))
 }
 
 #[utoipa::path(responses(
@@ -47,8 +38,21 @@ pub struct ProjectSpec {
   InternalServerErrorMessage
 ))]
 #[post("/projects")]
-pub async fn create_project(Json(_spec): Json<ProjectSpec>) -> ApiResult<Project> {
-  Ok(Project::default())
+pub async fn create_project(
+  Json(project): Json<ProjectSchema>,
+  pool: Pool,
+  user_id: UserId,
+) -> ApiResult<Project> {
+  let new_project = sqlx::query_as!(
+    Project,
+    "INSERT INTO projects(project_name, user_id) VALUES ($1, $2) RETURNING *",
+    project.name,
+    *user_id
+  )
+  .fetch_one(&**pool)
+  .await?;
+
+  Ok(new_project)
 }
 
 #[utoipa::path(responses(
@@ -58,8 +62,16 @@ pub async fn create_project(Json(_spec): Json<ProjectSpec>) -> ApiResult<Project
   InternalServerErrorMessage
 ))]
 #[get("/projects/{project_id}")]
-pub async fn get_project(_project_id: Path<Uuid>) -> ApiResult<Project> {
-  Ok(Project::default())
+pub async fn get_project(project_id: Path<Uuid>, pool: Pool) -> ApiResult<Project> {
+  let project = sqlx::query_as!(
+    Project,
+    "SELECT * FROM projects WHERE project_id = $1",
+    *project_id
+  )
+  .fetch_one(&**pool)
+  .await?;
+
+  Ok(project)
 }
 
 #[utoipa::path(responses(
@@ -70,12 +82,22 @@ pub async fn get_project(_project_id: Path<Uuid>) -> ApiResult<Project> {
   UnauthorizedErrorMessage,
   InternalServerErrorMessage
 ))]
-#[put("/projects/{project_id}")]
+#[patch("/projects/{project_id}")]
 pub async fn update_project(
-  _project_id: Path<Uuid>,
-  Json(_project): Json<ProjectSpec>,
+  project_id: Path<Uuid>,
+  Json(project): Json<PartialProjectSchema>,
+  pool: Pool,
 ) -> ApiResult<Project> {
-  Ok(Project::default())
+  let project = sqlx::query_as!(
+    Project,
+    "UPDATE projects SET project_name = COALESCE($1, project_name) WHERE project_id = $2 RETURNING *",
+    project.name,
+    *project_id
+  )
+  .fetch_one(&**pool)
+  .await?;
+
+  Ok(project)
 }
 
 #[utoipa::path(responses(
@@ -85,8 +107,16 @@ pub async fn update_project(
   InternalServerErrorMessage
 ))]
 #[delete("/projects/{project_id}")]
-pub async fn delete_project(_project_id: Path<Uuid>) -> ApiResult<Project> {
-  Ok(Project::default())
+pub async fn delete_project(project_id: Path<Uuid>, pool: Pool) -> ApiResult<Project> {
+  let project = sqlx::query_as!(
+    Project,
+    "DELETE FROM projects WHERE project_id = $1 RETURNING *",
+    *project_id
+  )
+  .fetch_one(&**pool)
+  .await?;
+
+  Ok(project)
 }
 
 pub fn config(cfg: &mut ServiceConfig) {

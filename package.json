@@ -12,6 +12,7 @@
     "start": "turbo run start",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
+    "test": "turbo run test",
     "lint:root": "eslint ./scripts/*.ts --max-warnings 0 --cache",
     "lint:fix:root": "eslint ./scripts/*.ts --max-warnings 0 --cache --fix",
     "fmt": "prettier --ignore-unknown --cache --write . && cargo fmt",

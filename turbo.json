@@ -18,7 +18,7 @@
       ]
     },
     "start": {
-      "dependsOn": ["build", "//#setup-dev"],
+      "dependsOn": ["^build", "//#setup-dev"],
       "persistent": true,
       "cache": false
     },
@@ -30,6 +30,7 @@
       "dependsOn": ["//#lint:fix:root"],
       "outputs": [".eslintcache"]
     },
+    "test": {},
     "//#setup-dev": {},
     "//#lint:root": {
       "outputs": [".eslintcache"]

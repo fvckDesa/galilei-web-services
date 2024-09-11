@@ -8,6 +8,7 @@
     "build": "cargo build --release",
     "start": "cargo run --release",
     "lint": "cargo clippy -- -D warnings",
-    "lint:fix": "cargo clippy -- -D warnings"
+    "lint:fix": "cargo clippy -- -D warnings",
+    "test": "cargo test"
   }
 }

@@ -7,3 +7,9 @@ pre-commit:
     fmt:
       glob: "*"
       run: pnpm fmt
+
+pre-push:
+  commands:
+    test:
+      glob: "*.{ts,tsx,rs}"
+      run: pnpm test

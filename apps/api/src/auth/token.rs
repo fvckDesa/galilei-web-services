@@ -1,6 +1,7 @@
+use derive_more::derive::{AsRef, Display};
 use getrandom::getrandom;
 use hex::FromHex;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use utoipa::ToSchema;
 
@@ -8,10 +9,15 @@ use crate::utils;
 
 use super::{AuthError, AuthResult, AuthSecurity};
 
-#[derive(Serialize, ToSchema)]
-#[serde(transparent)]
+#[derive(AsRef, Display, Serialize, Deserialize, ToSchema)]
+#[as_ref([u8])]
+#[display("{}", hex::encode(_0))]
 #[schema(value_type = String)]
-pub struct Token(#[serde(serialize_with = "utils::as_hex")] [u8; Self::LENGTH]);
+pub struct Token(
+  #[serde(deserialize_with = "utils::from_hex")]
+  #[serde(serialize_with = "utils::as_hex")]
+  [u8; Self::LENGTH],
+);
 
 impl Token {
   const LENGTH: usize = 32;

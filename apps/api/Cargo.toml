@@ -30,3 +30,6 @@ argon2 = { version = "0.5.3", features = ["std"] }
 sha2 = "0.10.8"
 getrandom = "0.2.15"
 hex = "0.4.3"
+
+[dev-dependencies]
+fake = { version = "2.9.2", features = ["derive", "chrono", "uuid"] }

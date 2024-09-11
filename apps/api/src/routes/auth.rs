@@ -15,7 +15,10 @@ use crate::{
   ApiError, ApiResult,
 };
 
+const CONTEXT: &str = "/auth";
+
 #[utoipa::path(
+  context_path = CONTEXT,
   responses(
     AuthResponse,
     BadRequestErrorMessage,
@@ -26,7 +29,7 @@ use crate::{
     () // api key not required
   )
 )]
-#[post("/auth/register")]
+#[post("/register/")]
 pub async fn register(Json(auth_ata): Json<AuthData>, pool: Pool) -> ApiResult<AuthResponse> {
   let AuthData {
     username,
@@ -53,6 +56,7 @@ pub async fn register(Json(auth_ata): Json<AuthData>, pool: Pool) -> ApiResult<A
 }
 
 #[utoipa::path(
+  context_path = CONTEXT,
   responses(
     AuthResponse,
     BadRequestErrorMessage,
@@ -63,7 +67,7 @@ pub async fn register(Json(auth_ata): Json<AuthData>, pool: Pool) -> ApiResult<A
     () // api key not required
   )
 )]
-#[post("/auth/login")]
+#[post("/login/")]
 pub async fn login(Json(auth_ata): Json<AuthData>, pool: Pool) -> ApiResult<AuthResponse> {
   let AuthData {
     username,
@@ -74,8 +78,9 @@ pub async fn login(Json(auth_ata): Json<AuthData>, pool: Pool) -> ApiResult<Auth
   let mut tx = pool.begin().await?;
 
   let user = sqlx::query_as!(User, "SELECT * FROM users WHERE username = $1", username)
-    .fetch_one(&mut *tx)
-    .await?;
+    .fetch_optional(&mut *tx)
+    .await?
+    .ok_or(ApiError::Unauthorized)?;
 
   password.verify(&user.password)?;
 
@@ -89,7 +94,7 @@ pub async fn login(Json(auth_ata): Json<AuthData>, pool: Pool) -> ApiResult<Auth
 #[utoipa::path(
   responses((status = NO_CONTENT), BadRequestErrorMessage, UnauthorizedErrorMessage, InternalServerErrorMessage)
 )]
-#[post("/auth/logout")]
+#[post("/logout/")]
 pub async fn logout(req: HttpRequest, pool: Pool) -> ApiResult<HttpResponse> {
   let api_key = req.headers().get(API_KEY);
 

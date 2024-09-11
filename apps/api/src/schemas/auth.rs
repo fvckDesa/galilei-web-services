@@ -10,7 +10,7 @@ use crate::{
   impl_json_response, utils,
 };
 
-#[derive(Debug, Serialize, ToSchema)]
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct User {
   #[serde(rename = "id")]
   pub user_id: Uuid,
@@ -31,14 +31,14 @@ pub struct Session {
   pub user_id: Uuid,
 }
 
-#[derive(Debug, Serialize, Constructor, IntoResponses)]
+#[derive(Debug, Serialize, Deserialize, Constructor, IntoResponses)]
 #[response(status = StatusCode::OK)]
 pub struct AuthResponse {
-  user: User,
+  pub user: User,
   #[debug(skip)]
-  token: Token,
+  pub token: Token,
   #[serde(with = "ts_seconds_option")]
-  expires: Option<NaiveDateTime>,
+  pub expires: Option<NaiveDateTime>,
 }
 impl_json_response!(AuthResponse);
 

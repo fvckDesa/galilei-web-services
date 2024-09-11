@@ -3,7 +3,7 @@ use argon2::{
   Argon2, PasswordHash, PasswordVerifier,
 };
 use confique::Config;
-use derive_more::derive::Deref;
+use derive_more::derive::{Deref, From};
 use serde::Deserialize;
 use std::sync::LazyLock;
 use utoipa::ToSchema;
@@ -32,7 +32,8 @@ static ARGON: LazyLock<Argon2<'static>> = LazyLock::new(|| {
   .unwrap()
 });
 
-#[derive(Deref, Deserialize, Validate, ToSchema)]
+#[derive(Deref, From, Deserialize, Validate, ToSchema)]
+#[from(String, &str)]
 pub struct Password {
   #[deref]
   #[serde(rename = "password", deserialize_with = "utils::trim_string")]
@@ -42,7 +43,10 @@ pub struct Password {
 
 impl From<password_hash::Error> for AuthError {
   fn from(err: password_hash::Error) -> Self {
-    AuthError::Other(Box::new(err))
+    match err {
+      password_hash::Error::Password => AuthError::Invalid,
+      err => AuthError::Other(Box::new(err)),
+    }
   }
 }
 

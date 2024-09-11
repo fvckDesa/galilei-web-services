@@ -10,7 +10,8 @@ pub(crate) mod utils;
 
 pub mod schemas;
 
-pub use app::AppConfig;
-pub use database::DatabaseConfig;
+pub use app::{create_app, AppConfig};
+pub use auth::{AuthSecurity, Password, Token, API_KEY};
+pub use database::{DatabaseConfig, MIGRATOR};
 pub use error::{ApiError, ApiResult};
 pub use openapi::OpenApiSpec;

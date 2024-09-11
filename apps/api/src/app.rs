@@ -39,7 +39,7 @@ pub fn create_app(
     .app_data(JsonConfig::default().error_handler(|err, _| ApiError::from(err).into()))
     .app_data(Data::new(pool))
     .wrap(NormalizePath::new(middleware::TrailingSlash::Always))
-    .configure(auth_routes::config)
+    .service(web::scope("/auth").configure(auth_routes::config))
     .service(
       web::scope("/projects")
         .wrap(middleware::from_fn(session_middleware))

@@ -2,6 +2,7 @@
   "extends": ["//"],
   "tasks": {
     "gen": {
+      "dependsOn": ["build"],
       "outputs": ["openapi.yaml"]
     }
   }

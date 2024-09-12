@@ -8,3 +8,4 @@ api = { path = "../../apps/api" }
 clap = { version = "4.5.17", features = ["derive"] }
 utoipa = { workspace = true }
 anyhow = { workspace = true }
+oas3 = "0.10.0"

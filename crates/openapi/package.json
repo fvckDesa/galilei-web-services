@@ -1,0 +1,19 @@
+{
+  "name": "@gws/openapi",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    "./openapi.json": "./openapi.json"
+  },
+  "scripts": {
+    "gen": "cargo run --release -- --format json --output openapi.json",
+    "build": "cargo build --release",
+    "lint": "cargo clippy -- -D warnings",
+    "lint:fix": "cargo clippy -- -D warnings"
+  },
+  "dependencies": {
+    "api": "workspace:*"
+  }
+}

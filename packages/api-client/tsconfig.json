@@ -1,0 +1,10 @@
+{
+  "extends": "@gws/tsconfig/base.json",
+  "compilerOptions": {
+    "outDir": "build",
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "exclude": ["node_modules", "build"]
+}

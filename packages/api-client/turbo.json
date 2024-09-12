@@ -1,0 +1,12 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["gen"]
+    },
+    "gen": {
+      "dependsOn": ["@gws/openapi#gen"],
+      "outputs": ["client.ts"]
+    }
+  }
+}

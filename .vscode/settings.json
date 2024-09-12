@@ -12,6 +12,7 @@
   "turbo.useLocalTurbo": true,
   "cSpell.words": [
     "actix",
+    "apidevtools",
     "chrono",
     "clippy",
     "confique",
@@ -21,7 +22,9 @@
     "openapi",
     "schemars",
     "sqlx",
-    "utoipa"
+    "tailwindcss",
+    "utoipa",
+    "zodios"
   ],
   "[toml]": {
     "editor.defaultFormatter": "tamasfe.even-better-toml"

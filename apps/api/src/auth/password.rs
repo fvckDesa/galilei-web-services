@@ -37,6 +37,7 @@ static ARGON: LazyLock<Argon2<'static>> = LazyLock::new(|| {
 pub struct Password {
   #[deref]
   #[serde(rename = "password", deserialize_with = "utils::trim_string")]
+  #[schema(min_length = 1)]
   #[validate(length(min = 1))]
   value: String,
 }

@@ -44,10 +44,12 @@ impl_json_response!(AuthResponse);
 
 #[derive(Debug, Deserialize, Validate, ToSchema)]
 pub struct AuthData {
+  #[schema(min_length = 1)]
   #[validate(length(min = 1))]
   #[serde(deserialize_with = "utils::trim_string")]
   pub username: String,
   #[debug(skip)]
+  #[schema(format = Password)]
   #[validate(nested)]
   #[serde(flatten)]
   pub password: Password,

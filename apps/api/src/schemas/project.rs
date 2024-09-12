@@ -32,6 +32,7 @@ partial_schema! {
   PartialProjectSchema,
   #[derive(Debug, Deserialize, Validate, ToSchema)]
   pub struct ProjectSchema {
+    #[schema(min_length = 1)]
     #[validate(length(min = 1))]
     pub name: String,
   }

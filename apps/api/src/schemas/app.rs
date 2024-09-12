@@ -36,12 +36,16 @@ partial_schema! {
   PartialAppServiceSchema,
   #[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
   pub struct AppServiceSchema {
+    #[schema(min_length = 1)]
     #[validate(length(min = 1))]
     pub name: String,
+    #[schema(minimum = 0)]
     #[validate(range(min = 0))]
     pub replicas: i32,
+    #[schema(min_length = 1)]
     #[validate(length(min = 1))]
     pub image: String,
+    #[schema(minimum = 1, maximum = 65535)]
     #[validate(range(min = 1, max = 65535))]
     pub port: i32,
   }

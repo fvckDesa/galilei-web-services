@@ -1,5 +1,5 @@
 {
-  "extends": "@gws/tsconfig/base.json",
+  "extends": "@gws/tsconfig/pack.json",
   "compilerOptions": {
     "outDir": "build",
     "paths": {

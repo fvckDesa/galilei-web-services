@@ -8,14 +8,13 @@
   "types": "./build/client.d.ts",
   "scripts": {
     "gen": "tsx ./bin/gen.ts",
-    "build": "tsc --declaration"
+    "build": "tsc"
   },
   "dependencies": {
     "@zodios/core": "^10.9.6",
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@gws/eslint-config": "workspace:*",
     "@gws/openapi": "workspace:*",
     "@gws/tsconfig": "workspace:*",
     "@types/node": "^20",

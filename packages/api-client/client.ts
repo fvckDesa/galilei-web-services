@@ -43,19 +43,6 @@ export const PartialAppServiceSchema = z
   .partial();
 export type PartialAppServiceSchema = z.infer<typeof PartialAppServiceSchema>;
 
-export const schemas = {
-  Password,
-  AuthData,
-  Token,
-  User,
-  ApiError,
-  ErrorMessage,
-  ProjectSchema,
-  PartialProjectSchema,
-  AppServiceSchema,
-  PartialAppServiceSchema,
-};
-
 const endpoints = makeApi([
   {
     method: "post",

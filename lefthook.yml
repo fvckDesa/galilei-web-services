@@ -13,6 +13,3 @@ pre-push:
     test:
       glob: "*.{ts,tsx,rs}"
       run: pnpm test
-    gen:
-      glob: "apps/api/**/*"
-      run: pnpm gen

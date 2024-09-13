@@ -5,7 +5,7 @@
       "dependsOn": ["gen"]
     },
     "gen": {
-      "dependsOn": ["^gen"],
+      "dependsOn": ["@gws/openapi#gen"],
       "outputs": ["client.ts"]
     }
   }

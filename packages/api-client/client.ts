@@ -1,10 +1,10 @@
 import { makeApi, Zodios, type ZodiosOptions } from "@zodios/core";
 import { z } from "zod";
 
-export const Password = z.object({ password: z.string() });
+export const Password = z.object({ password: z.string().min(1) });
 export type Password = z.infer<typeof Password>;
 export const AuthData = Password.and(
-  z.object({ remember: z.boolean(), username: z.string() })
+  z.object({ remember: z.boolean(), username: z.string().min(1) })
 );
 export type AuthData = z.infer<typeof AuthData>;
 export const Token = z.string();
@@ -22,23 +22,25 @@ export const ApiError = z.union([
 export type ApiError = z.infer<typeof ApiError>;
 export const ErrorMessage = ApiError.and(z.object({ message: z.string() }));
 export type ErrorMessage = z.infer<typeof ErrorMessage>;
-export const ProjectSchema = z.object({ name: z.string() });
+export const ProjectSchema = z.object({ name: z.string().min(1) });
 export type ProjectSchema = z.infer<typeof ProjectSchema>;
-export const PartialProjectSchema = z.object({ name: z.string() }).partial();
+export const PartialProjectSchema = z
+  .object({ name: z.string().min(1) })
+  .partial();
 export type PartialProjectSchema = z.infer<typeof PartialProjectSchema>;
 export const AppServiceSchema = z.object({
-  image: z.string(),
-  name: z.string(),
-  port: z.number().int(),
-  replicas: z.number().int(),
+  image: z.string().min(1),
+  name: z.string().min(1),
+  port: z.number().int().gte(1).lte(65535),
+  replicas: z.number().int().gte(0),
 });
 export type AppServiceSchema = z.infer<typeof AppServiceSchema>;
 export const PartialAppServiceSchema = z
   .object({
-    image: z.string(),
-    name: z.string(),
-    port: z.number().int(),
-    replicas: z.number().int(),
+    image: z.string().min(1),
+    name: z.string().min(1),
+    port: z.number().int().gte(1).lte(65535),
+    replicas: z.number().int().gte(0),
   })
   .partial();
 export type PartialAppServiceSchema = z.infer<typeof PartialAppServiceSchema>;
@@ -128,7 +130,7 @@ const endpoints = makeApi([
       {
         name: "body",
         type: "Body",
-        schema: z.object({ name: z.string() }),
+        schema: z.object({ name: z.string().min(1) }),
       },
     ],
     response: z.object({
@@ -213,7 +215,7 @@ const endpoints = makeApi([
       {
         name: "body",
         type: "Body",
-        schema: z.object({ name: z.string() }).partial(),
+        schema: z.object({ name: z.string().min(1) }).partial(),
       },
       {
         name: "project_id",

@@ -3,17 +3,17 @@ import { z } from "zod";
 
 {{#each schemas}}
 export const {{@key}} = {{{this}}};
-export type {{@key}} = z.infer<typeof {{@key}}>;
+export type T{{@key}} = z.infer<typeof {{@key}}>;
 {{/each}}
 
-const endpoints = makeApi([
+export const endpoints = makeApi([
 {{#each endpoints}}
 	{
 		method: "{{method}}",
 		path: "{{path}}",
 		{{#if @root.options.withAlias}}
 		{{#if alias}}
-		alias: "{{alias}}",
+		alias: "{{toCamelCase alias}}",
 		{{/if}}
 		{{/if}}
 		{{#if description}}

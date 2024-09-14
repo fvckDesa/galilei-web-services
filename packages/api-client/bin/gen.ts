@@ -10,6 +10,7 @@ try {
     options: {
       shouldExportAllSchemas: true,
       additionalPropertiesDefaultValue: false,
+      withAlias: true,
     },
   });
 

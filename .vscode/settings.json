@@ -1,6 +1,9 @@
 {
   "editor.tabSize": 2,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "always"
+  },
   "files.associations": {
     "*.css": "tailwindcss"
   },
@@ -14,10 +17,15 @@
     "actix",
     "apidevtools",
     "chrono",
+    "classname",
     "clippy",
+    "clsx",
     "confique",
     "getrandom",
     "Hasher",
+    "hookform",
+    "lucide",
+    "nextjs",
     "nothrow",
     "openapi",
     "schemars",
@@ -31,5 +39,9 @@
   },
   "[sql]": {
     "editor.defaultFormatter": "inferrinizzard.prettier-sql-vscode"
-  }
+  },
+  "[xml]": {
+    "editor.defaultFormatter": "redhat.vscode-xml"
+  },
+  "eslint.workingDirectories": [{ "mode": "auto" }]
 }

@@ -1,8 +1,13 @@
+use std::env;
+
 use api::AppConfig;
 use confique::Config;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+  unsafe {
+    env::set_var("RUST_LOG", "debug");
+  }
   env_logger::init();
 
   let app_config = AppConfig::builder()

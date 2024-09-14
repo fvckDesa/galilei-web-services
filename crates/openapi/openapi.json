@@ -11,7 +11,9 @@
   "paths": {
     "/auth/login/": {
       "post": {
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "operationId": "login",
         "requestBody": {
           "description": "",
@@ -30,20 +32,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "required": ["user", "token"],
-                  "properties": {
-                    "expires": {
-                      "type": "string",
-                      "format": "date-time"
-                    },
-                    "token": {
-                      "$ref": "#/components/schemas/Token"
-                    },
-                    "user": {
-                      "$ref": "#/components/schemas/User"
-                    }
-                  }
+                  "$ref": "#/components/schemas/AuthResponse"
                 }
               }
             }
@@ -73,7 +62,9 @@
     },
     "/auth/register/": {
       "post": {
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "operationId": "register",
         "requestBody": {
           "description": "",
@@ -92,20 +83,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "required": ["user", "token"],
-                  "properties": {
-                    "expires": {
-                      "type": "string",
-                      "format": "date-time"
-                    },
-                    "token": {
-                      "$ref": "#/components/schemas/Token"
-                    },
-                    "user": {
-                      "$ref": "#/components/schemas/User"
-                    }
-                  }
+                  "$ref": "#/components/schemas/AuthResponse"
                 }
               }
             }
@@ -145,7 +123,9 @@
     },
     "/projects/": {
       "get": {
-        "tags": ["project"],
+        "tags": [
+          "project"
+        ],
         "operationId": "list_projects",
         "responses": {
           "200": {
@@ -156,7 +136,11 @@
                   "type": "array",
                   "items": {
                     "type": "object",
-                    "required": ["id", "name", "userId"],
+                    "required": [
+                      "id",
+                      "name",
+                      "userId"
+                    ],
                     "properties": {
                       "id": {
                         "type": "string",
@@ -188,7 +172,9 @@
         }
       },
       "post": {
-        "tags": ["project"],
+        "tags": [
+          "project"
+        ],
         "operationId": "create_project",
         "requestBody": {
           "description": "",
@@ -208,7 +194,11 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["id", "name", "userId"],
+                  "required": [
+                    "id",
+                    "name",
+                    "userId"
+                  ],
                   "properties": {
                     "id": {
                       "type": "string",
@@ -261,7 +251,9 @@
     },
     "/projects/{project_id}/": {
       "get": {
-        "tags": ["project"],
+        "tags": [
+          "project"
+        ],
         "operationId": "get_project",
         "parameters": [
           {
@@ -281,7 +273,11 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["id", "name", "userId"],
+                  "required": [
+                    "id",
+                    "name",
+                    "userId"
+                  ],
                   "properties": {
                     "id": {
                       "type": "string",
@@ -322,7 +318,9 @@
         }
       },
       "delete": {
-        "tags": ["project"],
+        "tags": [
+          "project"
+        ],
         "operationId": "delete_project",
         "parameters": [
           {
@@ -342,7 +340,11 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["id", "name", "userId"],
+                  "required": [
+                    "id",
+                    "name",
+                    "userId"
+                  ],
                   "properties": {
                     "id": {
                       "type": "string",
@@ -383,7 +385,9 @@
         }
       },
       "patch": {
-        "tags": ["project"],
+        "tags": [
+          "project"
+        ],
         "operationId": "update_project",
         "parameters": [
           {
@@ -414,7 +418,11 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["id", "name", "userId"],
+                  "required": [
+                    "id",
+                    "name",
+                    "userId"
+                  ],
                   "properties": {
                     "id": {
                       "type": "string",
@@ -477,7 +485,9 @@
     },
     "/projects/{project_id}/apps": {
       "get": {
-        "tags": ["app"],
+        "tags": [
+          "app"
+        ],
         "operationId": "list_apps",
         "parameters": [
           {
@@ -559,7 +569,9 @@
         }
       },
       "post": {
-        "tags": ["app"],
+        "tags": [
+          "app"
+        ],
         "operationId": "create_app",
         "parameters": [
           {
@@ -671,7 +683,9 @@
     },
     "/projects/{project_id}/apps/{app_id}": {
       "get": {
-        "tags": ["app"],
+        "tags": [
+          "app"
+        ],
         "operationId": "get_app",
         "parameters": [
           {
@@ -759,7 +773,9 @@
         }
       },
       "delete": {
-        "tags": ["app"],
+        "tags": [
+          "app"
+        ],
         "operationId": "delete_app",
         "parameters": [
           {
@@ -847,7 +863,9 @@
         }
       },
       "patch": {
-        "tags": ["app"],
+        "tags": [
+          "app"
+        ],
         "operationId": "update_app",
         "parameters": [
           {
@@ -973,61 +991,85 @@
         "oneOf": [
           {
             "type": "object",
-            "required": ["kind"],
+            "required": [
+              "kind"
+            ],
             "properties": {
               "kind": {
                 "type": "string",
-                "enum": ["BadRequest"]
+                "enum": [
+                  "BadRequest"
+                ]
               }
             }
           },
           {
             "type": "object",
-            "required": ["kind"],
+            "required": [
+              "kind"
+            ],
             "properties": {
               "kind": {
                 "type": "string",
-                "enum": ["Validation"]
+                "enum": [
+                  "Validation"
+                ]
               }
             }
           },
           {
             "type": "object",
-            "required": ["kind"],
+            "required": [
+              "kind"
+            ],
             "properties": {
               "kind": {
                 "type": "string",
-                "enum": ["AlreadyExists"]
+                "enum": [
+                  "AlreadyExists"
+                ]
               }
             }
           },
           {
             "type": "object",
-            "required": ["kind"],
+            "required": [
+              "kind"
+            ],
             "properties": {
               "kind": {
                 "type": "string",
-                "enum": ["NotFound"]
+                "enum": [
+                  "NotFound"
+                ]
               }
             }
           },
           {
             "type": "object",
-            "required": ["kind"],
+            "required": [
+              "kind"
+            ],
             "properties": {
               "kind": {
                 "type": "string",
-                "enum": ["Unauthorized"]
+                "enum": [
+                  "Unauthorized"
+                ]
               }
             }
           },
           {
             "type": "object",
-            "required": ["kind"],
+            "required": [
+              "kind"
+            ],
             "properties": {
               "kind": {
                 "type": "string",
-                "enum": ["InternalError"]
+                "enum": [
+                  "InternalError"
+                ]
               }
             }
           }
@@ -1035,7 +1077,12 @@
       },
       "AppServiceSchema": {
         "type": "object",
-        "required": ["name", "replicas", "image", "port"],
+        "required": [
+          "name",
+          "replicas",
+          "image",
+          "port"
+        ],
         "properties": {
           "image": {
             "type": "string",
@@ -1065,7 +1112,10 @@
           },
           {
             "type": "object",
-            "required": ["username", "remember"],
+            "required": [
+              "username",
+              "remember"
+            ],
             "properties": {
               "remember": {
                 "type": "boolean"
@@ -1078,6 +1128,26 @@
           }
         ]
       },
+      "AuthResponse": {
+        "type": "object",
+        "required": [
+          "user",
+          "token",
+          "expires"
+        ],
+        "properties": {
+          "expires": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "token": {
+            "$ref": "#/components/schemas/Token"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          }
+        }
+      },
       "ErrorMessage": {
         "allOf": [
           {
@@ -1085,7 +1155,9 @@
           },
           {
             "type": "object",
-            "required": ["message"],
+            "required": [
+              "message"
+            ],
             "properties": {
               "message": {
                 "type": "string"
@@ -1129,7 +1201,9 @@
       },
       "Password": {
         "type": "object",
-        "required": ["password"],
+        "required": [
+          "password"
+        ],
         "properties": {
           "password": {
             "type": "string",
@@ -1139,7 +1213,9 @@
       },
       "ProjectSchema": {
         "type": "object",
-        "required": ["name"],
+        "required": [
+          "name"
+        ],
         "properties": {
           "name": {
             "type": "string",
@@ -1152,7 +1228,10 @@
       },
       "User": {
         "type": "object",
-        "required": ["id", "username"],
+        "required": [
+          "id",
+          "username"
+        ],
         "properties": {
           "id": {
             "type": "string",

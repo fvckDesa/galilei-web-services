@@ -33,6 +33,7 @@ use utoipa::OpenApi;
     Token,
     schemas::User,
     schemas::AuthData,
+    schemas::AuthResponse,
     schemas::ProjectSchema,
     schemas::PartialProjectSchema,
     schemas::AppServiceSchema,

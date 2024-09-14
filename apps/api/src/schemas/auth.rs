@@ -1,7 +1,7 @@
-use chrono::{naive::serde::ts_seconds_option, NaiveDateTime};
+use chrono::{naive::serde::ts_milliseconds_option, NaiveDateTime};
 use derive_more::derive::{Constructor, Debug};
 use serde::{Deserialize, Serialize};
-use utoipa::{IntoResponses, ToSchema};
+use utoipa::ToSchema;
 use uuid::Uuid;
 use validator::Validate;
 
@@ -31,13 +31,13 @@ pub struct Session {
   pub user_id: Uuid,
 }
 
-#[derive(Debug, Serialize, Deserialize, Constructor, IntoResponses)]
-#[response(status = StatusCode::OK)]
+#[derive(Debug, Serialize, Deserialize, Constructor, ToSchema)]
 pub struct AuthResponse {
   pub user: User,
   #[debug(skip)]
   pub token: Token,
-  #[serde(with = "ts_seconds_option")]
+  #[serde(with = "ts_milliseconds_option")]
+  #[schema(value_type = i64)]
   pub expires: Option<NaiveDateTime>,
 }
 impl_json_response!(AuthResponse);

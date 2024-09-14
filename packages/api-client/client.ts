@@ -2,15 +2,21 @@ import { makeApi, Zodios, type ZodiosOptions } from "@zodios/core";
 import { z } from "zod";
 
 export const Password = z.object({ password: z.string().min(1) });
-export type Password = z.infer<typeof Password>;
+export type TPassword = z.infer<typeof Password>;
 export const AuthData = Password.and(
   z.object({ remember: z.boolean(), username: z.string().min(1) })
 );
-export type AuthData = z.infer<typeof AuthData>;
+export type TAuthData = z.infer<typeof AuthData>;
 export const Token = z.string();
-export type Token = z.infer<typeof Token>;
+export type TToken = z.infer<typeof Token>;
 export const User = z.object({ id: z.string().uuid(), username: z.string() });
-export type User = z.infer<typeof User>;
+export type TUser = z.infer<typeof User>;
+export const AuthResponse = z.object({
+  expires: z.number().int(),
+  token: Token,
+  user: User,
+});
+export type TAuthResponse = z.infer<typeof AuthResponse>;
 export const ApiError = z.union([
   z.object({ kind: z.literal("BadRequest") }),
   z.object({ kind: z.literal("Validation") }),
@@ -19,22 +25,22 @@ export const ApiError = z.union([
   z.object({ kind: z.literal("Unauthorized") }),
   z.object({ kind: z.literal("InternalError") }),
 ]);
-export type ApiError = z.infer<typeof ApiError>;
+export type TApiError = z.infer<typeof ApiError>;
 export const ErrorMessage = ApiError.and(z.object({ message: z.string() }));
-export type ErrorMessage = z.infer<typeof ErrorMessage>;
+export type TErrorMessage = z.infer<typeof ErrorMessage>;
 export const ProjectSchema = z.object({ name: z.string().min(1) });
-export type ProjectSchema = z.infer<typeof ProjectSchema>;
+export type TProjectSchema = z.infer<typeof ProjectSchema>;
 export const PartialProjectSchema = z
   .object({ name: z.string().min(1) })
   .partial();
-export type PartialProjectSchema = z.infer<typeof PartialProjectSchema>;
+export type TPartialProjectSchema = z.infer<typeof PartialProjectSchema>;
 export const AppServiceSchema = z.object({
   image: z.string().min(1),
   name: z.string().min(1),
   port: z.number().int().gte(1).lte(65535),
   replicas: z.number().int().gte(0),
 });
-export type AppServiceSchema = z.infer<typeof AppServiceSchema>;
+export type TAppServiceSchema = z.infer<typeof AppServiceSchema>;
 export const PartialAppServiceSchema = z
   .object({
     image: z.string().min(1),
@@ -43,12 +49,13 @@ export const PartialAppServiceSchema = z
     replicas: z.number().int().gte(0),
   })
   .partial();
-export type PartialAppServiceSchema = z.infer<typeof PartialAppServiceSchema>;
+export type TPartialAppServiceSchema = z.infer<typeof PartialAppServiceSchema>;
 
-const endpoints = makeApi([
+export const endpoints = makeApi([
   {
     method: "post",
     path: "/auth/login/",
+    alias: "login",
     requestFormat: "json",
     parameters: [
       {
@@ -57,11 +64,7 @@ const endpoints = makeApi([
         schema: AuthData,
       },
     ],
-    response: z.object({
-      expires: z.string().datetime({ offset: true }).optional(),
-      token: Token,
-      user: User,
-    }),
+    response: AuthResponse,
     errors: [
       {
         status: 400,
@@ -76,6 +79,7 @@ const endpoints = makeApi([
   {
     method: "post",
     path: "/auth/register/",
+    alias: "register",
     requestFormat: "json",
     parameters: [
       {
@@ -84,11 +88,7 @@ const endpoints = makeApi([
         schema: AuthData,
       },
     ],
-    response: z.object({
-      expires: z.string().datetime({ offset: true }).optional(),
-      token: Token,
-      user: User,
-    }),
+    response: AuthResponse,
     errors: [
       {
         status: 400,
@@ -107,6 +107,7 @@ const endpoints = makeApi([
   {
     method: "get",
     path: "/projects/",
+    alias: "listProjects",
     requestFormat: "json",
     response: z.array(
       z.object({
@@ -125,6 +126,7 @@ const endpoints = makeApi([
   {
     method: "post",
     path: "/projects/",
+    alias: "createProject",
     requestFormat: "json",
     parameters: [
       {
@@ -156,6 +158,7 @@ const endpoints = makeApi([
   {
     method: "get",
     path: "/projects/:project_id/",
+    alias: "getProject",
     requestFormat: "json",
     parameters: [
       {
@@ -183,6 +186,7 @@ const endpoints = makeApi([
   {
     method: "delete",
     path: "/projects/:project_id/",
+    alias: "deleteProject",
     requestFormat: "json",
     parameters: [
       {
@@ -210,6 +214,7 @@ const endpoints = makeApi([
   {
     method: "patch",
     path: "/projects/:project_id/",
+    alias: "updateProject",
     requestFormat: "json",
     parameters: [
       {
@@ -250,6 +255,7 @@ const endpoints = makeApi([
   {
     method: "get",
     path: "/projects/:project_id/apps",
+    alias: "listApps",
     requestFormat: "json",
     parameters: [
       {
@@ -282,6 +288,7 @@ const endpoints = makeApi([
   {
     method: "post",
     path: "/projects/:project_id/apps",
+    alias: "createApp",
     requestFormat: "json",
     parameters: [
       {
@@ -325,6 +332,7 @@ const endpoints = makeApi([
   {
     method: "get",
     path: "/projects/:project_id/apps/:app_id",
+    alias: "getApp",
     requestFormat: "json",
     parameters: [
       {
@@ -360,6 +368,7 @@ const endpoints = makeApi([
   {
     method: "delete",
     path: "/projects/:project_id/apps/:app_id",
+    alias: "deleteApp",
     requestFormat: "json",
     parameters: [
       {
@@ -395,6 +404,7 @@ const endpoints = makeApi([
   {
     method: "patch",
     path: "/projects/:project_id/apps/:app_id",
+    alias: "updateApp",
     requestFormat: "json",
     parameters: [
       {

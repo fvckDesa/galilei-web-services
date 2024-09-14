@@ -20,7 +20,7 @@ const CONTEXT: &str = "/auth";
 #[utoipa::path(
   context_path = CONTEXT,
   responses(
-    AuthResponse,
+    (status = 200, content_type = "application/json", body = AuthResponse),
     BadRequestErrorMessage,
     AlreadyExistsErrorMessage,
     InternalServerErrorMessage
@@ -58,7 +58,7 @@ pub async fn register(Json(auth_ata): Json<AuthData>, pool: Pool) -> ApiResult<A
 #[utoipa::path(
   context_path = CONTEXT,
   responses(
-    AuthResponse,
+    (status = 200, content_type = "application/json", body = AuthResponse),
     BadRequestErrorMessage,
     UnauthorizedErrorMessage,
     InternalServerErrorMessage
@@ -125,7 +125,7 @@ async fn create_session(
   let expires = if remember {
     None
   } else {
-    Some((Utc::now() + Duration::hours(1)).naive_utc())
+    Some(Utc::now().naive_utc() + Duration::days(1))
   };
 
   sqlx::query!(

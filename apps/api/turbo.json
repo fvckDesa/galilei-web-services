@@ -1,0 +1,14 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "env": [
+        "RUST_LOG",
+        "DATABASE_URL",
+        "SERVER_ADDRESS",
+        "SERVER_PORT",
+        "PASSWORD_SECRET"
+      ]
+    }
+  }
+}

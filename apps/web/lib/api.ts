@@ -1,9 +1,12 @@
 import { createApiClient } from "@gws/api-client";
 import { TokenCookie } from "./cookies";
 
-export const apiClient = createApiClient("http://localhost:8000", {
-  validate: "response",
-});
+export const apiClient = createApiClient(
+  process.env.API_HOST ?? "http://localhost:8000",
+  {
+    validate: "response",
+  }
+);
 
 apiClient.use({
   name: "token",

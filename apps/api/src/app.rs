@@ -18,9 +18,9 @@ use crate::{
 
 #[derive(Config)]
 pub struct AppConfig {
-  #[config(env = "APP_ADDRESS", default = "127.0.0.1")]
+  #[config(env = "SERVER_ADDRESS", default = "127.0.0.1")]
   address: IpAddr,
-  #[config(env = "APP_PORT", default = 8000)]
+  #[config(env = "SERVER_PORT", default = 8000)]
   port: u16,
 }
 

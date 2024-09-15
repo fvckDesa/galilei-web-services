@@ -1,13 +1,13 @@
-use std::env;
+use std::{env, path::Path};
 
 use api::AppConfig;
 use confique::Config;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-  unsafe {
-    env::set_var("RUST_LOG", "debug");
-  }
+  let crate_path = Path::new(env!("CARGO_MANIFEST_DIR"));
+
+  dotenv::from_path(crate_path.join(".env")).ok().unwrap();
   env_logger::init();
 
   let app_config = AppConfig::builder()

@@ -21,6 +21,7 @@
     "clippy",
     "clsx",
     "confique",
+    "dotenv",
     "getrandom",
     "Hasher",
     "hookform",

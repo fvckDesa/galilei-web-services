@@ -1,22 +1,22 @@
 "use server";
 
-import { actionClient, createErrorResult } from "@/lib/safe-action";
+import { apiActionClient, withApiResult } from "@/lib/safe-action";
 import { TokenCookie } from "@/lib/cookies";
 import { AuthData } from "@gws/api-client";
 import { redirect } from "next/navigation";
 
-export const loginAction = actionClient
-  .schema(AuthData)
-  .action(async ({ parsedInput: authData, ctx: { apiClient } }) => {
-    try {
-      const res = await apiClient.login(authData);
+export const loginAction = apiActionClient.schema(AuthData).action(
+  withApiResult({
+    alias: "login",
+    async action({ parsedInput: authData, ctx: { apiClient } }) {
+      const { token, expires } = await apiClient.login(authData);
 
       TokenCookie.set({
-        value: res.token,
-        expires: res.expires,
+        value: token,
+        expires: expires,
       });
-    } catch (error) {
-      return createErrorResult("login", error);
-    }
-    redirect("/projects");
-  });
+
+      redirect("/projects");
+    },
+  })
+);

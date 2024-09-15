@@ -1,6 +1,13 @@
 import { listUserProject } from "./action";
 
 export default async function ProjectsPage() {
-  const projects = await listUserProject();
-  return <div>{JSON.stringify(projects)}</div>;
+  const res = await listUserProject();
+
+  const { success, error } = res?.data ?? {};
+
+  if (error) {
+    throw error;
+  }
+
+  return <div>{JSON.stringify(success)}</div>;
 }

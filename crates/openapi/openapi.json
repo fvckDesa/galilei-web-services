@@ -1054,7 +1054,7 @@
       },
       "AuthResponse": {
         "type": "object",
-        "required": ["user", "token", "expires"],
+        "required": ["user", "token"],
         "properties": {
           "expires": {
             "type": "integer",

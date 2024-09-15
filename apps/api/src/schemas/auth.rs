@@ -37,7 +37,7 @@ pub struct AuthResponse {
   #[debug(skip)]
   pub token: Token,
   #[serde(with = "ts_milliseconds_option")]
-  #[schema(value_type = i64)]
+  #[schema(value_type = Option<i64>)]
   pub expires: Option<NaiveDateTime>,
 }
 impl_json_response!(AuthResponse);

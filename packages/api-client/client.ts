@@ -12,7 +12,7 @@ export type TToken = z.infer<typeof Token>;
 export const User = z.object({ id: z.string().uuid(), username: z.string() });
 export type TUser = z.infer<typeof User>;
 export const AuthResponse = z.object({
-  expires: z.number().int(),
+  expires: z.number().int().optional(),
   token: Token,
   user: User,
 });

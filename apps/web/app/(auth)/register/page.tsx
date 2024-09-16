@@ -42,10 +42,10 @@ export default function RegisterPage() {
   }
 
   useEffect(() => {
-    if (!result.data?.error) {
+    if (!result.serverError) {
       return;
     }
-    if (result.data?.error.kind === "AlreadyExists") {
+    if (result.serverError.kind === "AlreadyExists") {
       form.setError("username", {
         type: "response",
         message: "This username is unavailable. Try another.",

@@ -41,10 +41,11 @@ export default function LoginPage() {
   }
 
   useEffect(() => {
-    if (!result.data?.error) {
+    if (!result.serverError) {
       return;
     }
-    if (result.data?.error.kind === "Unauthorized") {
+
+    if (result.serverError.kind === "Unauthorized") {
       form.setError("root", {
         type: "response",
         message: "Invalid credentials",

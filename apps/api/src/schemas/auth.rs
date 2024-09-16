@@ -38,7 +38,8 @@ pub struct AuthResponse {
   pub token: Token,
   #[serde(
     with = "ts_milliseconds_option",
-    skip_serializing_if = "Option::is_none"
+    skip_serializing_if = "Option::is_none",
+    default
   )]
   #[schema(value_type = Option<i64>)]
   pub expires: Option<NaiveDateTime>,

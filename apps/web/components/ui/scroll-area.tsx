@@ -7,23 +7,50 @@ import { cn } from "@/lib/utils";
 
 const ScrollArea = React.forwardRef<
   React.ElementRef<typeof ScrollAreaPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root>
->(({ className, children, ...props }, ref) => (
-  <ScrollAreaPrimitive.Root
-    ref={ref}
-    className={cn("relative overflow-hidden", className)}
-    {...props}
-  >
-    <ScrollAreaPrimitive.Viewport
-      className="size-full rounded-[inherit]"
-      asChild
+  React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root> & {
+    overflowMarker?: boolean;
+  }
+>(({ className, children, overflowMarker = false, ...props }, ref) => {
+  const [overflowOn, setOverflowOn] = React.useState<
+    "top" | "bottom" | "both" | null
+  >(null);
+
+  const onScroll = React.useCallback((e: React.UIEvent<HTMLElement>) => {
+    const { scrollHeight, scrollTop, clientHeight } = e.currentTarget;
+
+    if (scrollHeight <= clientHeight) {
+      setOverflowOn(null);
+    } else if (scrollTop === 0) {
+      setOverflowOn("bottom");
+    } else if (Math.abs(scrollHeight - clientHeight - scrollTop) <= 1) {
+      setOverflowOn("top");
+    } else {
+      setOverflowOn("both");
+    }
+  }, []);
+
+  return (
+    <ScrollAreaPrimitive.Root
+      ref={ref}
+      className={cn("relative overflow-hidden", className)}
+      {...props}
     >
-      <div className="h-full">{children}</div>
-    </ScrollAreaPrimitive.Viewport>
-    <ScrollBar />
-    <ScrollAreaPrimitive.Corner />
-  </ScrollAreaPrimitive.Root>
-));
+      <ScrollAreaPrimitive.Viewport
+        className={cn(
+          "size-full rounded-[inherit] border-y-2 border-transparent transition-colors",
+          overflowMarker && overflowOn === "top" && "border-t-border",
+          overflowMarker && overflowOn === "both" && "border-y-border",
+          overflowMarker && overflowOn === "bottom" && "border-b-border"
+        )}
+        onScroll={overflowMarker ? onScroll : undefined}
+      >
+        {children}
+      </ScrollAreaPrimitive.Viewport>
+      <ScrollBar />
+      <ScrollAreaPrimitive.Corner />
+    </ScrollAreaPrimitive.Root>
+  );
+});
 ScrollArea.displayName = ScrollAreaPrimitive.Root.displayName;
 
 const ScrollBar = React.forwardRef<

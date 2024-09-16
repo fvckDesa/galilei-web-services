@@ -1,12 +1,10 @@
 "use server";
 
-import { apiActionClient, withApiResult } from "@/lib/safe-action";
+import { apiClient } from "@/lib/api";
+import { apiActionClient } from "@/lib/safe-action";
 
-export const listUserProject = apiActionClient.action(
-  withApiResult({
-    alias: "listProjects",
-    async action({ ctx: { apiClient } }) {
-      return apiClient.listProjects();
-    },
-  })
-);
+export const listUserProject = apiActionClient
+  .metadata({ name: "listProjects" })
+  .action(async () => await apiClient.listProjects(), {
+    throwServerError: true,
+  });

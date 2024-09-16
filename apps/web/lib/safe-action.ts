@@ -10,17 +10,7 @@ import { Schema } from "next-safe-action/adapters/types";
 import axios from "axios";
 import { z } from "zod";
 
-export class ServerError extends Error {
-  public readonly kind: TErrorMessage["kind"];
-  public readonly action: string;
-
-  constructor(actionName: string, { kind, message }: TErrorMessage) {
-    super(message);
-    this.name = `ServerError from "${actionName}"`;
-    this.kind = kind;
-    this.action = actionName;
-  }
-}
+export type ActionError = TErrorMessage & { action: string };
 
 export const apiActionClient = createSafeActionClient({
   defineMetadataSchema() {
@@ -28,19 +18,35 @@ export const apiActionClient = createSafeActionClient({
   },
   handleServerError(err, { metadata: { name } }) {
     if (axios.isAxiosError(err) && err.response) {
-      return new ServerError(name, ErrorMessage.parse(err.response.data));
+      return {
+        action: name,
+        ...ErrorMessage.parse(err.response.data),
+      } as ActionError;
     }
-    return new ServerError(name, {
+    return {
+      action: name,
       kind: "InternalError",
       message: err.message,
-    });
+    } as ActionError;
   },
 }).use(async ({ next }) => {
   return next({ ctx: { apiClient } });
 });
 
+export class ActionServerError extends Error {
+  public readonly kind: TErrorMessage["kind"];
+  public readonly action: string;
+
+  constructor({ kind, message, action }: ActionError) {
+    super(message);
+    this.name = `ActionError from "${action}"`;
+    this.kind = kind;
+    this.action = action;
+  }
+}
+
 export function unwrap<
-  ServerError,
+  ServerError extends ActionError,
   S extends Schema | undefined,
   BAS extends readonly Schema[],
   CVE = ValidationErrors<S>,
@@ -53,7 +59,13 @@ export function unwrap<
     | undefined
 ): Data {
   if (!result || !result.data) {
-    throw new Error("Internal server error: data not found");
+    throw new ActionServerError(
+      result?.serverError ?? {
+        kind: "InternalError",
+        message: "data not found when unwrap",
+        action: "unknown",
+      }
+    );
   }
 
   return result.data;

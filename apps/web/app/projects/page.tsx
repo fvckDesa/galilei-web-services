@@ -1,4 +1,4 @@
-import { listUserProject } from "./action";
+import { listUserProject } from "./actions";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Link from "next/link";
 import { unwrap } from "@/lib/safe-action";

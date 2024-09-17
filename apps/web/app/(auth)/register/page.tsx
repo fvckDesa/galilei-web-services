@@ -16,7 +16,7 @@ import Link from "next/link";
 import { Lock, Unlock, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks";
-import { registerAction } from "./action";
+import { registerAction } from "./actions";
 import { RegisterSchema } from "./schema";
 
 export default function RegisterPage() {

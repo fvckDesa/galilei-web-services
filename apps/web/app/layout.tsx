@@ -18,9 +18,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={cn(inter.className, "w-screen h-screen overflow-hidden")}
+        className={cn(
+          inter.className,
+          "w-screen h-screen overflow-hidden bg-background"
+        )}
       >
-        {children}
+        <div data-vaul-drawer-wrapper className="size-full bg-background">
+          {children}
+        </div>
       </body>
     </html>
   );

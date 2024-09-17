@@ -25,6 +25,7 @@ const buttonVariants = cva(
         sm: "h-9 rounded-md px-3",
         lg: "h-11 rounded-md px-8",
         icon: "size-10",
+        "icon-sm": "size-8",
       },
     },
     defaultVariants: {
@@ -39,6 +40,7 @@ export interface ButtonProps
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
   loading?: boolean;
+  icon?: React.ReactNode;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -47,6 +49,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       className,
       variant,
       size,
+      icon,
       disabled = false,
       loading = false,
       asChild = false,
@@ -56,14 +59,21 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const Comp = asChild ? Slot : "button";
+    const internalIcon = loading ? <Loader2 className="animate-spin" /> : icon;
+    const Text = internalIcon ? "span" : React.Fragment;
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={cn(
+          buttonVariants({ variant, size, className }),
+          internalIcon &&
+            "flex items-center gap-1 [&>*:first-child]:size-5 [&>*:first-child]:aspect-square"
+        )}
         ref={ref}
         disabled={loading || disabled}
         {...props}
       >
-        {loading ? <Loader2 className="animate-spin" /> : children}
+        {internalIcon}
+        <Text>{children}</Text>
       </Comp>
     );
   }

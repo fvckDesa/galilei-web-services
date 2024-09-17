@@ -45,17 +45,26 @@ export default function RegisterPage() {
     if (!result.serverError) {
       return;
     }
-    if (result.serverError.kind === "AlreadyExists") {
-      form.setError("username", {
-        type: "response",
-        message: "This username is unavailable. Try another.",
-      });
-    } else {
-      form.setError("root", {
-        type: "response",
-        message:
-          "Oops! An unexpected error occurred. Please refresh the page or try again later.",
-      });
+    switch (result.serverError.kind) {
+      case "AlreadyExists":
+        form.setError("username", {
+          type: "response",
+          message: "This username is unavailable. Try another.",
+        });
+        break;
+      case "Unauthorized":
+        form.setError("root", {
+          type: "response",
+          message: "Invalid credentials",
+        });
+        break;
+      default:
+        form.setError("root", {
+          type: "response",
+          message:
+            "Oops! An unexpected error occurred. Please refresh the page or try again later.",
+        });
+        break;
     }
   }, [form, result]);
 

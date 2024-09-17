@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 
 export type ExpandType<T> = {
   [K in keyof T]: T[K];
-};
+} & {};
 
 export interface PageParams<P extends object> {
   params: P;

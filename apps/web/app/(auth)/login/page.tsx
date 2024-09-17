@@ -143,8 +143,12 @@ export default function LoginPage() {
               </FormItem>
             )}
           />
-          <Button type="submit" className="w-full">
-            Submit
+          <Button
+            type="submit"
+            className="w-full"
+            loading={form.formState.isSubmitting}
+          >
+            Login
           </Button>
           <p className="text-sm font-medium text-destructive">
             {form.formState.errors.root?.message}

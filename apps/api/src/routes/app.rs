@@ -28,7 +28,7 @@ const CONTEXT_PATH: &str = "/projects/{project_id}";
     InternalServerErrorMessage
   )
 )]
-#[get("/apps")]
+#[get("/apps/")]
 pub async fn list_apps(path: Path<ProjectPath>, pool: Pool) -> ApiResult<AppServicesList> {
   let ProjectPath { project_id } = *path;
   let apps = sqlx::query_as!(
@@ -54,7 +54,7 @@ pub async fn list_apps(path: Path<ProjectPath>, pool: Pool) -> ApiResult<AppServ
     InternalServerErrorMessage
   )
 )]
-#[post("/apps")]
+#[post("/apps/")]
 pub async fn create_app(
   path: Path<ProjectPath>,
   Json(app): Json<AppServiceSchema>,
@@ -93,7 +93,7 @@ pub async fn create_app(
     InternalServerErrorMessage
   )
 )]
-#[get("/apps/{app_id}")]
+#[get("/apps/{app_id}/")]
 pub async fn get_app(path: Path<AppPath>, pool: Pool) -> ApiResult<AppService> {
   let AppPath { project_id, app_id } = *path;
 
@@ -121,7 +121,7 @@ pub async fn get_app(path: Path<AppPath>, pool: Pool) -> ApiResult<AppService> {
     InternalServerErrorMessage
   )
 )]
-#[patch("/apps/{app_id}")]
+#[patch("/apps/{app_id}/")]
 pub async fn update_app(
   path: Path<AppPath>,
   Json(app): Json<PartialAppServiceSchema>,
@@ -169,7 +169,7 @@ pub async fn update_app(
     InternalServerErrorMessage
   )
 )]
-#[delete("/apps/{app_id}")]
+#[delete("/apps/{app_id}/")]
 pub async fn delete_app(path: Path<AppPath>, pool: Pool) -> ApiResult<AppService> {
   let AppPath { project_id, app_id } = *path;
 

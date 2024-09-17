@@ -5,7 +5,7 @@ use actix_web::{
   dev::{Server, ServiceFactory, ServiceResponse},
   middleware::{self, NormalizePath},
   web::{self, Data},
-  App, HttpServer,
+  App, HttpResponse, HttpServer, ResponseError,
 };
 use actix_web_validator::JsonConfig;
 use confique::Config;
@@ -22,6 +22,10 @@ pub struct AppConfig {
   address: IpAddr,
   #[config(env = "SERVER_PORT", default = 8000)]
   port: u16,
+}
+
+async fn default_route() -> HttpResponse {
+  ApiError::NotFound.error_response()
 }
 
 pub fn create_app(
@@ -51,6 +55,7 @@ pub fn create_app(
             .configure(app::config),
         ),
     )
+    .default_service(web::to(default_route))
 }
 
 impl AppConfig {

@@ -73,7 +73,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       >
         {internalIcon}
-        <Text>{children}</Text>
+        {size !== "icon" ? <Text>{children}</Text> : null}
       </Comp>
     );
   }

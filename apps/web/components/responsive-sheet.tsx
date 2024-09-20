@@ -1,16 +1,17 @@
 "use client";
+
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogOverlay,
-  DialogPortal,
-  DialogTitle,
-  DialogTrigger,
-} from "./ui/dialog";
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetOverlay,
+  SheetPortal,
+  SheetTitle,
+  SheetTrigger,
+} from "./ui/sheet";
 import {
   Drawer,
   DrawerClose,
@@ -38,9 +39,9 @@ import { cn } from "@/lib/utils";
 import dynamic from "next/dynamic";
 import { Screen, useScreenMediaQuery } from "@/hooks/screen-media-query";
 
-type DialogType = "drawer" | "dialog";
+type SheetType = "drawer" | "sheet";
 
-const ResponsiveDialogCtx = createContext<DialogType>("dialog");
+const ResponsiveSheetCtx = createContext<SheetType>("sheet");
 
 type Common<A, B> = Pick<
   A,
@@ -63,13 +64,13 @@ type ExclusivePropsWithoutRef<
   B extends ElementType,
 > = Omit<ComponentPropsWithoutRef<A>, keyof ComponentPropsWithoutRef<B>>;
 
-type IntersectionDialogAndDrawerProps<
+type IntersectionSheetAndDrawerProps<
   A extends ElementType,
   B extends ElementType,
   C extends CommonPropsWithoutRef<A, B> = CommonPropsWithoutRef<A, B>,
 > = ExpandType<
   C & {
-    dialogProps?: ExpandType<
+    sheetProps?: ExpandType<
       ExclusivePropsWithoutRef<A, B> &
         ("className" extends keyof C ? { className?: string } : object)
     >;
@@ -80,16 +81,16 @@ type IntersectionDialogAndDrawerProps<
   }
 >;
 
-interface UseResponsiveDialogRenderProps<
+interface UseResponsiveSheetRenderProps<
   A extends ElementType,
   B extends ElementType,
   C extends CommonPropsWithoutRef<A, B> = CommonPropsWithoutRef<A, B>,
 > {
-  type: DialogType;
-  Dialog: A;
+  type: SheetType;
+  Sheet: A;
   Drawer: B;
   commonProps: CommonPropsWithoutRef<A, B>;
-  dialogProps?:
+  sheetProps?:
     | (ExclusivePropsWithoutRef<A, B> &
         ("className" extends keyof C ? { className?: string } : object))
     | undefined;
@@ -99,23 +100,23 @@ interface UseResponsiveDialogRenderProps<
     | undefined;
 }
 
-function useResponsiveDialogRender<
+function useResponsiveSheetRender<
   A extends ElementType,
   B extends ElementType,
 >({
   type,
-  Dialog,
+  Sheet,
   Drawer,
   commonProps,
-  dialogProps,
+  sheetProps,
   drawerProps,
-}: UseResponsiveDialogRenderProps<A, B>) {
+}: UseResponsiveSheetRenderProps<A, B>) {
   return useMemo(() => {
-    const Comp = type === "dialog" ? Dialog : Drawer;
+    const Comp = type === "sheet" ? Sheet : Drawer;
 
     const CLASS_NAME = "className";
 
-    const specificProps = type === "dialog" ? dialogProps : drawerProps;
+    const specificProps = type === "sheet" ? sheetProps : drawerProps;
 
     const props = {
       ...commonProps,
@@ -132,16 +133,16 @@ function useResponsiveDialogRender<
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return <Comp {...(props as any)} />;
-  }, [type, Dialog, Drawer, commonProps, dialogProps, drawerProps]);
+  }, [type, Sheet, Drawer, commonProps, sheetProps, drawerProps]);
 }
 
-function useResponsiveDialogRenderFromCtx<
+function useResponsiveSheetRenderFromCtx<
   A extends ElementType,
   B extends ElementType,
->(props: Omit<UseResponsiveDialogRenderProps<A, B>, "type">) {
-  const type = useContext(ResponsiveDialogCtx);
+>(props: Omit<UseResponsiveSheetRenderProps<A, B>, "type">) {
+  const type = useContext(ResponsiveSheetCtx);
 
-  return useResponsiveDialogRender({ ...props, type });
+  return useResponsiveSheetRender({ ...props, type });
 }
 
 interface UseControlledOpenProps {
@@ -171,20 +172,20 @@ function useControlledOpen({
   return [internalOpen, onInternalOpen] as const;
 }
 
-export type ResponsiveDialogProps = IntersectionDialogAndDrawerProps<
-  typeof Dialog,
+export type ResponsiveSheetProps = IntersectionSheetAndDrawerProps<
+  typeof Sheet,
   typeof Drawer
 > & { screen?: Screen };
 
-function ResponsiveDialog({
-  dialogProps,
+function ResponsiveSheet({
+  sheetProps,
   drawerProps,
   open,
   onOpenChange,
   defaultOpen,
   screen = "sm",
   ...props
-}: ResponsiveDialogProps) {
+}: ResponsiveSheetProps) {
   const matchScreen = useScreenMediaQuery(screen);
 
   const [internalOpen, setInternalOpen] = useControlledOpen({
@@ -193,222 +194,222 @@ function ResponsiveDialog({
     defaultOpen,
   });
 
-  const type = matchScreen ? "dialog" : "drawer";
+  const type = matchScreen ? "sheet" : "drawer";
 
-  const dialog = useResponsiveDialogRender({
+  const sheet = useResponsiveSheetRender({
     type,
-    Dialog,
+    Sheet,
     Drawer,
     commonProps: {
       ...props,
       open: internalOpen,
       onOpenChange: setInternalOpen,
     },
-    dialogProps,
+    sheetProps,
     drawerProps,
   });
 
   return (
-    <ResponsiveDialogCtx.Provider value={type}>
-      {dialog}
-    </ResponsiveDialogCtx.Provider>
+    <ResponsiveSheetCtx.Provider value={type}>
+      {sheet}
+    </ResponsiveSheetCtx.Provider>
   );
 }
-ResponsiveDialog.displayName = "ResponsiveDialog";
+ResponsiveSheet.displayName = "ResponsiveSheet";
 
-export type ResponsiveDialogTriggerProps = IntersectionDialogAndDrawerProps<
-  typeof DialogTrigger,
+export type ResponsiveSheetTriggerProps = IntersectionSheetAndDrawerProps<
+  typeof SheetTrigger,
   typeof DrawerTrigger
 >;
 
-function ResponsiveDialogTrigger({
-  dialogProps,
+function ResponsiveSheetTrigger({
+  sheetProps,
   drawerProps,
   ...props
-}: ResponsiveDialogTriggerProps) {
-  return useResponsiveDialogRenderFromCtx({
-    Dialog: DialogTrigger,
+}: ResponsiveSheetTriggerProps) {
+  return useResponsiveSheetRenderFromCtx({
+    Sheet: SheetTrigger,
     Drawer: DrawerTrigger,
     commonProps: props,
-    dialogProps,
+    sheetProps,
     drawerProps,
   });
 }
-ResponsiveDialogTrigger.displayName = "ResponsiveDialogTrigger";
+ResponsiveSheetTrigger.displayName = "ResponsiveSheetTrigger";
 
-export type ResponsiveDialogPortalProps = IntersectionDialogAndDrawerProps<
-  typeof DialogPortal,
+export type ResponsiveSheetPortalProps = IntersectionSheetAndDrawerProps<
+  typeof SheetPortal,
   typeof DrawerPortal
 >;
 
-function ResponsiveDialogPortal({
-  dialogProps,
+function ResponsiveSheetPortal({
+  sheetProps,
   drawerProps,
   ...props
-}: ResponsiveDialogPortalProps) {
-  return useResponsiveDialogRenderFromCtx({
-    Dialog: DialogPortal,
+}: ResponsiveSheetPortalProps) {
+  return useResponsiveSheetRenderFromCtx({
+    Sheet: SheetPortal,
     Drawer: DrawerPortal,
     commonProps: props,
-    dialogProps,
+    sheetProps,
     drawerProps,
   });
 }
-ResponsiveDialogPortal.displayName = "ResponsiveDialogPortal";
+ResponsiveSheetPortal.displayName = "ResponsiveSheetPortal";
 
-export type ResponsiveDialogCloseProps = IntersectionDialogAndDrawerProps<
-  typeof DialogTrigger,
+export type ResponsiveSheetCloseProps = IntersectionSheetAndDrawerProps<
+  typeof SheetTrigger,
   typeof DrawerTrigger
 >;
 
-function ResponsiveDialogClose({
-  dialogProps,
+function ResponsiveSheetClose({
+  sheetProps,
   drawerProps,
   ...props
-}: ResponsiveDialogCloseProps) {
-  return useResponsiveDialogRenderFromCtx({
-    Dialog: DialogClose,
+}: ResponsiveSheetCloseProps) {
+  return useResponsiveSheetRenderFromCtx({
+    Sheet: SheetClose,
     Drawer: DrawerClose,
     commonProps: props,
-    dialogProps,
+    sheetProps,
     drawerProps,
   });
 }
-ResponsiveDialogClose.displayName = "ResponsiveDialogClose";
+ResponsiveSheetClose.displayName = "ResponsiveSheetClose";
 
-export type ResponsiveDialogOverlayProps = IntersectionDialogAndDrawerProps<
-  typeof DialogOverlay,
+export type ResponsiveSheetOverlayProps = IntersectionSheetAndDrawerProps<
+  typeof SheetOverlay,
   typeof DrawerOverlay
 >;
 
-function ResponsiveDialogOverlay({
-  dialogProps,
+function ResponsiveSheetOverlay({
+  sheetProps,
   drawerProps,
   ...props
-}: ResponsiveDialogOverlayProps) {
-  return useResponsiveDialogRenderFromCtx({
-    Dialog: DialogOverlay,
+}: ResponsiveSheetOverlayProps) {
+  return useResponsiveSheetRenderFromCtx({
+    Sheet: SheetOverlay,
     Drawer: DrawerOverlay,
     commonProps: props,
-    dialogProps,
+    sheetProps,
     drawerProps,
   });
 }
-ResponsiveDialogOverlay.displayName = "ResponsiveDialogOverlay";
+ResponsiveSheetOverlay.displayName = "ResponsiveSheetOverlay";
 
-export type ResponsiveDialogContentProps = IntersectionDialogAndDrawerProps<
-  typeof DialogContent,
+export type ResponsiveSheetContentProps = IntersectionSheetAndDrawerProps<
+  typeof SheetContent,
   typeof DrawerContent
 >;
 
-function ResponsiveDialogContent({
-  dialogProps,
+function ResponsiveSheetContent({
+  sheetProps,
   drawerProps,
   ...props
-}: ResponsiveDialogContentProps) {
-  return useResponsiveDialogRenderFromCtx({
-    Dialog: DialogContent,
+}: ResponsiveSheetContentProps) {
+  return useResponsiveSheetRenderFromCtx({
+    Sheet: SheetContent,
     Drawer: DrawerContent,
     commonProps: props,
-    dialogProps,
+    sheetProps,
     drawerProps,
   });
 }
-ResponsiveDialogContent.displayName = "ResponsiveDialogContent";
+ResponsiveSheetContent.displayName = "ResponsiveSheetContent";
 
-export type ResponsiveDialogHeaderProps = IntersectionDialogAndDrawerProps<
-  typeof DialogHeader,
+export type ResponsiveSheetHeaderProps = IntersectionSheetAndDrawerProps<
+  typeof SheetHeader,
   typeof DrawerHeader
 >;
 
-function ResponsiveDialogHeader({
-  dialogProps,
+function ResponsiveSheetHeader({
+  sheetProps,
   drawerProps,
   ...props
-}: ResponsiveDialogHeaderProps) {
-  return useResponsiveDialogRenderFromCtx({
-    Dialog: DialogHeader,
+}: ResponsiveSheetHeaderProps) {
+  return useResponsiveSheetRenderFromCtx({
+    Sheet: SheetHeader,
     Drawer: DrawerHeader,
     commonProps: props,
-    dialogProps,
+    sheetProps,
     drawerProps,
   });
 }
-ResponsiveDialogHeader.displayName = "ResponsiveDialogHeader";
+ResponsiveSheetHeader.displayName = "ResponsiveSheetHeader";
 
-export type ResponsiveDialogFooterProps = IntersectionDialogAndDrawerProps<
-  typeof DialogFooter,
+export type ResponsiveSheetFooterProps = IntersectionSheetAndDrawerProps<
+  typeof SheetFooter,
   typeof DrawerFooter
 >;
 
-function ResponsiveDialogFooter({
-  dialogProps,
+function ResponsiveSheetFooter({
+  sheetProps,
   drawerProps,
   ...props
-}: ResponsiveDialogFooterProps) {
-  return useResponsiveDialogRenderFromCtx({
-    Dialog: DialogFooter,
+}: ResponsiveSheetFooterProps) {
+  return useResponsiveSheetRenderFromCtx({
+    Sheet: SheetFooter,
     Drawer: DrawerFooter,
     commonProps: props,
-    dialogProps,
+    sheetProps,
     drawerProps,
   });
 }
-ResponsiveDialogFooter.displayName = "ResponsiveDialogFooter";
+ResponsiveSheetFooter.displayName = "ResponsiveSheetFooter";
 
-export type ResponsiveDialogTitleProps = IntersectionDialogAndDrawerProps<
-  typeof DialogTitle,
+export type ResponsiveSheetTitleProps = IntersectionSheetAndDrawerProps<
+  typeof SheetTitle,
   typeof DrawerTitle
 >;
 
-function ResponsiveDialogTitle({
-  dialogProps,
+function ResponsiveSheetTitle({
+  sheetProps,
   drawerProps,
   ...props
-}: ResponsiveDialogTitleProps) {
-  return useResponsiveDialogRenderFromCtx({
-    Dialog: DialogTitle,
+}: ResponsiveSheetTitleProps) {
+  return useResponsiveSheetRenderFromCtx({
+    Sheet: SheetTitle,
     Drawer: DrawerTitle,
     commonProps: props,
-    dialogProps,
+    sheetProps,
     drawerProps,
   });
 }
-ResponsiveDialogTitle.displayName = "ResponsiveDialogTitle";
+ResponsiveSheetTitle.displayName = "ResponsiveSheetTitle";
 
-export type ResponsiveDialogDescriptionProps = IntersectionDialogAndDrawerProps<
-  typeof DialogDescription,
+export type ResponsiveSheetDescriptionProps = IntersectionSheetAndDrawerProps<
+  typeof SheetDescription,
   typeof DrawerDescription
 >;
 
-function ResponsiveDialogDescription({
-  dialogProps,
+function ResponsiveSheetDescription({
+  sheetProps,
   drawerProps,
   ...props
-}: ResponsiveDialogDescriptionProps) {
-  return useResponsiveDialogRenderFromCtx({
-    Dialog: DialogDescription,
+}: ResponsiveSheetDescriptionProps) {
+  return useResponsiveSheetRenderFromCtx({
+    Sheet: SheetDescription,
     Drawer: DrawerDescription,
     commonProps: props,
-    dialogProps,
+    sheetProps,
     drawerProps,
   });
 }
-ResponsiveDialogDescription.displayName = "ResponsiveDialogDescription";
+ResponsiveSheetDescription.displayName = "ResponsiveSheetDescription";
 
-const ResponsiveDialogNoSsr = dynamic(() => Promise.resolve(ResponsiveDialog), {
+const ResponsiveSheetNoSsr = dynamic(() => Promise.resolve(ResponsiveSheet), {
   ssr: false,
 });
 
 export {
-  ResponsiveDialogNoSsr as ResponsiveDialog,
-  ResponsiveDialogTrigger,
-  ResponsiveDialogPortal,
-  ResponsiveDialogClose,
-  ResponsiveDialogOverlay,
-  ResponsiveDialogContent,
-  ResponsiveDialogHeader,
-  ResponsiveDialogFooter,
-  ResponsiveDialogTitle,
-  ResponsiveDialogDescription,
+  ResponsiveSheetNoSsr as ResponsiveSheet,
+  ResponsiveSheetTrigger,
+  ResponsiveSheetPortal,
+  ResponsiveSheetClose,
+  ResponsiveSheetOverlay,
+  ResponsiveSheetContent,
+  ResponsiveSheetHeader,
+  ResponsiveSheetFooter,
+  ResponsiveSheetTitle,
+  ResponsiveSheetDescription,
 };

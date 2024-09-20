@@ -1,5 +1,6 @@
 import { createApiClient } from "@gws/api-client";
 import { TokenCookie } from "./cookies";
+import { pluginFetch } from "@zodios/plugins";
 
 export const apiClient = createApiClient(
   process.env.API_HOST ?? "http://localhost:8000",
@@ -7,6 +8,8 @@ export const apiClient = createApiClient(
     validate: "response",
   }
 );
+
+apiClient.use(pluginFetch());
 
 apiClient.use({
   name: "token",

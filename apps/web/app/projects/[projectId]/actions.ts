@@ -4,6 +4,7 @@ import { apiActionClient } from "@/lib/safe-action";
 import { z } from "zod";
 import { AppServiceSchema } from "@gws/api-client";
 import { revalidateTag } from "next/cache";
+import { redirect } from "next/navigation";
 
 export const getProject = apiActionClient
   .metadata({
@@ -14,6 +15,15 @@ export const getProject = apiActionClient
     async ({ parsedInput: id, ctx: { apiClient } }) =>
       await apiClient.getProject({ params: { project_id: id } })
   );
+
+export const releaseProject = apiActionClient
+  .metadata({ name: "releaseProject" })
+  .schema(z.string().uuid())
+  .action(async ({ parsedInput: projectId, ctx: { apiClient } }) => {
+    return await apiClient.releaseProject(undefined, {
+      params: { project_id: projectId },
+    });
+  });
 
 export const listApps = apiActionClient
   .metadata({
@@ -42,7 +52,6 @@ export const createApp = apiActionClient
       });
 
       revalidateTag("apps-list");
-
-      return newApp;
+      redirect(`/projects/${newApp.projectId}/apps/${newApp.id}`);
     }
   );

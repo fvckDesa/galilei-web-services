@@ -295,6 +295,66 @@
           }
         }
       },
+      "post": {
+        "tags": ["project"],
+        "operationId": "release_project",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      },
       "delete": {
         "tags": ["project"],
         "operationId": "delete_project",
@@ -449,7 +509,7 @@
         }
       }
     },
-    "/projects/{project_id}/apps": {
+    "/projects/{project_id}/apps/": {
       "get": {
         "tags": ["app"],
         "operationId": "list_apps",
@@ -643,7 +703,7 @@
         }
       }
     },
-    "/projects/{project_id}/apps/{app_id}": {
+    "/projects/{project_id}/apps/{app_id}/": {
       "get": {
         "tags": ["app"],
         "operationId": "get_app",

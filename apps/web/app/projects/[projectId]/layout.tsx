@@ -4,6 +4,7 @@ import { unwrap } from "@/lib/safe-action";
 import { CreateBtn } from "./create-btn";
 import Resources from "./resources";
 import { ResponsiveLayout } from "./responsive-layout";
+import { ReleaseBtn } from "./release-btn";
 
 type ProjectLayoutProps = Layout & Page<{ projectId: string }>;
 
@@ -15,9 +16,12 @@ export default async function ProjectLayout({
 
   return (
     <div className="flex size-full flex-col">
-      <header className="flex items-center justify-between gap-4 border-b-2 border-border px-8 py-4 text-2xl">
+      <header className="flex items-center justify-between border-b-2 border-border px-8 py-4 text-2xl">
         <h1>{project.name}</h1>
-        <CreateBtn project={projectId} />
+        <div className="flex gap-4">
+          <CreateBtn project={projectId} />
+          <ReleaseBtn projectId={projectId} />
+        </div>
       </header>
       <div className="flex-1 overflow-hidden">
         <ResponsiveLayout

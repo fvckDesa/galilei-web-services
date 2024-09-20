@@ -4,6 +4,7 @@ mod error;
 mod openapi;
 
 pub(crate) mod auth;
+pub(crate) mod k8s;
 pub(crate) mod middleware;
 pub(crate) mod routes;
 pub(crate) mod utils;

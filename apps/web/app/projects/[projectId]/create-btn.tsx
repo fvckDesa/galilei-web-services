@@ -56,7 +56,9 @@ export function CreateBtn({ project }: CreateBtnProps) {
     <ResponsiveDialog open={open} onOpenChange={setOpen}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button icon={<Plus />}>Create</Button>
+          <Button variant="secondary" icon={<Plus />}>
+            Create
+          </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
           <ResponsiveDialogTrigger

@@ -1,6 +1,7 @@
 use actix_web::{
   delete, get, patch, post,
   web::{Path, ServiceConfig},
+  HttpResponse,
 };
 use actix_web_validator::Json;
 
@@ -10,8 +11,9 @@ use crate::{
     AlreadyExistsErrorMessage, BadRequestErrorMessage, InternalServerErrorMessage,
     NotFoundErrorMessage, UnauthorizedErrorMessage,
   },
+  k8s,
   middleware::UserId,
-  schemas::{PartialProjectSchema, Project, ProjectPath, ProjectSchema, ProjectsList},
+  schemas::{AppService, PartialProjectSchema, Project, ProjectPath, ProjectSchema, ProjectsList},
   ApiResult,
 };
 
@@ -161,9 +163,38 @@ pub async fn delete_project(
   Ok(project)
 }
 
+#[utoipa::path(
+  context_path = CONTEXT_PATH_WITH_ID,
+  params(ProjectPath),
+  responses(
+    (status = NO_CONTENT),
+    BadRequestErrorMessage,
+    NotFoundErrorMessage,
+    AlreadyExistsErrorMessage,
+    UnauthorizedErrorMessage,
+    InternalServerErrorMessage
+  )
+)]
+#[post("/")]
+pub async fn release_project(path: Path<ProjectPath>, pool: Pool) -> ApiResult<HttpResponse> {
+  let ProjectPath { project_id } = *path;
+  let apps = sqlx::query_as!(
+    AppService,
+    "SELECT * FROM app_services WHERE project_id = $1",
+    project_id
+  )
+  .fetch_all(pool.as_ref())
+  .await?;
+
+  k8s::release(apps).await?;
+
+  Ok(HttpResponse::NoContent().finish())
+}
+
 pub fn config_with_id(cfg: &mut ServiceConfig) {
   cfg
     .service(get_project)
     .service(update_project)
-    .service(delete_project);
+    .service(delete_project)
+    .service(release_project);
 }

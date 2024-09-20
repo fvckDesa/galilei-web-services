@@ -1,5 +1,5 @@
 #!/usr/bin/env -S pnpm tsx
-import { spinner, minimist, path } from "zx";
+import { spinner, minimist, path, globby } from "zx";
 import { $$, checkDependencies, Logger } from "./utils";
 
 const CLUSTER_NAME = "gws" as const;
@@ -15,7 +15,7 @@ const argv = minimist(process.argv.slice(2), {
 });
 
 try {
-  await checkDependencies(["k3d", "docker", "docker-compose"]);
+  await checkDependencies(["k3d", "docker", "docker-compose", "kubectl"]);
 } catch (err) {
   if (err instanceof Error) {
     log.error(err.message);
@@ -38,6 +38,13 @@ if (!clusters.some((cluster) => cluster.name == CLUSTER_NAME)) {
     `Creating ${CLUSTER_NAME} cluster...`,
     () =>
       $$`k3d cluster create ${CLUSTER_NAME} --config ${path.join(process.cwd(), argv.config)}`
+  );
+  log.info(`Apply resources to cluster ${CLUSTER_NAME}`);
+  const resources = await globby("**/k8s/*.yaml", { gitignore: true });
+  await Promise.all(
+    resources.map((res) =>
+      spinner(`Applying ${res}`, () => $$`kubectl apply -f ${res}`)
+    )
   );
 } else {
   await spinner(

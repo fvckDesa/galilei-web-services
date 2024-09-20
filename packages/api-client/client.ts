@@ -184,6 +184,38 @@ export const endpoints = makeApi([
     ],
   },
   {
+    method: "post",
+    path: "/projects/:project_id/",
+    alias: "releaseProject",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "project_id",
+        type: "Path",
+        schema: z.string().uuid(),
+      },
+    ],
+    response: z.void(),
+    errors: [
+      {
+        status: 400,
+        schema: ErrorMessage,
+      },
+      {
+        status: 401,
+        schema: ErrorMessage,
+      },
+      {
+        status: 404,
+        schema: ErrorMessage,
+      },
+      {
+        status: 409,
+        schema: ErrorMessage,
+      },
+    ],
+  },
+  {
     method: "delete",
     path: "/projects/:project_id/",
     alias: "deleteProject",
@@ -254,7 +286,7 @@ export const endpoints = makeApi([
   },
   {
     method: "get",
-    path: "/projects/:project_id/apps",
+    path: "/projects/:project_id/apps/",
     alias: "listApps",
     requestFormat: "json",
     parameters: [
@@ -287,7 +319,7 @@ export const endpoints = makeApi([
   },
   {
     method: "post",
-    path: "/projects/:project_id/apps",
+    path: "/projects/:project_id/apps/",
     alias: "createApp",
     requestFormat: "json",
     parameters: [
@@ -331,7 +363,7 @@ export const endpoints = makeApi([
   },
   {
     method: "get",
-    path: "/projects/:project_id/apps/:app_id",
+    path: "/projects/:project_id/apps/:app_id/",
     alias: "getApp",
     requestFormat: "json",
     parameters: [
@@ -367,7 +399,7 @@ export const endpoints = makeApi([
   },
   {
     method: "delete",
-    path: "/projects/:project_id/apps/:app_id",
+    path: "/projects/:project_id/apps/:app_id/",
     alias: "deleteApp",
     requestFormat: "json",
     parameters: [
@@ -403,7 +435,7 @@ export const endpoints = makeApi([
   },
   {
     method: "patch",
-    path: "/projects/:project_id/apps/:app_id",
+    path: "/projects/:project_id/apps/:app_id/",
     alias: "updateApp",
     requestFormat: "json",
     parameters: [

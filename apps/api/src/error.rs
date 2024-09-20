@@ -96,6 +96,13 @@ impl From<auth::AuthError> for ApiError {
   }
 }
 
+impl From<kube::Error> for ApiError {
+  fn from(err: kube::Error) -> Self {
+    log::error!("K8s error: {}", err.to_string());
+    ApiError::InternalError
+  }
+}
+
 #[derive(Debug, Serialize, ToSchema)]
 pub struct ErrorMessage {
   #[serde(flatten)]

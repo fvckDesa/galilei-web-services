@@ -20,6 +20,7 @@ use utoipa::OpenApi;
     project::get_project,
     project::update_project,
     project::delete_project,
+    project::release_project,
     app::list_apps,
     app::create_app,
     app::get_app,

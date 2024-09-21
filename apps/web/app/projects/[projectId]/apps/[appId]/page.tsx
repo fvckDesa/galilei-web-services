@@ -8,6 +8,7 @@ import {
   ResourceHeader,
   ResourceName,
 } from "@/components/resource";
+import { Container } from "lucide-react";
 
 export default async function AppPage({
   params: { projectId, appId },
@@ -21,6 +22,7 @@ export default async function AppPage({
   return (
     <Resource type="App" resourceSelected={app}>
       <ResourceHeader>
+        <Container className="size-8" />
         <ResourceName>{app.name}</ResourceName>
       </ResourceHeader>
       <ResourceContent>

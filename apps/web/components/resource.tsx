@@ -171,7 +171,7 @@ function ResourceHeader({
       )}
       {...props}
     >
-      <div>{children}</div>
+      <div className="flex items-center gap-2">{children}</div>
       <div className="flex gap-2">
         <Button
           form={formId}

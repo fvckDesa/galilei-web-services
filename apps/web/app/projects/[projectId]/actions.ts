@@ -20,9 +20,11 @@ export const releaseProject = apiActionClient
   .metadata({ name: "releaseProject" })
   .schema(z.string().uuid())
   .action(async ({ parsedInput: projectId, ctx: { apiClient } }) => {
-    return await apiClient.releaseProject(undefined, {
+    await apiClient.releaseProject(undefined, {
       params: { project_id: projectId },
     });
+
+    revalidateTag("apps-list");
   });
 
 export const listApps = apiActionClient
@@ -31,10 +33,25 @@ export const listApps = apiActionClient
   })
   .schema(z.string().uuid())
   .action(async ({ parsedInput: id, ctx: { apiClient } }) => {
-    return await apiClient.listApps({
+    const apps = await apiClient.listApps({
       params: { project_id: id },
       fetchOptions: { next: { tags: ["apps-list"] } },
     });
+
+    return apps.reduce(
+      (acc, app) => {
+        if (app.deleted) {
+          acc.deleted.push(app);
+        } else {
+          acc.available.push(app);
+        }
+        return acc;
+      },
+      { available: [], deleted: [] } as {
+        available: typeof apps;
+        deleted: typeof apps;
+      }
+    );
   });
 
 export const createApp = apiActionClient

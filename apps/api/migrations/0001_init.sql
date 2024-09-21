@@ -31,6 +31,7 @@ CREATE TABLE
     replicas INT NOT NULL,
     image TEXT NOT NULL,
     port INT NOT NULL,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
     project_id UUID NOT NULL,
     FOREIGN KEY (project_id) REFERENCES projects (project_id) ON DELETE CASCADE,
     CONSTRAINT unique_app_name_for_project UNIQUE (app_name, project_id)

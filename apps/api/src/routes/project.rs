@@ -4,6 +4,7 @@ use actix_web::{
   HttpResponse,
 };
 use actix_web_validator::Json;
+use uuid::Uuid;
 
 use crate::{
   database::Pool,
@@ -178,15 +179,36 @@ pub async fn delete_project(
 #[post("/")]
 pub async fn release_project(path: Path<ProjectPath>, pool: Pool) -> ApiResult<HttpResponse> {
   let ProjectPath { project_id } = *path;
+
+  let mut tx = pool.begin().await?;
+
   let apps = sqlx::query_as!(
     AppService,
     "SELECT * FROM app_services WHERE project_id = $1",
     project_id
   )
-  .fetch_all(pool.as_ref())
+  .fetch_all(tx.as_mut())
   .await?;
 
-  k8s::release(apps).await?;
+  let apps_id: Vec<Uuid> = apps
+    .iter()
+    .filter(|&app| app.deleted)
+    .map(|app| app.app_id)
+    .collect();
+
+  sqlx::query!(
+    "DELETE FROM app_services WHERE app_id IN (SELECT unnest($1::uuid[]))",
+    &apps_id
+  )
+  .execute(tx.as_mut())
+  .await?;
+
+  if let Err(err) = k8s::release(apps).await {
+    tx.rollback().await?;
+    return Err(err.into());
+  } else {
+    tx.commit().await?;
+  }
 
   Ok(HttpResponse::NoContent().finish())
 }

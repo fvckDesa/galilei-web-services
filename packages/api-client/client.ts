@@ -298,6 +298,7 @@ export const endpoints = makeApi([
     ],
     response: z.array(
       z.object({
+        deleted: z.boolean(),
         id: z.string().uuid(),
         image: z.string(),
         name: z.string(),
@@ -335,6 +336,7 @@ export const endpoints = makeApi([
       },
     ],
     response: z.object({
+      deleted: z.boolean(),
       id: z.string().uuid(),
       image: z.string(),
       name: z.string(),
@@ -379,6 +381,7 @@ export const endpoints = makeApi([
       },
     ],
     response: z.object({
+      deleted: z.boolean(),
       id: z.string().uuid(),
       image: z.string(),
       name: z.string(),
@@ -415,6 +418,7 @@ export const endpoints = makeApi([
       },
     ],
     response: z.object({
+      deleted: z.boolean(),
       id: z.string().uuid(),
       image: z.string(),
       name: z.string(),
@@ -456,6 +460,7 @@ export const endpoints = makeApi([
       },
     ],
     response: z.object({
+      deleted: z.boolean(),
       id: z.string().uuid(),
       image: z.string(),
       name: z.string(),

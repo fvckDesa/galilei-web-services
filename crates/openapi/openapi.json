@@ -539,9 +539,13 @@
                       "replicas",
                       "image",
                       "port",
+                      "deleted",
                       "projectId"
                     ],
                     "properties": {
+                      "deleted": {
+                        "type": "boolean"
+                      },
                       "id": {
                         "type": "string",
                         "format": "uuid"
@@ -630,9 +634,13 @@
                     "replicas",
                     "image",
                     "port",
+                    "deleted",
                     "projectId"
                   ],
                   "properties": {
+                    "deleted": {
+                      "type": "boolean"
+                    },
                     "id": {
                       "type": "string",
                       "format": "uuid"
@@ -740,9 +748,13 @@
                     "replicas",
                     "image",
                     "port",
+                    "deleted",
                     "projectId"
                   ],
                   "properties": {
+                    "deleted": {
+                      "type": "boolean"
+                    },
                     "id": {
                       "type": "string",
                       "format": "uuid"
@@ -828,9 +840,13 @@
                     "replicas",
                     "image",
                     "port",
+                    "deleted",
                     "projectId"
                   ],
                   "properties": {
+                    "deleted": {
+                      "type": "boolean"
+                    },
                     "id": {
                       "type": "string",
                       "format": "uuid"
@@ -927,9 +943,13 @@
                     "replicas",
                     "image",
                     "port",
+                    "deleted",
                     "projectId"
                   ],
                   "properties": {
+                    "deleted": {
+                      "type": "boolean"
+                    },
                     "id": {
                       "type": "string",
                       "format": "uuid"

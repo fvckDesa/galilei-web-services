@@ -175,7 +175,7 @@ pub async fn delete_app(path: Path<AppPath>, pool: Pool) -> ApiResult<AppService
 
   let app = sqlx::query_as!(
     AppService,
-    "DELETE FROM app_services WHERE project_id = $1 AND app_id = $2 RETURNING *",
+    "UPDATE app_services SET deleted = true WHERE project_id = $1 AND app_id = $2 RETURNING *",
     project_id,
     app_id,
   )

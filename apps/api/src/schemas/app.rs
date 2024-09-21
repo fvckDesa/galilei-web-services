@@ -17,6 +17,7 @@ pub struct AppService {
   pub replicas: i32,
   pub image: String,
   pub port: i32,
+  pub deleted: bool,
   pub project_id: Uuid,
 }
 impl_json_response!(AppService);

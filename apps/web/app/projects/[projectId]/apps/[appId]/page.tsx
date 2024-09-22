@@ -1,33 +1,87 @@
-import { Page } from "@/lib/types";
-import { getApp } from "./actions";
-import { unwrap } from "@/lib/safe-action";
-import { AppForm } from "./form";
-import {
-  Resource,
-  ResourceContent,
-  ResourceHeader,
-  ResourceName,
-} from "@/components/resource";
-import { Container } from "lucide-react";
+"use client";
 
-export default async function AppPage({
-  params: { projectId, appId },
-}: Page<{ projectId: string; appId: string }>) {
-  const {
-    id: _id,
-    projectId: _projectId,
-    ...app
-  } = await getApp({ projectId, appId }).then(unwrap);
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { TPartialAppServiceSchema } from "@gws/api-client";
+import { useFormContext } from "react-hook-form";
+
+export default function AppPage() {
+  const { control } = useFormContext<TPartialAppServiceSchema>();
 
   return (
-    <Resource type="App" resourceSelected={app}>
-      <ResourceHeader>
-        <Container className="size-8" />
-        <ResourceName>{app.name}</ResourceName>
-      </ResourceHeader>
-      <ResourceContent>
-        <AppForm projectId={projectId} appId={appId} app={app} />
-      </ResourceContent>
-    </Resource>
+    <>
+      <FormField
+        control={control}
+        name="name"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Name</FormLabel>
+            <FormControl>
+              <Input type="text" autoComplete="off" {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={control}
+        name="image"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Image</FormLabel>
+            <FormControl>
+              <Input type="text" autoComplete="off" {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={control}
+        name="port"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Port</FormLabel>
+            <FormControl>
+              <Input
+                type="number"
+                autoComplete="off"
+                {...field}
+                onChange={(e) =>
+                  field.onChange(parseInt(e.target.value || "0", 10))
+                }
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={control}
+        name="replicas"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Replicas</FormLabel>
+            <FormControl>
+              <Input
+                type="number"
+                autoComplete="off"
+                {...field}
+                onChange={(e) =>
+                  field.onChange(parseInt(e.target.value || "0", 10))
+                }
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    </>
   );
 }

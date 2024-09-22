@@ -185,11 +185,38 @@ pub async fn delete_app(path: Path<AppPath>, pool: Pool) -> ApiResult<AppService
   Ok(app)
 }
 
+#[utoipa::path(
+  context_path = CONTEXT_PATH,
+  params(AppPath),
+  responses(
+    AppService,
+    NotFoundErrorMessage,
+    UnauthorizedErrorMessage,
+    InternalServerErrorMessage
+  )
+)]
+#[post("/apps/{app_id}/recover/")]
+pub async fn recover_app(path: Path<AppPath>, pool: Pool) -> ApiResult<AppService> {
+  let AppPath { project_id, app_id } = *path;
+
+  let app = sqlx::query_as!(
+    AppService,
+    "UPDATE app_services SET deleted = false WHERE project_id = $1 AND app_id = $2 RETURNING *",
+    project_id,
+    app_id,
+  )
+  .fetch_one(pool.as_ref())
+  .await?;
+
+  Ok(app)
+}
+
 pub fn config(cfg: &mut ServiceConfig) {
   cfg
     .service(list_apps)
     .service(create_app)
     .service(get_app)
     .service(update_app)
-    .service(delete_app);
+    .service(delete_app)
+    .service(recover_app);
 }

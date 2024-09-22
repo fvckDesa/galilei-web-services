@@ -39,7 +39,7 @@ export const updateApp = apiActionClient
         },
       });
 
-      //revalidateTag("app");
+      revalidateTag("app");
       revalidateTag("apps-list");
 
       return res;
@@ -50,9 +50,24 @@ export const deleteApp = apiActionClient
   .metadata({ name: "deleteApp" })
   .schema(IdentifyApp)
   .action(async ({ parsedInput: { projectId, appId }, ctx: { apiClient } }) => {
-    await apiClient.deleteApp(undefined, {
+    const app = await apiClient.deleteApp(undefined, {
       params: { project_id: projectId, app_id: appId },
     });
 
     revalidateTag("apps-list");
+    revalidateTag("app");
+
+    return app;
+  });
+
+export const recoverApp = apiActionClient
+  .metadata({ name: "recoverApp" })
+  .schema(IdentifyApp)
+  .action(async ({ parsedInput: { projectId, appId }, ctx: { apiClient } }) => {
+    await apiClient.recoverApp(undefined, {
+      params: { project_id: projectId, app_id: appId },
+    });
+
+    revalidateTag("apps-list");
+    revalidateTag("app");
   });

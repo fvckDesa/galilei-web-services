@@ -1,16 +1,9 @@
-import {
-  BindArgsValidationErrors,
-  createSafeActionClient,
-  SafeActionResult,
-  ValidationErrors,
-} from "next-safe-action";
+import { createSafeActionClient } from "next-safe-action";
 import { apiClient } from "./api";
-import { ErrorMessage, TErrorMessage } from "@gws/api-client";
-import { Schema } from "next-safe-action/adapters/types";
+import { ErrorMessage } from "@gws/api-client";
 import axios from "axios";
 import { z } from "zod";
-
-export type ActionError = TErrorMessage & { action: string };
+import { ActionError } from "./utils";
 
 export const apiActionClient = createSafeActionClient({
   defineMetadataSchema() {
@@ -32,41 +25,3 @@ export const apiActionClient = createSafeActionClient({
 }).use(async ({ next }) => {
   return next({ ctx: { apiClient } });
 });
-
-export class ActionServerError extends Error {
-  public readonly kind: TErrorMessage["kind"];
-  public readonly action: string;
-
-  constructor({ kind, message, action }: ActionError) {
-    super(message);
-    this.name = `ActionError from "${action}"`;
-    this.kind = kind;
-    this.action = action;
-  }
-}
-
-export function unwrap<
-  ServerError extends ActionError,
-  S extends Schema | undefined,
-  BAS extends readonly Schema[],
-  CVE = ValidationErrors<S>,
-  CBAVE = BindArgsValidationErrors<BAS>,
-  Data = unknown,
-  NextCtx = object,
->(
-  result:
-    | SafeActionResult<ServerError, S, BAS, CVE, CBAVE, Data, NextCtx>
-    | undefined
-): Data {
-  if (!result || !result.data) {
-    throw new ActionServerError(
-      result?.serverError ?? {
-        kind: "InternalError",
-        message: "data not found when unwrap",
-        action: "unknown",
-      }
-    );
-  }
-
-  return result.data;
-}

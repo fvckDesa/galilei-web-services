@@ -1,168 +1,144 @@
 "use client";
+
 import {
-  ResponsiveSheetDescription,
+  ComponentPropsWithoutRef,
+  ElementRef,
+  forwardRef,
+  ReactNode,
+  useCallback,
+  useEffect,
+} from "react";
+import { Form } from "./ui/form";
+import {
+  HookProps,
+  useHookFormAction,
+} from "@next-safe-action/adapter-react-hook-form/hooks";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Schema, z } from "zod";
+import { BindArgsValidationErrors, ValidationErrors } from "next-safe-action";
+import { ActionError, cn, unwrap } from "@/lib/utils";
+import { HookSafeActionFn, useAction } from "next-safe-action/hooks";
+import { FieldPath, useFormContext } from "react-hook-form";
+import {
   ResponsiveSheetHeader,
   ResponsiveSheetTitle,
 } from "./responsive-sheet";
-import {
-  ComponentPropsWithoutRef,
-  createContext,
-  Dispatch,
-  ElementRef,
-  forwardRef,
-  SetStateAction,
-  useCallback,
-  useContext,
-  useId,
-  useLayoutEffect,
-  useState,
-} from "react";
-import { ScrollArea } from "./ui/scroll-area";
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import { cn } from "@/lib/utils";
 import { useScreenMediaQuery } from "@/hooks/screen-media-query";
 import { Button } from "./ui/button";
-import { Trash2, Upload, X } from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
-import { useAction } from "next-safe-action/hooks";
-import { deleteApp } from "@/app/projects/[projectId]/apps/[appId]/actions";
+import { Upload, X } from "lucide-react";
 import { toast } from "sonner";
-import { FieldValues, FormState } from "react-hook-form";
+import { useParams, useRouter } from "next/navigation";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
-interface ResourceContextProps<T extends { name: string }> {
-  type: string;
-  resource: T;
-  formState: {
-    formId: string;
-    isSubmitting: boolean;
-    setIsSubmitting: Dispatch<SetStateAction<boolean>>;
-    isDirty: boolean;
-    setIsDirty: Dispatch<SetStateAction<boolean>>;
-  };
+type ResponseErrorMap<S extends Schema> = {
+  [K in keyof z.infer<S>]?: string;
+};
+
+function Resource({ className, ...props }: ComponentPropsWithoutRef<"aside">) {
+  return (
+    <aside
+      className={cn("relative flex flex-1 flex-col overflow-hidden", className)}
+      {...props}
+    />
+  );
 }
 
-const ResourceContext = createContext<ResourceContextProps<{
-  name: string;
-}> | null>(null);
+type ResourceFormProps<
+  ServerError extends ActionError,
+  S extends Schema,
+  BAS extends readonly Schema[],
+  CVE = ValidationErrors<S>,
+  CBAVE = BindArgsValidationErrors<BAS>,
+  Data = unknown,
+> = ComponentPropsWithoutRef<"form"> & {
+  schema: S;
+  updateAction: HookSafeActionFn<ServerError, S, BAS, CVE, CBAVE, Data>;
+  setResponseErrors?: (err: ServerError) => ResponseErrorMap<S>;
+} & HookProps<ServerError, S, BAS, CVE, CBAVE, Data>;
 
-export function useResource<
-  T extends { name: string },
->(): ResourceContextProps<T> {
-  const ctx = useContext(ResourceContext);
-
-  if (!ctx) {
-    throw new Error("Wrap component in Resource component");
-  }
-
-  return ctx as ResourceContextProps<T>;
-}
-
-export function useResourceState(formState: FormState<FieldValues>) {
-  const {
-    formState: { formId, setIsDirty, setIsSubmitting },
-  } = useResource();
-
-  useLayoutEffect(() => {
-    setIsDirty(formState.isDirty);
-    setIsSubmitting(formState.isSubmitting);
-  }, [formState, setIsDirty, setIsSubmitting]);
-
-  return formId;
-}
-
-type ResourceProps<T extends { name: string }> =
-  ComponentPropsWithoutRef<"aside"> & {
-    type: string;
-    resourceSelected: T;
-  };
-
-function Resource<T extends { name: string }>({
-  type,
-  resourceSelected,
+function ResourceForm<
+  ServerError extends ActionError,
+  S extends Schema,
+  BAS extends readonly Schema[],
+  CVE = ValidationErrors<S>,
+  CBAVE = BindArgsValidationErrors<BAS>,
+  Data = unknown,
+>({
   className,
+  schema,
+  updateAction,
   children,
+  actionProps,
+  formProps,
+  errorMapProps,
+  setResponseErrors,
   ...props
-}: ResourceProps<T>) {
-  const isScreen = useScreenMediaQuery("lg");
-  const formId = useId();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isDirty, setIsDirty] = useState(true);
+}: ResourceFormProps<ServerError, S, BAS, CVE, CBAVE, Data>) {
+  const {
+    form,
+    action: { result },
+    resetFormAndAction,
+    handleSubmitWithAction,
+  } = useHookFormAction(updateAction, zodResolver(schema), {
+    formProps: {
+      ...formProps,
+      reValidateMode: "onBlur",
+    },
+    actionProps,
+    errorMapProps,
+  });
+
+  useEffect(() => {
+    if (result.data) {
+      resetFormAndAction();
+      return;
+    }
+    if (!result.serverError || !setResponseErrors) {
+      return;
+    }
+
+    for (const [name, error] of Object.entries(
+      setResponseErrors(result.serverError)
+    )) {
+      form.setError(name as FieldPath<z.infer<S>>, {
+        type: "response",
+        message: error,
+      });
+    }
+  }, [result, form, resetFormAndAction, setResponseErrors]);
 
   return (
-    <ResourceContext.Provider
-      value={{
-        type,
-        resource: resourceSelected,
-        formState: {
-          formId,
-          isSubmitting,
-          setIsSubmitting,
-          isDirty,
-          setIsDirty,
-        },
-      }}
-    >
-      <aside
-        className={cn(
-          "relative flex flex-1 flex-col overflow-hidden",
-          className
-        )}
+    <Form {...form}>
+      <form
+        className={cn("flex-1", className)}
+        onSubmit={handleSubmitWithAction}
         {...props}
       >
         {children}
-        {!isScreen ? (
-          <VisuallyHidden>
-            <ResponsiveSheetDescription>
-              {type} resource
-            </ResponsiveSheetDescription>
-          </VisuallyHidden>
-        ) : null}
-      </aside>
-    </ResourceContext.Provider>
+      </form>
+    </Form>
   );
 }
 
-type ResourceHeaderProps = ComponentPropsWithoutRef<
-  typeof ResponsiveSheetHeader
->;
+function ResourceName({ children }: { children: ReactNode }) {
+  const isScreen = useScreenMediaQuery("lg");
 
-function useRedirectToProject(projectId: string) {
-  const router = useRouter();
+  if (isScreen) {
+    return (
+      <h1 className="text-lg font-semibold leading-none tracking-tight">
+        {children}
+      </h1>
+    );
+  }
 
-  return useCallback(
-    () => router.push(`/projects/${projectId}`),
-    [router, projectId]
-  );
+  return <ResponsiveSheetTitle>{children}</ResponsiveSheetTitle>;
 }
 
 function ResourceHeader({
   className,
   children,
   ...props
-}: ResourceHeaderProps) {
-  const {
-    type,
-    resource,
-    formState: { formId, isDirty, isSubmitting },
-  } = useResource();
-  const { projectId, appId } = useParams<{
-    projectId: string;
-    appId: string;
-  }>();
-  const redirect = useRedirectToProject(projectId);
-  const { execute, isExecuting } = useAction(deleteApp, {
-    onSuccess: () => {
-      toast.success(`${type} ${resource.name} successfully deleted`);
-      redirect();
-    },
-    onError: ({ error }) => {
-      console.error(error);
-      toast.error(`Unable to delete ${type} ${resource.name}`, {
-        description: error.serverError?.message,
-      });
-    },
-  });
-
+}: ComponentPropsWithoutRef<typeof ResponsiveSheetHeader>) {
   return (
     <ResponsiveSheetHeader
       className={cn(
@@ -171,59 +147,105 @@ function ResourceHeader({
       )}
       {...props}
     >
-      <div className="flex items-center gap-2">{children}</div>
-      <div className="flex gap-2">
-        <Button
-          form={formId}
-          type="submit"
-          size="icon"
-          disabled={!isDirty}
-          loading={isSubmitting}
-          icon={<Upload />}
-        />
-        <Button
-          type="button"
-          variant="destructive"
-          size="icon"
-          icon={<Trash2 />}
-          loading={isExecuting}
-          onClick={() => execute({ projectId, appId })}
-        />
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          icon={<X />}
-          onClick={redirect}
-        />
-      </div>
+      {children}
     </ResponsiveSheetHeader>
   );
 }
 
-type ResourceNameProps = ComponentPropsWithoutRef<"h1">;
+type ResourceActionButtonProps<
+  ServerError extends ActionError,
+  S extends Schema,
+  BAS extends readonly Schema[],
+  CVE = ValidationErrors<S>,
+  CBAVE = BindArgsValidationErrors<BAS>,
+  Data = unknown,
+> = ComponentPropsWithoutRef<typeof Button> & {
+  action: HookSafeActionFn<ServerError, S, BAS, CVE, CBAVE, Data>;
+  actionInputs: z.infer<S>;
+  toastProps?: Parameters<typeof toast.promise<Data>>[1];
+};
 
-function ResourceName({ className, children, ...props }: ResourceNameProps) {
-  const isScreen = useScreenMediaQuery("lg");
-
-  if (isScreen) {
-    return (
-      <h1
-        className={cn(
-          "text-lg font-semibold leading-none tracking-tight",
-          className
-        )}
-        {...props}
-      >
-        {children}
-      </h1>
-    );
-  }
+function ResourceActionButton<
+  ServerError extends ActionError,
+  S extends Schema,
+  BAS extends readonly Schema[],
+  CVE = ValidationErrors<S>,
+  CBAVE = BindArgsValidationErrors<BAS>,
+  Data = unknown,
+>({
+  loading = false,
+  action,
+  actionInputs,
+  onClick,
+  toastProps,
+  ...props
+}: ResourceActionButtonProps<ServerError, S, BAS, CVE, CBAVE, Data>) {
+  const { executeAsync, isExecuting } = useAction(action);
 
   return (
-    <ResponsiveSheetTitle className={className} {...props}>
-      {children}
-    </ResponsiveSheetTitle>
+    <Button
+      type="button"
+      {...props}
+      loading={loading || isExecuting}
+      onClick={(e) => {
+        toast.promise(executeAsync(actionInputs).then(unwrap), {
+          ...toastProps,
+          dismissible: false,
+        });
+        onClick?.(e);
+      }}
+    />
+  );
+}
+
+function ResourceUpdateButton({
+  disabled = false,
+  loading = false,
+  ...props
+}: ComponentPropsWithoutRef<typeof Button>) {
+  const { formState } = useFormContext();
+  const { isDirty, isSubmitting } = formState;
+
+  return (
+    <Button
+      type="submit"
+      size="icon"
+      icon={<Upload />}
+      {...props}
+      disabled={disabled || !isDirty}
+      loading={loading || isSubmitting}
+    />
+  );
+}
+
+function useRedirectToProject() {
+  const router = useRouter();
+  const { projectId } = useParams<{ projectId: string }>();
+
+  return useCallback(
+    () => router.push(`/projects/${projectId}`),
+    [router, projectId]
+  );
+}
+
+function ResourceCloseButton({
+  onClick,
+  ...props
+}: ComponentPropsWithoutRef<typeof Button>) {
+  const redirect = useRedirectToProject();
+
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      size="icon"
+      icon={<X />}
+      {...props}
+      onClick={(e) => {
+        onClick?.(e);
+        redirect();
+      }}
+    />
   );
 }
 
@@ -243,4 +265,13 @@ const ResourceContent = forwardRef<
 ));
 ResourceContent.displayName = "ResourceContent";
 
-export { Resource, ResourceHeader, ResourceName, ResourceContent };
+export {
+  Resource,
+  ResourceForm,
+  ResourceHeader,
+  ResourceName,
+  ResourceUpdateButton,
+  ResourceActionButton,
+  ResourceCloseButton,
+  ResourceContent,
+};

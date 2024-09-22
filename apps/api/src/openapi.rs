@@ -26,6 +26,7 @@ use utoipa::OpenApi;
     app::get_app,
     app::update_app,
     app::delete_app,
+    app::recover_app,
   ),
   components(schemas(
     error::ApiError,
@@ -37,6 +38,7 @@ use utoipa::OpenApi;
     schemas::AuthResponse,
     schemas::ProjectSchema,
     schemas::PartialProjectSchema,
+    schemas::AppService,
     schemas::AppServiceSchema,
     schemas::PartialAppServiceSchema,
   ))

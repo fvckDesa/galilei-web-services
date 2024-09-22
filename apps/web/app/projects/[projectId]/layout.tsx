@@ -1,6 +1,6 @@
 import { Layout, Page } from "@/lib/types";
 import { getProject } from "./actions";
-import { unwrap } from "@/lib/safe-action";
+import { unwrap } from "@/lib/utils";
 import { CreateBtn } from "./create-btn";
 import Resources from "./resources";
 import { ResponsiveLayout } from "./responsive-layout";

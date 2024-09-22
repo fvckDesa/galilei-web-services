@@ -50,6 +50,16 @@ export const PartialAppServiceSchema = z
   })
   .partial();
 export type TPartialAppServiceSchema = z.infer<typeof PartialAppServiceSchema>;
+export const AppService = z.object({
+  deleted: z.boolean(),
+  id: z.string().uuid(),
+  image: z.string(),
+  name: z.string(),
+  port: z.number().int(),
+  projectId: z.string().uuid(),
+  replicas: z.number().int(),
+});
+export type TAppService = z.infer<typeof AppService>;
 
 export const endpoints = makeApi([
   {
@@ -483,6 +493,43 @@ export const endpoints = makeApi([
       },
       {
         status: 409,
+        schema: ErrorMessage,
+      },
+    ],
+  },
+  {
+    method: "post",
+    path: "/projects/:project_id/apps/:app_id/recover",
+    alias: "recoverApp",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "project_id",
+        type: "Path",
+        schema: z.string().uuid(),
+      },
+      {
+        name: "app_id",
+        type: "Path",
+        schema: z.string().uuid(),
+      },
+    ],
+    response: z.object({
+      deleted: z.boolean(),
+      id: z.string().uuid(),
+      image: z.string(),
+      name: z.string(),
+      port: z.number().int(),
+      projectId: z.string().uuid(),
+      replicas: z.number().int(),
+    }),
+    errors: [
+      {
+        status: 401,
+        schema: ErrorMessage,
+      },
+      {
+        status: 404,
         schema: ErrorMessage,
       },
     ],

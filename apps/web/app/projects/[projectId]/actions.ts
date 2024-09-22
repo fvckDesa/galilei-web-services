@@ -25,6 +25,7 @@ export const releaseProject = apiActionClient
     });
 
     revalidateTag("apps-list");
+    redirect(`/projects/${projectId}`);
   });
 
 export const listApps = apiActionClient

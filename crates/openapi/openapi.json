@@ -1131,6 +1131,73 @@
           }
         }
       }
+    },
+    "/projects/{project_id}/apps/{app_id}/status/": {
+      "get": {
+        "tags": ["app"],
+        "operationId": "get_app_status",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "app_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "object",
+                  "required": ["available", "state"],
+                  "properties": {
+                    "available": {
+                      "type": "boolean"
+                    },
+                    "state": {
+                      "$ref": "#/components/schemas/AppReleaseState"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1199,6 +1266,10 @@
           }
         ]
       },
+      "AppReleaseState": {
+        "type": "string",
+        "enum": ["Unknown", "Failed", "Progressing", "Released"]
+      },
       "AppService": {
         "type": "object",
         "required": [
@@ -1243,7 +1314,7 @@
       },
       "AppServiceSchema": {
         "type": "object",
-        "required": ["name", "replicas", "image", "port", "public_domain"],
+        "required": ["name", "replicas", "image", "port", "publicDomain"],
         "properties": {
           "image": {
             "type": "string",
@@ -1259,13 +1330,25 @@
             "minimum": 1,
             "maximum": 65535
           },
-          "public_domain": {
+          "publicDomain": {
             "$ref": "#/components/schemas/DomainName"
           },
           "replicas": {
             "type": "integer",
             "format": "int32",
             "minimum": 0
+          }
+        }
+      },
+      "AppStatus": {
+        "type": "object",
+        "required": ["available", "state"],
+        "properties": {
+          "available": {
+            "type": "boolean"
+          },
+          "state": {
+            "$ref": "#/components/schemas/AppReleaseState"
           }
         }
       },
@@ -1349,7 +1432,7 @@
             "minimum": 1,
             "maximum": 65535
           },
-          "public_domain": {
+          "publicDomain": {
             "allOf": [
               {
                 "$ref": "#/components/schemas/DomainName"

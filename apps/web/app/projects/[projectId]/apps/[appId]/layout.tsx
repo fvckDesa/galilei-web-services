@@ -12,12 +12,15 @@ import { Container, Trash2, Undo2 } from "lucide-react";
 import { cn, unwrap } from "@/lib/utils";
 import { deleteApp, getApp, recoverApp, updateApp } from "./actions";
 import { AppResourceForm } from "./AppResourceForm";
+import { AppStatusLight } from "@/components/app-status-light";
+import { TokenCookie } from "@/lib/cookies";
 
 export default async function AppLayout({
   params: { projectId, appId },
   children,
 }: Layout & Page<{ projectId: string; appId: string }>) {
   const app = await getApp({ projectId, appId }).then(unwrap);
+  const token = TokenCookie.get()?.value ?? "";
 
   return (
     <Resource>
@@ -26,7 +29,7 @@ export default async function AppLayout({
         formProps={{
           defaultValues: {
             ...app,
-            public_domain: { subdomain: app.publicDomain ?? "" },
+            publicDomain: { subdomain: app.publicDomain ?? "" },
           },
         }}
       >
@@ -37,6 +40,7 @@ export default async function AppLayout({
               app.deleted && "text-destructive"
             )}
           >
+            <AppStatusLight token={token} project={projectId} app={appId} />
             <Container className="size-6" />
             <ResourceName>{app.name}</ResourceName>
           </div>

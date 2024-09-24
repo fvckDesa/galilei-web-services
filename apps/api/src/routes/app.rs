@@ -1,8 +1,11 @@
 use actix_web::{
   delete, get, patch, post,
   web::{Path, ServiceConfig},
+  Responder,
 };
+use actix_web_lab::sse;
 use actix_web_validator::Json;
+use futures::TryStreamExt;
 
 use crate::{
   database::Pool,
@@ -10,8 +13,10 @@ use crate::{
     AlreadyExistsErrorMessage, BadRequestErrorMessage, InternalServerErrorMessage,
     NotFoundErrorMessage, UnauthorizedErrorMessage,
   },
+  k8s,
   schemas::{
-    AppPath, AppService, AppServiceSchema, AppServicesList, PartialAppServiceSchema, ProjectPath,
+    AppPath, AppService, AppServiceSchema, AppServicesList, AppStatus, PartialAppServiceSchema,
+    ProjectPath,
   },
   ApiResult,
 };
@@ -109,6 +114,35 @@ pub async fn get_app(path: Path<AppPath>, pool: Pool) -> ApiResult<AppService> {
   .await?;
 
   Ok(app)
+}
+
+#[utoipa::path(
+  context_path = CONTEXT_PATH,
+  params(AppPath),
+  responses(
+    AppStatus,
+    NotFoundErrorMessage,
+    UnauthorizedErrorMessage,
+    InternalServerErrorMessage
+  )
+)]
+#[get("/apps/{app_id}/status/")]
+pub async fn get_app_status(path: Path<AppPath>) -> ApiResult<impl Responder> {
+  let AppPath {
+    project_id: _,
+    app_id,
+  } = *path;
+
+  let stream = k8s::app_status(&app_id).await?.map_ok(|status| {
+    log::debug!("Status: {status:?}");
+    sse::Event::Data(
+      sse::Data::new_json(status)
+        .expect("Invalid app status json")
+        .event("message"),
+    )
+  });
+
+  Ok(sse::Sse::from_stream(stream))
 }
 
 #[utoipa::path(
@@ -222,6 +256,7 @@ pub fn config(cfg: &mut ServiceConfig) {
     .service(list_apps)
     .service(create_app)
     .service(get_app)
+    .service(get_app_status)
     .service(update_app)
     .service(delete_app)
     .service(recover_app);

@@ -108,7 +108,7 @@ function NewAppForm({ project, closeDialog }: NewAppFormProps) {
           image: "",
           port: 80,
           replicas: 3,
-          public_domain: {},
+          publicDomain: {},
         },
       },
       actionProps: {

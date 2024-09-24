@@ -86,7 +86,7 @@ export default function AppPage() {
       />
       <FormField
         control={control}
-        name="public_domain.subdomain"
+        name="publicDomain.subdomain"
         render={({ field }) => (
           <FormItem>
             <FormLabel>Public http subdomain</FormLabel>

@@ -1,3 +1,4 @@
+use futures::{stream::MapOk, Stream, TryStreamExt};
 use k8s_openapi::api::{
   apps::v1::{Deployment, DeploymentSpec},
   core::v1::{Container, ContainerPort, Service},
@@ -5,13 +6,47 @@ use k8s_openapi::api::{
 };
 use kube::{
   api::{Patch, PatchParams},
+  runtime::{
+    utils::{EventFlatten, StreamBackoff},
+    watcher::{self, watcher, DefaultBackoff, Event},
+    WatchStreamExt,
+  },
   Api, Client, Result,
 };
 use serde_json::json;
+use uuid::Uuid;
 
-use crate::schemas::AppService;
+use crate::schemas::{AppService, AppStatus};
 
 use super::K8S_CONFIG;
+
+pub async fn app_status(
+  id: &Uuid,
+) -> Result<
+  MapOk<
+    StreamBackoff<
+      EventFlatten<impl Stream<Item = Result<Event<Deployment>, watcher::Error>> + Send>,
+      DefaultBackoff,
+    >,
+    impl FnMut(Deployment) -> AppStatus,
+  >,
+> {
+  let client = Client::try_default().await?;
+  let api: Api<Deployment> = Api::namespaced(client, &K8S_CONFIG.namespace);
+
+  let stream = watcher(
+    api,
+    watcher::Config::default().fields(&format!("metadata.name=app-{id}")),
+  )
+  .applied_objects()
+  .default_backoff()
+  .map_ok(|deploy| match deploy.status {
+    Some(status) => AppStatus::from(status),
+    None => AppStatus::default(),
+  });
+
+  Ok(stream)
+}
 
 pub async fn reconcile_app(app: AppService, client: Client) -> Result<()> {
   let name = format!("app-{}", app.app_id);

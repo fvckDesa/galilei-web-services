@@ -1,5 +1,6 @@
 use std::net::IpAddr;
 
+use actix_cors::Cors;
 use actix_web::{
   body::MessageBody,
   dev::{Server, ServiceFactory, ServiceResponse},
@@ -39,10 +40,12 @@ pub fn create_app(
     InitError = (),
   >,
 > {
+  let cors = Cors::permissive();
   App::new()
     .app_data(JsonConfig::default().error_handler(|err, _| ApiError::from(err).into()))
     .app_data(Data::new(pool))
     .wrap(NormalizePath::new(middleware::TrailingSlash::Always))
+    .wrap(cors)
     .service(web::scope("/auth").configure(auth_routes::config))
     .service(
       web::scope("/projects")

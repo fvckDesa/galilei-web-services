@@ -5,6 +5,8 @@ use kube::Client;
 
 use crate::schemas::AppService;
 
+pub use app::app_status;
+
 mod app;
 
 pub async fn release(apps: Vec<AppService>) -> kube::Result<()> {

@@ -48,7 +48,7 @@ export const AppServiceSchema = z.object({
   image: z.string().min(1),
   name: z.string().min(1),
   port: z.number().int().gte(1).lte(65535),
-  public_domain: DomainName,
+  publicDomain: DomainName,
   replicas: z.number().int().gte(0),
 });
 export type TAppServiceSchema = z.infer<typeof AppServiceSchema>;
@@ -57,11 +57,18 @@ export const PartialAppServiceSchema = z
     image: z.string().min(1),
     name: z.string().min(1),
     port: z.number().int().gte(1).lte(65535),
-    public_domain: DomainName,
+    publicDomain: DomainName,
     replicas: z.number().int().gte(0),
   })
   .partial();
 export type TPartialAppServiceSchema = z.infer<typeof PartialAppServiceSchema>;
+export const AppReleaseState = z.enum([
+  "Unknown",
+  "Failed",
+  "Progressing",
+  "Released",
+]);
+export type TAppReleaseState = z.infer<typeof AppReleaseState>;
 export const AppService = z.object({
   deleted: z.boolean(),
   id: z.string().uuid(),
@@ -73,6 +80,11 @@ export const AppService = z.object({
   replicas: z.number().int(),
 });
 export type TAppService = z.infer<typeof AppService>;
+export const AppStatus = z.object({
+  available: z.boolean(),
+  state: AppReleaseState,
+});
+export type TAppStatus = z.infer<typeof AppStatus>;
 
 export const endpoints = makeApi([
   {
@@ -542,6 +554,35 @@ export const endpoints = makeApi([
       publicDomain: z.string().optional(),
       replicas: z.number().int(),
     }),
+    errors: [
+      {
+        status: 401,
+        schema: ErrorMessage,
+      },
+      {
+        status: 404,
+        schema: ErrorMessage,
+      },
+    ],
+  },
+  {
+    method: "get",
+    path: "/projects/:project_id/apps/:app_id/status/",
+    alias: "getAppStatus",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "project_id",
+        type: "Path",
+        schema: z.string().uuid(),
+      },
+      {
+        name: "app_id",
+        type: "Path",
+        schema: z.string().uuid(),
+      },
+    ],
+    response: z.void(),
     errors: [
       {
         status: 401,

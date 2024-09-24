@@ -15,7 +15,7 @@ export function AppResourceForm({
       schema={PartialAppServiceSchema}
       mapResponse={(data) => ({
         ...(data as TAppService),
-        public_domain: {
+        publicDomain: {
           subdomain: (data as TAppService).publicDomain ?? "",
         },
       })}

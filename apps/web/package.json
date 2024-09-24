@@ -26,6 +26,7 @@
     "axios": "^1.7.7",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "event-source-polyfill": "^1.0.31",
     "lucide-react": "^0.441.0",
     "next": "14.2.6",
     "next-runtime-env": "^3.2.2",
@@ -45,6 +46,7 @@
   "devDependencies": {
     "@gws/eslint-config": "workspace:*",
     "@gws/tsconfig": "workspace:*",
+    "@types/event-source-polyfill": "^1.0.5",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

@@ -17,6 +17,8 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { DeleteAppItem, RecoverAppItem } from "./context-menu";
+import { AppStatusLight } from "@/components/app-status-light";
+import { TokenCookie } from "@/lib/cookies";
 
 export interface ResourcesProps {
   projectId: string;
@@ -24,6 +26,7 @@ export interface ResourcesProps {
 
 export default async function Resources({ projectId }: ResourcesProps) {
   const apps = await listApps(projectId).then(unwrap);
+  const token = TokenCookie.get()?.value ?? "";
 
   return (
     <ScrollArea className="size-full px-8 py-4" type="auto">
@@ -42,6 +45,11 @@ export default async function Resources({ projectId }: ResourcesProps) {
                     )}
                     href={`/projects/${projectId}/apps/${appId}`}
                   >
+                    <AppStatusLight
+                      project={projectId}
+                      app={appId}
+                      token={token}
+                    />
                     <Container />
                     <span>{name}</span>
                   </Link>

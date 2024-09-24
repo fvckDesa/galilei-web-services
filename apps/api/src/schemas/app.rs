@@ -1,4 +1,5 @@
 use derive_more::derive::From;
+use k8s_openapi::api::apps::v1::DeploymentStatus;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use utoipa::{IntoParams, IntoResponses, ToSchema};
@@ -50,6 +51,7 @@ pub struct DomainName {
 partial_schema! {
   PartialAppServiceSchema,
   #[derive(Debug, Serialize, Deserialize, Validate, ToSchema)]
+  #[serde(rename_all = "camelCase")]
   pub struct AppServiceSchema {
     #[schema(min_length = 1)]
     #[validate(length(min = 1))]
@@ -65,5 +67,48 @@ partial_schema! {
     pub port: i32,
     #[validate(nested)]
     pub public_domain: DomainName,
+  }
+}
+
+#[derive(Debug, Default, Serialize, ToSchema)]
+pub enum AppReleaseState {
+  #[default]
+  Unknown,
+  Failed,
+  Progressing,
+  Released,
+}
+
+#[derive(Debug, Default, Serialize, ToSchema, IntoResponses)]
+#[response(status = 200, content_type = "text/event-stream")]
+#[serde(rename_all = "camelCase")]
+pub struct AppStatus {
+  available: bool,
+  state: AppReleaseState,
+}
+
+impl From<DeploymentStatus> for AppStatus {
+  fn from(value: DeploymentStatus) -> Self {
+    let mut status = AppStatus {
+      available: false,
+      state: AppReleaseState::Unknown,
+    };
+    if let Some(conditions) = value.conditions {
+      if let Some(available) = conditions.iter().find(|&con| con.type_ == "Available") {
+        status.available = available.status == "True";
+      }
+      if let Some(progressing) = conditions.iter().find(|&con| con.type_ == "Progressing") {
+        status.state = match progressing.reason.as_deref() {
+          Some("NewReplicaSetCreated") | Some("FoundNewReplicaSet") | Some("ReplicaSetUpdated") => {
+            AppReleaseState::Progressing
+          }
+          Some("NewReplicaSetAvailable") => AppReleaseState::Released,
+          Some("ProgressDeadlineExceeded") => AppReleaseState::Failed,
+          _ => AppReleaseState::Unknown,
+        }
+      }
+    }
+
+    status
   }
 }

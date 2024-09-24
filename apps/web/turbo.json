@@ -2,7 +2,7 @@
   "extends": ["//"],
   "tasks": {
     "build": {
-      "env": ["API_HOST"]
+      "env": ["API_HOST", "HOST_DOMAIN"]
     }
   }
 }

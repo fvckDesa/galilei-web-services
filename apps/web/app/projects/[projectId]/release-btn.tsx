@@ -13,9 +13,7 @@ interface ReleaseBtnProps {
 export function ReleaseBtn({ projectId }: ReleaseBtnProps) {
   const { execute, isExecuting } = useAction(releaseProject, {
     onSuccess: () => {
-      toast.success("Project released", {
-        duration: Infinity,
-      });
+      toast.success("Project released");
     },
     onError: ({ error }) => {
       console.error(error);

@@ -39,6 +39,7 @@ use utoipa::OpenApi;
     schemas::ProjectSchema,
     schemas::PartialProjectSchema,
     schemas::AppService,
+    schemas::DomainName,
     schemas::AppServiceSchema,
     schemas::PartialAppServiceSchema,
   ))

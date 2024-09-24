@@ -1,0 +1,16 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: apps-cert
+  namespace: gws
+spec:
+  issuerRef:
+    name: ca-issuer
+    kind: ClusterIssuer
+  secretName: apps-tls
+  commonName: "*.localhost"
+  subject:
+    organizations:
+      - GWS
+  dnsNames:
+    - "*.localhost"

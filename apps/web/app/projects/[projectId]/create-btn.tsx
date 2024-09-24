@@ -107,6 +107,7 @@ function NewAppForm({ project, onSuccess }: NewAppFormProps) {
           image: "",
           port: 80,
           replicas: 3,
+          public_domain: {},
         },
       },
       actionProps: {
@@ -183,13 +184,13 @@ function NewAppForm({ project, onSuccess }: NewAppFormProps) {
           >
             Create
           </Button>
-          <Button type="submit" className="w-full sm:w-auto" variant="outline">
+          <Button type="button" className="w-full sm:w-auto" variant="outline">
             Cancel
           </Button>
-          <p className="text-sm font-medium text-destructive">
-            {form.formState.errors.root?.message}
-          </p>
         </ResponsiveDialogFooter>
+        <p className="text-sm font-medium text-destructive">
+          {form.formState.errors.root?.message}
+        </p>
       </form>
     </Form>
   );

@@ -564,6 +564,9 @@
                         "type": "string",
                         "format": "uuid"
                       },
+                      "publicDomain": {
+                        "type": "string"
+                      },
                       "replicas": {
                         "type": "integer",
                         "format": "int32"
@@ -658,6 +661,9 @@
                     "projectId": {
                       "type": "string",
                       "format": "uuid"
+                    },
+                    "publicDomain": {
+                      "type": "string"
                     },
                     "replicas": {
                       "type": "integer",
@@ -773,6 +779,9 @@
                       "type": "string",
                       "format": "uuid"
                     },
+                    "publicDomain": {
+                      "type": "string"
+                    },
                     "replicas": {
                       "type": "integer",
                       "format": "int32"
@@ -864,6 +873,9 @@
                     "projectId": {
                       "type": "string",
                       "format": "uuid"
+                    },
+                    "publicDomain": {
+                      "type": "string"
                     },
                     "replicas": {
                       "type": "integer",
@@ -968,6 +980,9 @@
                       "type": "string",
                       "format": "uuid"
                     },
+                    "publicDomain": {
+                      "type": "string"
+                    },
                     "replicas": {
                       "type": "integer",
                       "format": "int32"
@@ -1020,7 +1035,7 @@
         }
       }
     },
-    "/projects/{project_id}/apps/{app_id}/recover": {
+    "/projects/{project_id}/apps/{app_id}/recover/": {
       "post": {
         "tags": ["app"],
         "operationId": "recover_app",
@@ -1081,6 +1096,9 @@
                     "projectId": {
                       "type": "string",
                       "format": "uuid"
+                    },
+                    "publicDomain": {
+                      "type": "string"
                     },
                     "replicas": {
                       "type": "integer",
@@ -1214,6 +1232,9 @@
             "type": "string",
             "format": "uuid"
           },
+          "publicDomain": {
+            "type": "string"
+          },
           "replicas": {
             "type": "integer",
             "format": "int32"
@@ -1222,7 +1243,7 @@
       },
       "AppServiceSchema": {
         "type": "object",
-        "required": ["name", "replicas", "image", "port"],
+        "required": ["name", "replicas", "image", "port", "public_domain"],
         "properties": {
           "image": {
             "type": "string",
@@ -1237,6 +1258,9 @@
             "format": "int32",
             "minimum": 1,
             "maximum": 65535
+          },
+          "public_domain": {
+            "$ref": "#/components/schemas/DomainName"
           },
           "replicas": {
             "type": "integer",
@@ -1281,6 +1305,17 @@
           }
         }
       },
+      "DomainName": {
+        "type": "object",
+        "properties": {
+          "subdomain": {
+            "type": "string",
+            "pattern": "(^[a-zA-Z0-9]$)|(^[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]$)",
+            "minLength": 1,
+            "maxLength": 62
+          }
+        }
+      },
       "ErrorMessage": {
         "allOf": [
           {
@@ -1313,6 +1348,13 @@
             "format": "int32",
             "minimum": 1,
             "maximum": 65535
+          },
+          "public_domain": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DomainName"
+              }
+            ]
           },
           "replicas": {
             "type": "integer",

@@ -53,6 +53,7 @@ type ResourceFormProps<
 > = ComponentPropsWithoutRef<"form"> & {
   schema: S;
   updateAction: HookSafeActionFn<ServerError, S, BAS, CVE, CBAVE, Data>;
+  mapResponse: (data: Data) => z.infer<S>;
   setResponseErrors?: (err: ServerError) => ResponseErrorMap<S>;
 } & HookProps<ServerError, S, BAS, CVE, CBAVE, Data>;
 
@@ -71,12 +72,13 @@ function ResourceForm<
   actionProps,
   formProps,
   errorMapProps,
+  mapResponse,
   setResponseErrors,
   ...props
 }: ResourceFormProps<ServerError, S, BAS, CVE, CBAVE, Data>) {
   const {
     form,
-    action: { result },
+    action: { result, reset },
     resetFormAndAction,
     handleSubmitWithAction,
   } = useHookFormAction(updateAction, zodResolver(schema), {
@@ -90,7 +92,8 @@ function ResourceForm<
 
   useEffect(() => {
     if (result.data) {
-      resetFormAndAction();
+      form.reset(mapResponse(result.data));
+      reset();
       return;
     }
     if (!result.serverError || !setResponseErrors) {
@@ -105,12 +108,12 @@ function ResourceForm<
         message: error,
       });
     }
-  }, [result, form, resetFormAndAction, setResponseErrors]);
+  }, [result, form, resetFormAndAction, setResponseErrors, reset, mapResponse]);
 
   return (
     <Form {...form}>
       <form
-        className={cn("flex-1", className)}
+        className={cn("flex-1 flex flex-col overflow-hidden", className)}
         onSubmit={handleSubmitWithAction}
         {...props}
       >
@@ -252,16 +255,19 @@ function ResourceCloseButton({
 const ResourceContent = forwardRef<
   ElementRef<typeof ScrollArea>,
   ComponentPropsWithoutRef<typeof ScrollArea>
->(({ className, ...props }, ref) => (
+>(({ className, children, ...props }, ref) => (
   <ScrollArea
     ref={ref}
     className={cn(
-      "flex flex-1 flex-col overflow-hidden [&>*]:flex-1 px-4 py-2",
+      "flex flex-1 flex-col overflow-hidden [&>*]:flex-1 p-2",
       className
     )}
+    type="auto"
     overflowMarker
     {...props}
-  />
+  >
+    <div className="px-4 py-2">{children}</div>
+  </ScrollArea>
 ));
 ResourceContent.displayName = "ResourceContent";
 

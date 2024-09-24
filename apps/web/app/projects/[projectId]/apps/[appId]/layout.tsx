@@ -21,7 +21,15 @@ export default async function AppLayout({
 
   return (
     <Resource>
-      <AppResourceForm updateAction={updateApp.bind(null, projectId, appId)}>
+      <AppResourceForm
+        updateAction={updateApp.bind(null, projectId, appId)}
+        formProps={{
+          defaultValues: {
+            ...app,
+            public_domain: { subdomain: app.publicDomain ?? "" },
+          },
+        }}
+      >
         <ResourceHeader>
           <div
             className={cn(
@@ -66,7 +74,9 @@ export default async function AppLayout({
           </div>
         </ResourceHeader>
         <ResourceContent>
-          <fieldset disabled={app.deleted}>{children}</fieldset>
+          <fieldset className="flex flex-col gap-4" disabled={app.deleted}>
+            {children}
+          </fieldset>
         </ResourceContent>
       </AppResourceForm>
     </Resource>

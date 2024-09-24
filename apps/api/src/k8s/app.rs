@@ -1,6 +1,7 @@
 use k8s_openapi::api::{
   apps::v1::{Deployment, DeploymentSpec},
   core::v1::{Container, ContainerPort, Service},
+  networking::v1::Ingress,
 };
 use kube::{
   api::{Patch, PatchParams},
@@ -20,6 +21,8 @@ pub async fn reconcile_app(app: AppService, client: Client) -> Result<()> {
 
   reconcile_svc(&name, &app, client.clone(), &params).await?;
 
+  reconcile_ingress(&name, &app, client.clone(), &params).await?;
+
   Ok(())
 }
 
@@ -35,6 +38,7 @@ async fn reconcile_deploy(
 
   if current_deploy.is_some() && app.deleted {
     api.delete(name, &Default::default()).await?;
+    return Ok(());
   }
 
   if current_deploy.is_none()
@@ -133,10 +137,21 @@ fn generate_deploy(name: &str, app: &AppService) -> Deployment {
           }
         },
         "spec": {
+          "enableServiceLinks": false,
           "containers": [
             {
               "name": name,
               "image": app.image,
+              "env": [
+                {
+                  "name": "ADDRESS",
+                  "value": "0.0.0.0"
+                },
+                {
+                  "name": "PORT",
+                  "value": app.port.to_string()
+                }
+              ],
               "ports": [
                 {
                   "name": K8S_CONFIG.port_name,
@@ -160,13 +175,14 @@ async fn reconcile_svc(
 ) -> Result<()> {
   let api: Api<Service> = Api::namespaced(client, &K8S_CONFIG.namespace);
 
-  let current_service = api.get_opt(name).await?;
+  let service = api.get_opt(name).await?;
 
-  if current_service.is_some() && app.deleted {
+  if service.is_some() && app.deleted {
     api.delete(name, &Default::default()).await?;
+    return Ok(());
   }
 
-  if current_service.is_none() {
+  if service.is_none() {
     let service = generate_svc(name);
 
     api.patch(name, params, &Patch::Apply(service)).await?;
@@ -197,4 +213,100 @@ fn generate_svc(name: &str) -> Service {
     }
   }))
   .expect("Invalid app service")
+}
+
+async fn reconcile_ingress(
+  name: &str,
+  app: &AppService,
+  client: Client,
+  params: &PatchParams,
+) -> Result<()> {
+  let api: Api<Ingress> = Api::namespaced(client, &K8S_CONFIG.namespace);
+
+  let ingress = api.get_opt(name).await?;
+
+  if (ingress.is_some() && app.deleted) || ingress.is_some() && app.public_domain.is_none() {
+    api.delete(name, &Default::default()).await?;
+    return Ok(());
+  }
+
+  if (ingress.is_none() && app.public_domain.is_some())
+    || ingress.is_some_and(|ingress| {
+      ingress.spec.is_some_and(|spec| {
+        spec.rules.is_some_and(|rules| {
+          rules.first().is_some_and(|rule| {
+            rule.host.as_deref().is_some_and(|host| {
+              app
+                .public_domain
+                .as_deref()
+                .is_some_and(|public_domain| public_domain != host)
+            })
+          })
+        })
+      })
+    })
+  {
+    log::debug!("Generate ingress {:#?}", app);
+    let service = generate_ingress(name, app);
+
+    api.patch(name, params, &Patch::Apply(service)).await?;
+  }
+
+  Ok(())
+}
+
+fn generate_ingress(name: &str, app: &AppService) -> Ingress {
+  let domain = format!(
+    "{}.{}",
+    app
+      .public_domain
+      .as_deref()
+      .expect("Generate Ingress with no public domain"),
+    K8S_CONFIG.host_domain
+  );
+
+  serde_json::from_value(json!({
+    "apiVersion": "networking.k8s.io/v1",
+    "kind": "Ingress",
+    "metadata": {
+      "name": name,
+      "namespace": K8S_CONFIG.namespace,
+      "annotations": {
+        "traefik.ingress.kubernetes.io/router.middlewares": "gws-redirect@kubernetescrd",
+        "traefik.ingress.kubernetes.io/router.entrypoints": "web, websecure"
+      }
+    },
+    "spec": {
+      "tls": [
+        {
+          "hosts": [
+            domain,
+          ],
+          "secretName": "apps-tls"
+        }
+      ],
+      "rules": [
+        {
+          "host": domain,
+          "http": {
+            "paths": [
+              {
+                "path": "/",
+                "pathType": "Prefix",
+                "backend": {
+                  "service": {
+                    "name": name,
+                    "port": {
+                      "number": K8S_CONFIG.service_port
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }))
+  .expect("Invalid app ingress")
 }

@@ -30,4 +30,6 @@ struct K8sConfig {
   port_name: String,
   #[config(env = "K8S_SERVICE_PORT", default = 80)]
   service_port: u16,
+  #[config(env = "HOST_DOMAIN", default = "localhost")]
+  host_domain: String,
 }

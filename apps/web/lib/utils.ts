@@ -1,5 +1,6 @@
 import { TErrorMessage } from "@gws/api-client";
 import { clsx, type ClassValue } from "clsx";
+import { env } from "next-runtime-env";
 import {
   BindArgsValidationErrors,
   SafeActionResult,
@@ -56,4 +57,11 @@ export function unwrap<
   }
 
   return result.data as Data;
+}
+
+export function getPublicUrl(subdomain: string): string {
+  const HOST_DOMAIN = env("NEXT_PUBLIC_HOST_DOMAIN") ?? "localhost";
+  const HOST_HTTPS_PORT = env("NEXT_PUBLIC_HOST_PORT") ?? "8443";
+
+  return `https://${subdomain}.${HOST_DOMAIN}:${HOST_HTTPS_PORT}`;
 }

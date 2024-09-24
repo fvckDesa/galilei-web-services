@@ -31,6 +31,7 @@ CREATE TABLE
     replicas INT NOT NULL,
     image TEXT NOT NULL,
     port INT NOT NULL,
+    public_domain TEXT UNIQUE,
     deleted BOOLEAN NOT NULL DEFAULT FALSE,
     project_id UUID NOT NULL,
     FOREIGN KEY (project_id) REFERENCES projects (project_id) ON DELETE CASCADE,

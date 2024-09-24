@@ -34,10 +34,21 @@ export const PartialProjectSchema = z
   .object({ name: z.string().min(1) })
   .partial();
 export type TPartialProjectSchema = z.infer<typeof PartialProjectSchema>;
+export const DomainName = z
+  .object({
+    subdomain: z
+      .string()
+      .min(1)
+      .max(62)
+      .regex(/(^[a-zA-Z0-9]$)|(^[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]$)/),
+  })
+  .partial();
+export type TDomainName = z.infer<typeof DomainName>;
 export const AppServiceSchema = z.object({
   image: z.string().min(1),
   name: z.string().min(1),
   port: z.number().int().gte(1).lte(65535),
+  public_domain: DomainName,
   replicas: z.number().int().gte(0),
 });
 export type TAppServiceSchema = z.infer<typeof AppServiceSchema>;
@@ -46,6 +57,7 @@ export const PartialAppServiceSchema = z
     image: z.string().min(1),
     name: z.string().min(1),
     port: z.number().int().gte(1).lte(65535),
+    public_domain: DomainName,
     replicas: z.number().int().gte(0),
   })
   .partial();
@@ -57,6 +69,7 @@ export const AppService = z.object({
   name: z.string(),
   port: z.number().int(),
   projectId: z.string().uuid(),
+  publicDomain: z.string().optional(),
   replicas: z.number().int(),
 });
 export type TAppService = z.infer<typeof AppService>;
@@ -314,6 +327,7 @@ export const endpoints = makeApi([
         name: z.string(),
         port: z.number().int(),
         projectId: z.string().uuid(),
+        publicDomain: z.string().optional(),
         replicas: z.number().int(),
       })
     ),
@@ -352,6 +366,7 @@ export const endpoints = makeApi([
       name: z.string(),
       port: z.number().int(),
       projectId: z.string().uuid(),
+      publicDomain: z.string().optional(),
       replicas: z.number().int(),
     }),
     errors: [
@@ -397,6 +412,7 @@ export const endpoints = makeApi([
       name: z.string(),
       port: z.number().int(),
       projectId: z.string().uuid(),
+      publicDomain: z.string().optional(),
       replicas: z.number().int(),
     }),
     errors: [
@@ -434,6 +450,7 @@ export const endpoints = makeApi([
       name: z.string(),
       port: z.number().int(),
       projectId: z.string().uuid(),
+      publicDomain: z.string().optional(),
       replicas: z.number().int(),
     }),
     errors: [
@@ -476,6 +493,7 @@ export const endpoints = makeApi([
       name: z.string(),
       port: z.number().int(),
       projectId: z.string().uuid(),
+      publicDomain: z.string().optional(),
       replicas: z.number().int(),
     }),
     errors: [
@@ -499,7 +517,7 @@ export const endpoints = makeApi([
   },
   {
     method: "post",
-    path: "/projects/:project_id/apps/:app_id/recover",
+    path: "/projects/:project_id/apps/:app_id/recover/",
     alias: "recoverApp",
     requestFormat: "json",
     parameters: [
@@ -521,6 +539,7 @@ export const endpoints = makeApi([
       name: z.string(),
       port: z.number().int(),
       projectId: z.string().uuid(),
+      publicDomain: z.string().optional(),
       replicas: z.number().int(),
     }),
     errors: [

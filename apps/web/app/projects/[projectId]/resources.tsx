@@ -1,9 +1,15 @@
 import { listApps } from "./actions";
-import { unwrap } from "@/lib/utils";
+import { getPublicUrl, unwrap } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { Container, SquareArrowOutUpRight, Trash2, Undo2 } from "lucide-react";
+import {
+  Container,
+  Settings,
+  SquareArrowOutUpRight,
+  Trash2,
+  Undo2,
+} from "lucide-react";
 import {
   ContextMenu,
   ContextMenuContent,
@@ -24,7 +30,7 @@ export default async function Resources({ projectId }: ResourcesProps) {
       <ul className="flex flex-wrap justify-center gap-x-4 gap-y-3 px-4 py-2">
         {apps.available
           .concat(...apps.deleted)
-          .map(({ id: appId, name, deleted }) => (
+          .map(({ id: appId, name, deleted, publicDomain }) => (
             <li key={appId} className="w-80 rounded-md font-semibold">
               <ContextMenu>
                 <ContextMenuTrigger asChild>
@@ -41,10 +47,21 @@ export default async function Resources({ projectId }: ResourcesProps) {
                   </Link>
                 </ContextMenuTrigger>
                 <ContextMenuContent className="min-w-60">
+                  {publicDomain ? (
+                    <ContextMenuItem
+                      className="flex items-center gap-2"
+                      asChild
+                    >
+                      <Link href={getPublicUrl(publicDomain)} target="_blank">
+                        <SquareArrowOutUpRight className="size-4" />
+                        <span>Open public url</span>
+                      </Link>
+                    </ContextMenuItem>
+                  ) : null}
                   <ContextMenuItem className="flex items-center gap-2" asChild>
                     <Link href={`/projects/${projectId}/apps/${appId}`}>
-                      <SquareArrowOutUpRight className="size-4" />
-                      <span>Open</span>
+                      <Settings className="size-4" />
+                      <span>View settings</span>
                     </Link>
                   </ContextMenuItem>
                   {deleted ? (

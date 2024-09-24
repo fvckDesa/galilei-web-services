@@ -102,6 +102,11 @@ await spinner(
   () =>
     $$`kubectl apply -f ${path.join(process.cwd(), argv.kube, "apps-cert.yaml")}`
 );
+await spinner(
+  `Apply traefik configs...`,
+  () =>
+    $$`kubectl apply -f ${path.join(process.cwd(), argv.kube, "traefik.yaml")}`
+);
 
 log.success(`Cluster ${CLUSTER_NAME} running`);
 

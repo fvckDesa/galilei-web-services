@@ -23,7 +23,7 @@ import { createNewProject } from "./actions";
 import { ProjectSchema } from "@gws/api-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 
 export function NewProjectDialog() {
@@ -33,20 +33,25 @@ export function NewProjectDialog() {
     form,
     action: { result },
     handleSubmitWithAction,
+    resetFormAndAction,
   } = useHookFormAction(createNewProject, zodResolver(ProjectSchema), {
     formProps: {
       defaultValues: {
         name: "",
       },
     },
-    actionProps: {
-      onSuccess() {
-        setOpen(false);
-      },
-    },
   });
 
+  const closeDialog = useCallback(() => {
+    resetFormAndAction();
+    setOpen(false);
+  }, [resetFormAndAction, setOpen]);
+
   useEffect(() => {
+    if (result.data) {
+      closeDialog();
+      return;
+    }
     if (!result.serverError) {
       return;
     }
@@ -66,7 +71,7 @@ export function NewProjectDialog() {
         });
         break;
     }
-  }, [form, result]);
+  }, [form, result, closeDialog]);
 
   return (
     <ResponsiveDialog open={open} onOpenChange={setOpen}>
@@ -106,9 +111,13 @@ export function NewProjectDialog() {
                 Create
               </Button>
               <Button
-                type="submit"
+                type="button"
                 className="w-full sm:w-auto"
                 variant="outline"
+                onClick={() => {
+                  form.reset();
+                  setOpen(false);
+                }}
               >
                 Cancel
               </Button>

@@ -16,7 +16,7 @@ import {
   DropdownMenuContent,
 } from "@/components/ui/dropdown-menu";
 import { Container, Plus } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AppServiceSchema } from "@gws/api-client";
@@ -48,9 +48,9 @@ export function CreateBtn({ project }: CreateBtnProps) {
     };
   }
 
-  function onSuccess() {
+  const closeDialog = useCallback(() => {
     setOpen(false);
-  }
+  }, [setOpen]);
 
   return (
     <ResponsiveDialog open={open} onOpenChange={setOpen}>
@@ -79,7 +79,7 @@ export function CreateBtn({ project }: CreateBtnProps) {
               <ResponsiveDialogTitle>New App</ResponsiveDialogTitle>
               <ResponsiveDialogDescription></ResponsiveDialogDescription>
             </ResponsiveDialogHeader>
-            <NewAppForm project={project} onSuccess={onSuccess} />
+            <NewAppForm project={project} closeDialog={closeDialog} />
           </>
         ) : null}
       </ResponsiveDialogContent>
@@ -89,14 +89,15 @@ export function CreateBtn({ project }: CreateBtnProps) {
 
 interface NewAppFormProps {
   project: string;
-  onSuccess?: () => void;
+  closeDialog: () => void;
 }
 
-function NewAppForm({ project, onSuccess }: NewAppFormProps) {
+function NewAppForm({ project, closeDialog }: NewAppFormProps) {
   const {
     form,
     action: { result },
     handleSubmitWithAction,
+    resetFormAndAction,
   } = useHookFormAction(
     createApp.bind(null, project),
     zodResolver(AppServiceSchema),
@@ -112,11 +113,16 @@ function NewAppForm({ project, onSuccess }: NewAppFormProps) {
       },
       actionProps: {
         onSuccess() {
-          onSuccess?.();
+          closeDialog();
         },
       },
     }
   );
+
+  const close = useCallback(() => {
+    resetFormAndAction();
+    closeDialog();
+  }, [closeDialog, resetFormAndAction]);
 
   useEffect(() => {
     if (!result.serverError) {
@@ -184,7 +190,12 @@ function NewAppForm({ project, onSuccess }: NewAppFormProps) {
           >
             Create
           </Button>
-          <Button type="button" className="w-full sm:w-auto" variant="outline">
+          <Button
+            type="button"
+            className="w-full sm:w-auto"
+            variant="outline"
+            onClick={() => close()}
+          >
             Cancel
           </Button>
         </ResponsiveDialogFooter>

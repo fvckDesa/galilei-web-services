@@ -14,6 +14,7 @@ import { deleteApp, getApp, recoverApp, updateApp } from "./actions";
 import { AppResourceForm } from "./AppResourceForm";
 import { AppStatusLight } from "@/components/app-status-light";
 import { TokenCookie } from "@/lib/cookies";
+import { AppTabs } from "./tab";
 
 export default async function AppLayout({
   params: { projectId, appId },
@@ -77,11 +78,13 @@ export default async function AppLayout({
             <ResourceCloseButton />
           </div>
         </ResourceHeader>
-        <ResourceContent>
-          <fieldset className="flex flex-col gap-4" disabled={app.deleted}>
-            {children}
-          </fieldset>
-        </ResourceContent>
+        <AppTabs>
+          <ResourceContent>
+            <fieldset className="flex flex-col gap-4" disabled={app.deleted}>
+              {children}
+            </fieldset>
+          </ResourceContent>
+        </AppTabs>
       </AppResourceForm>
     </Resource>
   );

@@ -20,6 +20,7 @@
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-scroll-area": "^1.1.0",
     "@radix-ui/react-slot": "^1.1.0",
+    "@radix-ui/react-tabs": "^1.1.0",
     "@radix-ui/react-visually-hidden": "^1.1.0",
     "@zodios/core": "^10.9.6",
     "@zodios/plugins": "^10.6.0",

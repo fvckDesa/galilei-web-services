@@ -10,11 +10,13 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { getPublicUrl } from "@/lib/utils";
-import { TPartialAppServiceSchema } from "@gws/api-client";
 import { useFormContext } from "react-hook-form";
+import { z } from "zod";
+import { PartialAppServiceSchemaMod } from "./schema";
 
 export default function AppPage() {
-  const { control } = useFormContext<TPartialAppServiceSchema>();
+  const { control } =
+    useFormContext<z.infer<typeof PartialAppServiceSchemaMod>>();
 
   return (
     <>
@@ -86,22 +88,13 @@ export default function AppPage() {
       />
       <FormField
         control={control}
-        name="publicDomain.subdomain"
+        name="publicDomain"
         render={({ field }) => (
           <FormItem>
             <FormLabel>Public http subdomain</FormLabel>
             <div className="flex items-center gap-4">
               <FormControl>
-                <Input
-                  type="string"
-                  autoComplete="off"
-                  {...field}
-                  onChange={(e) =>
-                    field.onChange(
-                      e.target.value.length === 0 ? undefined : e.target.value
-                    )
-                  }
-                />
+                <Input type="string" autoComplete="off" {...field} />
               </FormControl>
               <CopyButton
                 text={field.value ? getPublicUrl(field.value) : ""}

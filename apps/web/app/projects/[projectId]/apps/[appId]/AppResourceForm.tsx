@@ -1,8 +1,9 @@
 "use client";
 
 import { ResourceForm } from "@/components/resource";
-import { PartialAppServiceSchema, TAppService } from "@gws/api-client";
+import { TAppService } from "@gws/api-client";
 import { ComponentPropsWithoutRef } from "react";
+import { PartialAppServiceSchemaMod } from "./schema";
 
 export function AppResourceForm({
   ...props
@@ -12,12 +13,10 @@ export function AppResourceForm({
 >) {
   return (
     <ResourceForm
-      schema={PartialAppServiceSchema}
+      schema={PartialAppServiceSchemaMod}
       mapResponse={(data) => ({
         ...(data as TAppService),
-        publicDomain: {
-          subdomain: (data as TAppService).publicDomain ?? "",
-        },
+        publicDomain: (data as TAppService).publicDomain ?? "",
       })}
       {...props}
     />

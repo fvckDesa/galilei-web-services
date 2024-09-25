@@ -1,9 +1,10 @@
 "use server";
 
 import { apiActionClient } from "@/lib/safe-action";
-import { PartialAppServiceSchema } from "@gws/api-client";
+import { TPartialAppServiceSchema } from "@gws/api-client";
 import { revalidateTag } from "next/cache";
 import { z } from "zod";
+import { PartialAppServiceSchemaMod } from "./schema";
 
 const IdentifyApp = z.object({
   projectId: z.string().uuid(),
@@ -29,10 +30,19 @@ export const updateApp = apiActionClient
     z.string().uuid(),
     z.string().uuid(),
   ])
-  .schema(PartialAppServiceSchema)
+  .schema(PartialAppServiceSchemaMod)
   .action(
     async ({ parsedInput: app, bindArgsParsedInputs, ctx: { apiClient } }) => {
-      const res = await apiClient.updateApp(app, {
+      const { publicDomain, ...partialApp } = app;
+      const body: TPartialAppServiceSchema = partialApp;
+
+      if (publicDomain != undefined) {
+        body.publicDomain = {
+          subdomain: publicDomain.length > 0 ? publicDomain : undefined,
+        };
+      }
+
+      const res = await apiClient.updateApp(body, {
         params: {
           project_id: bindArgsParsedInputs[0],
           app_id: bindArgsParsedInputs[1],

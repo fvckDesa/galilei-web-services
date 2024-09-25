@@ -29,7 +29,7 @@ export default async function AppLayout({
         formProps={{
           defaultValues: {
             ...app,
-            publicDomain: { subdomain: app.publicDomain ?? "" },
+            publicDomain: app.publicDomain ?? "",
           },
         }}
       >

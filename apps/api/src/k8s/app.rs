@@ -159,6 +159,7 @@ fn generate_deploy(name: &str, app: &AppService) -> Deployment {
       "namespace": K8S_CONFIG.namespace
     },
     "spec": {
+      "progressDeadlineSeconds": 120,
       "replicas": app.replicas,
       "selector": {
         "matchLabels": {

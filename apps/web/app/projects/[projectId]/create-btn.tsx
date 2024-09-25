@@ -119,11 +119,6 @@ function NewAppForm({ project, closeDialog }: NewAppFormProps) {
     }
   );
 
-  const close = useCallback(() => {
-    resetFormAndAction();
-    closeDialog();
-  }, [closeDialog, resetFormAndAction]);
-
   useEffect(() => {
     if (!result.serverError) {
       return;
@@ -194,7 +189,10 @@ function NewAppForm({ project, closeDialog }: NewAppFormProps) {
             type="button"
             className="w-full sm:w-auto"
             variant="outline"
-            onClick={() => close()}
+            onClick={() => {
+              resetFormAndAction();
+              closeDialog();
+            }}
           >
             Cancel
           </Button>

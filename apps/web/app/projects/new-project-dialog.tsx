@@ -23,7 +23,7 @@ import { createNewProject } from "./actions";
 import { ProjectSchema } from "@gws/api-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 
 export function NewProjectDialog() {
@@ -40,18 +40,14 @@ export function NewProjectDialog() {
         name: "",
       },
     },
+    actionProps: {
+      onSuccess() {
+        setOpen(false);
+      },
+    },
   });
 
-  const closeDialog = useCallback(() => {
-    resetFormAndAction();
-    setOpen(false);
-  }, [resetFormAndAction, setOpen]);
-
   useEffect(() => {
-    if (result.data) {
-      closeDialog();
-      return;
-    }
     if (!result.serverError) {
       return;
     }
@@ -71,7 +67,7 @@ export function NewProjectDialog() {
         });
         break;
     }
-  }, [form, result, closeDialog]);
+  }, [form, result]);
 
   return (
     <ResponsiveDialog open={open} onOpenChange={setOpen}>
@@ -115,7 +111,7 @@ export function NewProjectDialog() {
                 className="w-full sm:w-auto"
                 variant="outline"
                 onClick={() => {
-                  form.reset();
+                  resetFormAndAction();
                   setOpen(false);
                 }}
               >

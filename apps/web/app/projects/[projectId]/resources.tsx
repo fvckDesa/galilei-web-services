@@ -1,9 +1,10 @@
-import { listApps } from "./actions";
+import { listApps } from "@/server-actions/app";
 import { getPublicUrl, unwrap } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import {
+  Braces,
   Container,
   Settings,
   SquareArrowOutUpRight,
@@ -70,6 +71,12 @@ export default async function Resources({ projectId }: ResourcesProps) {
                     <Link href={`/projects/${projectId}/apps/${appId}`}>
                       <Settings className="size-4" />
                       <span>View settings</span>
+                    </Link>
+                  </ContextMenuItem>
+                  <ContextMenuItem className="flex items-center gap-2" asChild>
+                    <Link href={`/projects/${projectId}/apps/${appId}/env`}>
+                      <Braces className="size-4" />
+                      <span>View environment</span>
                     </Link>
                   </ContextMenuItem>
                   {deleted ? (

@@ -21,10 +21,10 @@ use crate::{
   ApiResult,
 };
 
-const CONTEXT_PATH: &str = "/projects/{project_id}";
+const CONTEXT_PATH_WITHOUT_ID: &str = "/projects/{project_id}/apps";
 
 #[utoipa::path(
-  context_path = CONTEXT_PATH,
+  context_path = CONTEXT_PATH_WITHOUT_ID,
   params(ProjectPath),
   responses(
     AppServicesList,
@@ -33,7 +33,7 @@ const CONTEXT_PATH: &str = "/projects/{project_id}";
     InternalServerErrorMessage
   )
 )]
-#[get("/apps/")]
+#[get("/")]
 pub async fn list_apps(path: Path<ProjectPath>, pool: Pool) -> ApiResult<AppServicesList> {
   let ProjectPath { project_id } = *path;
   let apps = sqlx::query_as!(
@@ -48,7 +48,7 @@ pub async fn list_apps(path: Path<ProjectPath>, pool: Pool) -> ApiResult<AppServ
 }
 
 #[utoipa::path(
-  context_path = CONTEXT_PATH,
+  context_path = CONTEXT_PATH_WITHOUT_ID,
   params(ProjectPath),
   responses(
     AppService,
@@ -59,7 +59,7 @@ pub async fn list_apps(path: Path<ProjectPath>, pool: Pool) -> ApiResult<AppServ
     InternalServerErrorMessage
   )
 )]
-#[post("/apps/")]
+#[post("/")]
 pub async fn create_app(
   path: Path<ProjectPath>,
   Json(app): Json<AppServiceSchema>,
@@ -90,8 +90,14 @@ pub async fn create_app(
   Ok(app)
 }
 
+pub fn config_without_id(cfg: &mut ServiceConfig) {
+  cfg.service(list_apps).service(create_app);
+}
+
+const CONTEXT_PATH_WITH_ID: &str = "/projects/{project_id}/apps/{app_id}";
+
 #[utoipa::path(
-  context_path = CONTEXT_PATH,
+  context_path = CONTEXT_PATH_WITH_ID,
   params(AppPath),
   responses(
     AppService,
@@ -100,7 +106,7 @@ pub async fn create_app(
     InternalServerErrorMessage
   )
 )]
-#[get("/apps/{app_id}/")]
+#[get("/")]
 pub async fn get_app(path: Path<AppPath>, pool: Pool) -> ApiResult<AppService> {
   let AppPath { project_id, app_id } = *path;
 
@@ -117,7 +123,7 @@ pub async fn get_app(path: Path<AppPath>, pool: Pool) -> ApiResult<AppService> {
 }
 
 #[utoipa::path(
-  context_path = CONTEXT_PATH,
+  context_path = CONTEXT_PATH_WITH_ID,
   params(AppPath),
   responses(
     AppStatus,
@@ -126,7 +132,7 @@ pub async fn get_app(path: Path<AppPath>, pool: Pool) -> ApiResult<AppService> {
     InternalServerErrorMessage
   )
 )]
-#[get("/apps/{app_id}/status/")]
+#[get("/status/")]
 pub async fn get_app_status(path: Path<AppPath>) -> ApiResult<impl Responder> {
   let AppPath {
     project_id: _,
@@ -134,7 +140,6 @@ pub async fn get_app_status(path: Path<AppPath>) -> ApiResult<impl Responder> {
   } = *path;
 
   let stream = k8s::app_status(&app_id).await?.map_ok(|status| {
-    log::debug!("Status: {status:?}");
     sse::Event::Data(
       sse::Data::new_json(status)
         .expect("Invalid app status json")
@@ -146,7 +151,7 @@ pub async fn get_app_status(path: Path<AppPath>) -> ApiResult<impl Responder> {
 }
 
 #[utoipa::path(
-  context_path = CONTEXT_PATH,
+  context_path = CONTEXT_PATH_WITH_ID,
   params(AppPath),
   responses(
     AppService,
@@ -157,7 +162,7 @@ pub async fn get_app_status(path: Path<AppPath>) -> ApiResult<impl Responder> {
     InternalServerErrorMessage
   )
 )]
-#[patch("/apps/{app_id}/")]
+#[patch("/")]
 pub async fn update_app(
   path: Path<AppPath>,
   Json(app): Json<PartialAppServiceSchema>,
@@ -200,7 +205,7 @@ pub async fn update_app(
 }
 
 #[utoipa::path(
-  context_path = CONTEXT_PATH,
+  context_path = CONTEXT_PATH_WITH_ID,
   params(AppPath),
   responses(
     AppService,
@@ -209,7 +214,7 @@ pub async fn update_app(
     InternalServerErrorMessage
   )
 )]
-#[delete("/apps/{app_id}/")]
+#[delete("/")]
 pub async fn delete_app(path: Path<AppPath>, pool: Pool) -> ApiResult<AppService> {
   let AppPath { project_id, app_id } = *path;
 
@@ -226,7 +231,7 @@ pub async fn delete_app(path: Path<AppPath>, pool: Pool) -> ApiResult<AppService
 }
 
 #[utoipa::path(
-  context_path = CONTEXT_PATH,
+  context_path = CONTEXT_PATH_WITH_ID,
   params(AppPath),
   responses(
     AppService,
@@ -235,7 +240,7 @@ pub async fn delete_app(path: Path<AppPath>, pool: Pool) -> ApiResult<AppService
     InternalServerErrorMessage
   )
 )]
-#[post("/apps/{app_id}/recover/")]
+#[post("/recover/")]
 pub async fn recover_app(path: Path<AppPath>, pool: Pool) -> ApiResult<AppService> {
   let AppPath { project_id, app_id } = *path;
 
@@ -251,10 +256,8 @@ pub async fn recover_app(path: Path<AppPath>, pool: Pool) -> ApiResult<AppServic
   Ok(app)
 }
 
-pub fn config(cfg: &mut ServiceConfig) {
+pub fn config_with_id(cfg: &mut ServiceConfig) {
   cfg
-    .service(list_apps)
-    .service(create_app)
     .service(get_app)
     .service(get_app_status)
     .service(update_app)

@@ -28,6 +28,11 @@ use utoipa::OpenApi;
     app::update_app,
     app::delete_app,
     app::recover_app,
+    env::list_envs,
+    env::create_env,
+    env::get_env,
+    env::update_env,
+    env::delete_env,
   ),
   components(schemas(
     error::ApiError,
@@ -45,6 +50,9 @@ use utoipa::OpenApi;
     schemas::DomainName,
     schemas::AppServiceSchema,
     schemas::PartialAppServiceSchema,
+    schemas::EnvVar,
+    schemas::EnvSchema,
+    schemas::PartialEnvSchema,
   ))
 )]
 pub struct OpenApiSpec;

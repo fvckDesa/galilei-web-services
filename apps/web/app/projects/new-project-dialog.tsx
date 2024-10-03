@@ -19,7 +19,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useHookFormAction } from "@next-safe-action/adapter-react-hook-form/hooks";
-import { createNewProject } from "./actions";
+import { createNewProject } from "@/server-actions/project";
 import { ProjectSchema } from "@gws/api-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";

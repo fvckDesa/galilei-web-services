@@ -1,5 +1,5 @@
 import { Layout, Page } from "@/lib/types";
-import { getProject } from "./actions";
+import { getProject } from "@/server-actions/project";
 import { unwrap } from "@/lib/utils";
 import { CreateBtn } from "./create-btn";
 import Resources from "./resources";

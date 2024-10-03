@@ -62,6 +62,15 @@ export const PartialAppServiceSchema = z
   })
   .partial();
 export type TPartialAppServiceSchema = z.infer<typeof PartialAppServiceSchema>;
+export const EnvSchema = z.object({
+  name: z.string().min(1),
+  value: z.string().min(1),
+});
+export type TEnvSchema = z.infer<typeof EnvSchema>;
+export const PartialEnvSchema = z
+  .object({ name: z.string().min(1), value: z.string().min(1) })
+  .partial();
+export type TPartialEnvSchema = z.infer<typeof PartialEnvSchema>;
 export const AppReleaseState = z.enum([
   "Unknown",
   "Failed",
@@ -85,6 +94,13 @@ export const AppStatus = z.object({
   state: AppReleaseState,
 });
 export type TAppStatus = z.infer<typeof AppStatus>;
+export const EnvVar = z.object({
+  appId: z.string().uuid(),
+  id: z.string().uuid(),
+  name: z.string(),
+  value: z.string(),
+});
+export type TEnvVar = z.infer<typeof EnvVar>;
 
 export const endpoints = makeApi([
   {
@@ -507,6 +523,219 @@ export const endpoints = makeApi([
       projectId: z.string().uuid(),
       publicDomain: z.string().optional(),
       replicas: z.number().int(),
+    }),
+    errors: [
+      {
+        status: 400,
+        schema: ErrorMessage,
+      },
+      {
+        status: 401,
+        schema: ErrorMessage,
+      },
+      {
+        status: 404,
+        schema: ErrorMessage,
+      },
+      {
+        status: 409,
+        schema: ErrorMessage,
+      },
+    ],
+  },
+  {
+    method: "get",
+    path: "/projects/:project_id/apps/:app_id/envs/",
+    alias: "listEnvs",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "project_id",
+        type: "Path",
+        schema: z.string().uuid(),
+      },
+      {
+        name: "app_id",
+        type: "Path",
+        schema: z.string().uuid(),
+      },
+    ],
+    response: z.array(
+      z.object({
+        appId: z.string().uuid(),
+        id: z.string().uuid(),
+        name: z.string(),
+        value: z.string(),
+      })
+    ),
+    errors: [
+      {
+        status: 401,
+        schema: ErrorMessage,
+      },
+      {
+        status: 404,
+        schema: ErrorMessage,
+      },
+    ],
+  },
+  {
+    method: "post",
+    path: "/projects/:project_id/apps/:app_id/envs/",
+    alias: "createEnv",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: EnvSchema,
+      },
+      {
+        name: "project_id",
+        type: "Path",
+        schema: z.string().uuid(),
+      },
+      {
+        name: "app_id",
+        type: "Path",
+        schema: z.string().uuid(),
+      },
+    ],
+    response: z.object({
+      appId: z.string().uuid(),
+      id: z.string().uuid(),
+      name: z.string(),
+      value: z.string(),
+    }),
+    errors: [
+      {
+        status: 400,
+        schema: ErrorMessage,
+      },
+      {
+        status: 401,
+        schema: ErrorMessage,
+      },
+      {
+        status: 404,
+        schema: ErrorMessage,
+      },
+      {
+        status: 409,
+        schema: ErrorMessage,
+      },
+    ],
+  },
+  {
+    method: "get",
+    path: "/projects/:project_id/apps/:app_id/envs/:env_id/",
+    alias: "getEnv",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "project_id",
+        type: "Path",
+        schema: z.string().uuid(),
+      },
+      {
+        name: "app_id",
+        type: "Path",
+        schema: z.string().uuid(),
+      },
+      {
+        name: "env_id",
+        type: "Path",
+        schema: z.string().uuid(),
+      },
+    ],
+    response: z.object({
+      appId: z.string().uuid(),
+      id: z.string().uuid(),
+      name: z.string(),
+      value: z.string(),
+    }),
+    errors: [
+      {
+        status: 401,
+        schema: ErrorMessage,
+      },
+      {
+        status: 404,
+        schema: ErrorMessage,
+      },
+    ],
+  },
+  {
+    method: "delete",
+    path: "/projects/:project_id/apps/:app_id/envs/:env_id/",
+    alias: "deleteEnv",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "project_id",
+        type: "Path",
+        schema: z.string().uuid(),
+      },
+      {
+        name: "app_id",
+        type: "Path",
+        schema: z.string().uuid(),
+      },
+      {
+        name: "env_id",
+        type: "Path",
+        schema: z.string().uuid(),
+      },
+    ],
+    response: z.object({
+      appId: z.string().uuid(),
+      id: z.string().uuid(),
+      name: z.string(),
+      value: z.string(),
+    }),
+    errors: [
+      {
+        status: 401,
+        schema: ErrorMessage,
+      },
+      {
+        status: 404,
+        schema: ErrorMessage,
+      },
+    ],
+  },
+  {
+    method: "patch",
+    path: "/projects/:project_id/apps/:app_id/envs/:env_id/",
+    alias: "updateEnv",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: PartialEnvSchema,
+      },
+      {
+        name: "project_id",
+        type: "Path",
+        schema: z.string().uuid(),
+      },
+      {
+        name: "app_id",
+        type: "Path",
+        schema: z.string().uuid(),
+      },
+      {
+        name: "env_id",
+        type: "Path",
+        schema: z.string().uuid(),
+      },
+    ],
+    response: z.object({
+      appId: z.string().uuid(),
+      id: z.string().uuid(),
+      name: z.string(),
+      value: z.string(),
     }),
     errors: [
       {

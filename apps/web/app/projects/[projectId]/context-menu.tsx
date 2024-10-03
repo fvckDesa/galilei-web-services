@@ -3,7 +3,7 @@
 import { ComponentPropsWithoutRef } from "react";
 import { toast } from "sonner";
 import { ContextMenuItem } from "@/components/ui/context-menu";
-import { deleteApp, recoverApp } from "./apps/[appId]/actions";
+import { deleteApp, recoverApp } from "@/server-actions/app";
 import { unwrap } from "@/lib/utils";
 
 export type DeleteAppItemProps = ComponentPropsWithoutRef<

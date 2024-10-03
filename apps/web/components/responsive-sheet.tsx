@@ -30,14 +30,12 @@ import {
   ComponentPropsWithoutRef,
   ElementType,
   useMemo,
-  useState,
-  useCallback,
-  useEffect,
 } from "react";
 import { ExpandType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import dynamic from "next/dynamic";
 import { Screen, useScreenMediaQuery } from "@/hooks/screen-media-query";
+import { useControlledOpen } from "@/hooks/controlled-open";
 
 type SheetType = "drawer" | "sheet";
 
@@ -143,33 +141,6 @@ function useResponsiveSheetRenderFromCtx<
   const type = useContext(ResponsiveSheetCtx);
 
   return useResponsiveSheetRender({ ...props, type });
-}
-
-interface UseControlledOpenProps {
-  open?: boolean | undefined;
-  onOpen?: ((open: boolean) => void) | undefined;
-  defaultOpen?: boolean | undefined;
-}
-
-function useControlledOpen({
-  open,
-  onOpen,
-  defaultOpen = false,
-}: UseControlledOpenProps) {
-  const [internalOpen, setInternalOpen] = useState(defaultOpen);
-
-  useEffect(() => {
-    if (open != undefined) {
-      setInternalOpen(open);
-    }
-  }, [open]);
-
-  const onInternalOpen = useCallback(
-    (open: boolean) => (onOpen ? onOpen(open) : setInternalOpen(open)),
-    [onOpen, setInternalOpen]
-  );
-
-  return [internalOpen, onInternalOpen] as const;
 }
 
 export type ResponsiveSheetProps = IntersectionSheetAndDrawerProps<

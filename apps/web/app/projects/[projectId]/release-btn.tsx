@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { GitMerge } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
-import { releaseProject } from "./actions";
+import { releaseProject } from "@/server-actions/project";
 import { toast } from "sonner";
 
 interface ReleaseBtnProps {

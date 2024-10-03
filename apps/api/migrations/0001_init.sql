@@ -37,3 +37,13 @@ CREATE TABLE
     FOREIGN KEY (project_id) REFERENCES projects (project_id) ON DELETE CASCADE,
     CONSTRAINT unique_app_name_for_project UNIQUE (app_name, project_id)
   );
+
+CREATE TABLE
+  IF NOT EXISTS envs (
+    env_id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
+    env_name TEXT NOT NULL,
+    env_value TEXT NOT NULL,
+    app_id UUID NOT NULL,
+    FOREIGN KEY (app_id) REFERENCES app_services (app_id) ON DELETE CASCADE,
+    CONSTRAINT unique_env_name_for_app UNIQUE (env_name, app_id)
+  );

@@ -103,9 +103,9 @@ function FixedRender({
       defaultOpen
     >
       <ResponsiveSheetContent
-        className="flex min-h-[50%] flex-col overflow-hidden"
-        sheetProps={{ className: "px-0", withCloseBtn: false }}
-        drawerProps={{ className: "max-h-[80%]" }}
+        className="flex min-h-[70%] flex-col overflow-hidden"
+        sheetProps={{ className: "px-0 sm:max-w-xl", withCloseBtn: false }}
+        drawerProps={{ className: "max-h-[90%]" }}
       >
         <VisuallyHidden>
           <ResponsiveSheetTitle>Resource</ResponsiveSheetTitle>

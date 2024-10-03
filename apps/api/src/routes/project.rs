@@ -14,7 +14,9 @@ use crate::{
   },
   k8s,
   middleware::UserId,
-  schemas::{AppService, PartialProjectSchema, Project, ProjectPath, ProjectSchema, ProjectsList},
+  schemas::{
+    AppService, EnvVar, PartialProjectSchema, Project, ProjectPath, ProjectSchema, ProjectsList,
+  },
   ApiResult,
 };
 
@@ -190,20 +192,30 @@ pub async fn release_project(path: Path<ProjectPath>, pool: Pool) -> ApiResult<H
   .fetch_all(tx.as_mut())
   .await?;
 
-  let apps_id: Vec<Uuid> = apps
-    .iter()
-    .filter(|&app| app.deleted)
-    .map(|app| app.app_id)
-    .collect();
-
   sqlx::query!(
-    "DELETE FROM app_services WHERE app_id IN (SELECT unnest($1::uuid[]))",
-    &apps_id
+    "DELETE FROM app_services WHERE project_id = $1 AND deleted = true",
+    project_id,
   )
   .execute(tx.as_mut())
   .await?;
 
-  if let Err(err) = k8s::release(apps).await {
+  let apps_id: Vec<Uuid> = apps.iter().map(|app| app.app_id).collect();
+
+  let envs = sqlx::query_as!(
+    EnvVar,
+    "SELECT * FROM envs WHERE app_id = ANY($1)",
+    &apps_id
+  )
+  .fetch_all(tx.as_mut())
+  .await?;
+
+  sqlx::query!(
+    "DELETE FROM envs USING app_services WHERE envs.app_id = app_services.app_id AND app_services.deleted = true"
+  )
+  .execute(tx.as_mut())
+  .await?;
+
+  if let Err(err) = k8s::release(apps, envs).await {
     tx.rollback().await?;
     return Err(err.into());
   } else {

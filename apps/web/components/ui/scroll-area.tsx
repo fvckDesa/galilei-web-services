@@ -4,6 +4,7 @@ import * as React from "react";
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 
 import { cn } from "@/lib/utils";
+import { Slottable } from "@radix-ui/react-slot";
 
 const ScrollArea = React.forwardRef<
   React.ElementRef<typeof ScrollAreaPrimitive.Root>,
@@ -44,7 +45,7 @@ const ScrollArea = React.forwardRef<
         )}
         onScroll={overflowMarker ? onScroll : undefined}
       >
-        {children}
+        <Slottable>{children}</Slottable>
       </ScrollAreaPrimitive.Viewport>
       <ScrollBar />
       <ScrollAreaPrimitive.Corner />

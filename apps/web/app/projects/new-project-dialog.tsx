@@ -83,7 +83,7 @@ export function NewProjectDialog() {
                 Group of resources belonging to the same project
               </ResponsiveDialogDescription>
             </ResponsiveDialogHeader>
-            <div className="p-4 sm:p-0">
+            <div className="px-4 py-2 sm:p-0">
               <FormField
                 control={form.control}
                 name="name"
@@ -98,14 +98,7 @@ export function NewProjectDialog() {
                 )}
               />
             </div>
-            <ResponsiveDialogFooter className="sm:flex-row-reverse sm:justify-start sm:gap-2">
-              <Button
-                type="submit"
-                className="w-full sm:w-auto"
-                loading={form.formState.isSubmitting}
-              >
-                Create
-              </Button>
+            <ResponsiveDialogFooter className="flex-row sm:justify-end sm:gap-2">
               <Button
                 type="button"
                 className="w-full sm:w-auto"
@@ -117,10 +110,19 @@ export function NewProjectDialog() {
               >
                 Cancel
               </Button>
-              <p className="text-sm font-medium text-destructive">
-                {form.formState.errors.root?.message}
-              </p>
+              <Button
+                type="submit"
+                className="w-full sm:w-auto"
+                loading={form.formState.isSubmitting}
+              >
+                Create
+              </Button>
             </ResponsiveDialogFooter>
+            {form.formState.errors.root?.message ? (
+              <p className="p-4 pt-0 text-sm font-medium text-destructive">
+                {form.formState.errors.root.message}
+              </p>
+            ) : null}
           </form>
         </ResponsiveDialogContent>
       </Form>

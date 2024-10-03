@@ -35,7 +35,10 @@ export default async function Resources({ projectId }: ResourcesProps) {
         {apps.available
           .concat(...apps.deleted)
           .map(({ id: appId, name, deleted, publicDomain }) => (
-            <li key={appId} className="w-80 rounded-md font-semibold">
+            <li
+              key={appId}
+              className="w-[min(20rem,100%)] rounded-md font-semibold"
+            >
               <ContextMenu>
                 <ContextMenuTrigger asChild>
                   <Link

@@ -4,11 +4,16 @@ import { apiActionClient } from "@/lib/safe-action";
 import { z } from "zod";
 import { revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
-import { ProjectSchema } from "@gws/api-client";
+import { PartialProjectSchema, ProjectSchema } from "@gws/api-client";
 
 export const listUserProject = apiActionClient
   .metadata({ name: "listProjects" })
-  .action(async ({ ctx: { apiClient } }) => await apiClient.listProjects());
+  .action(
+    async ({ ctx: { apiClient } }) =>
+      await apiClient.listProjects({
+        fetchOptions: { next: { tags: ["projects-list"] } },
+      })
+  );
 
 export const createNewProject = apiActionClient
   .metadata({
@@ -41,4 +46,37 @@ export const releaseProject = apiActionClient
 
     revalidateTag("apps-list");
     redirect(`/projects/${projectId}`);
+  });
+
+export const updateProject = apiActionClient
+  .metadata({ name: "updateProject" })
+  .bindArgsSchemas([z.string().uuid()])
+  .schema(PartialProjectSchema)
+  .action(
+    async ({
+      parsedInput: projectUpdate,
+      bindArgsParsedInputs: [projectId],
+      ctx: { apiClient },
+    }) => {
+      const project = await apiClient.updateProject(projectUpdate, {
+        params: { project_id: projectId },
+      });
+
+      revalidateTag("projects-list");
+
+      return project;
+    }
+  );
+
+export const deleteProject = apiActionClient
+  .metadata({ name: "deleteProject" })
+  .schema(z.string().uuid())
+  .action(async ({ parsedInput: projectId, ctx: { apiClient } }) => {
+    const project = await apiClient.deleteProject(undefined, {
+      params: { project_id: projectId },
+    });
+
+    revalidateTag("projects-list");
+
+    return project;
   });

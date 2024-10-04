@@ -32,7 +32,7 @@ export function Project({ id, name }: ProjectProps) {
   }
 
   return (
-    <li className="w-[min(20rem,100%)] rounded-md font-semibold">
+    <li className="h-fit w-[min(20rem,100%)] overflow-hidden rounded-md font-semibold">
       <ResponsiveDialog open={open} onOpenChange={setOpen}>
         <ContextMenu>
           <ContextMenuTrigger asChild>
@@ -41,7 +41,9 @@ export function Project({ id, name }: ProjectProps) {
               className="flex size-full items-center gap-4 rounded-[inherit] border-2 border-border bg-secondary px-6 py-4 transition-colors hover:bg-secondary/40 focus-visible:border-primary focus-visible:outline-none"
             >
               <PencilRuler />
-              <span>{name}</span>
+              <span className="flex-1 overflow-hidden text-ellipsis text-nowrap">
+                {name}
+              </span>
             </Link>
           </ContextMenuTrigger>
           <ContextMenuContent className="min-w-60">

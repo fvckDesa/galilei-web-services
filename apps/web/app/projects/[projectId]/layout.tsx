@@ -19,18 +19,24 @@ export default async function ProjectLayout({
   return (
     <div className="flex size-full flex-col">
       <header className="flex items-center justify-between border-b-2 border-border px-8 py-4 text-2xl">
-        <div className="flex items-center gap-3">
+        <div className="flex flex-1 items-center gap-3 overflow-hidden">
           <Link href="/projects">
             <FolderPen />
           </Link>
           <span>/</span>
-          <h1>{project.name}</h1>
+          <h1 className="flex-1 overflow-hidden text-ellipsis text-nowrap">
+            {project.name}
+          </h1>
         </div>
-        <div className="flex gap-4">
+        <div className="hidden gap-4 sm:flex">
           <CreateBtn project={projectId} />
           <ReleaseBtn projectId={projectId} />
         </div>
       </header>
+      <div className="flex justify-end gap-4 px-4 py-2 sm:hidden">
+        <CreateBtn project={projectId} />
+        <ReleaseBtn projectId={projectId} />
+      </div>
       <div className="flex-1 overflow-hidden">
         <ResponsiveLayout
           projectId={projectId}

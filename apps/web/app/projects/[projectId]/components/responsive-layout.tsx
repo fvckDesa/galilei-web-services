@@ -95,10 +95,10 @@ function FixedRender({
     <ResponsiveSheet
       open={open}
       onOpenChange={(open) => {
+        if (!open) {
+          setTimeout(() => router.push(`/projects/${projectId}`), 500);
+        }
         setOpen(open);
-        setTimeout(() => {
-          router.push(`/projects/${projectId}`);
-        }, 400);
       }}
       defaultOpen
     >

@@ -28,6 +28,7 @@ import { toast } from "sonner";
 import { useParams, useRouter } from "next/navigation";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { createPortal } from "react-dom";
+import { ResponsiveDialogClose } from "./responsive-dialog";
 
 interface ResourceContextProps<T = unknown> {
   container: RefObject<HTMLDivElement>;
@@ -187,19 +188,34 @@ function ResourceCloseButton({
   ...props
 }: ComponentPropsWithoutRef<typeof Button>) {
   const redirect = useRedirectToProject();
+  const isScreen = useScreenMediaQuery("lg");
+
+  if (isScreen) {
+    return (
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        icon={<X />}
+        {...props}
+        onClick={(e) => {
+          onClick?.(e);
+          redirect();
+        }}
+      />
+    );
+  }
 
   return (
-    <Button
-      type="button"
-      variant="ghost"
-      size="icon"
-      icon={<X />}
-      {...props}
-      onClick={(e) => {
-        onClick?.(e);
-        redirect();
-      }}
-    />
+    <ResponsiveDialogClose asChild>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        icon={<X />}
+        {...props}
+      />
+    </ResponsiveDialogClose>
   );
 }
 

@@ -177,14 +177,7 @@ function NewAppForm({ project, closeDialog }: NewAppFormProps) {
             />
           </div>
         </ScrollArea>
-        <ResponsiveDialogFooter className="sm:flex-row-reverse sm:justify-start sm:gap-2">
-          <Button
-            type="submit"
-            className="w-full sm:w-auto"
-            loading={form.formState.isSubmitting}
-          >
-            Create
-          </Button>
+        <ResponsiveDialogFooter className="flex-row">
           <Button
             type="button"
             className="w-full sm:w-auto"
@@ -195,6 +188,13 @@ function NewAppForm({ project, closeDialog }: NewAppFormProps) {
             }}
           >
             Cancel
+          </Button>
+          <Button
+            type="submit"
+            className="w-full sm:w-auto"
+            loading={form.formState.isSubmitting}
+          >
+            Create
           </Button>
         </ResponsiveDialogFooter>
         <p className="text-sm font-medium text-destructive">

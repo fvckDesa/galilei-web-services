@@ -1,7 +1,7 @@
 "use client";
 
 import { Layout, Page } from "@/lib/types";
-import { EnvForm } from "./env-form";
+import { EnvForm } from "./components/env-form";
 import { ResourceContent, useResource } from "@/components/resource";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";

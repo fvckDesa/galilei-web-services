@@ -1,7 +1,7 @@
 import { Page } from "@/lib/types";
 import { getAppEnvs } from "@/server-actions/env";
 import { unwrap } from "@/lib/utils";
-import { EnvVar } from "./env-var";
+import { EnvVar } from "./components/env-var";
 
 export default async function EnvPage({
   params: { projectId, appId },

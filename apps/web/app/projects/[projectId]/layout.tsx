@@ -1,10 +1,10 @@
 import { Layout, Page } from "@/lib/types";
 import { getProject } from "@/server-actions/project";
 import { unwrap } from "@/lib/utils";
-import { CreateBtn } from "./create-btn";
-import Resources from "./resources";
-import { ResponsiveLayout } from "./responsive-layout";
-import { ReleaseBtn } from "./release-btn";
+import { CreateBtn } from "./components/create-btn";
+import Resources from "./components/resources";
+import { ResponsiveLayout } from "./components/responsive-layout";
+import { ReleaseBtn } from "./components/release-btn";
 import Link from "next/link";
 import { FolderPen } from "lucide-react";
 

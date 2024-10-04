@@ -1,8 +1,8 @@
 import { listUserProject } from "@/server-actions/project";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { unwrap } from "@/lib/utils";
-import { NewProject } from "./new-project";
-import { Project } from "./project";
+import { NewProject } from "./components/new-project";
+import { Project } from "./components/project";
 
 export default async function ProjectsPage() {
   const projects = await listUserProject().then(unwrap);

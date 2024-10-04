@@ -69,18 +69,33 @@ function Resource<T = unknown>({
   );
 }
 
-function ResourceName({ children }: { children: ReactNode }) {
+function ResourceName({
+  className,
+  children,
+}: {
+  className?: string;
+  children: ReactNode;
+}) {
   const isScreen = useScreenMediaQuery("lg");
 
   if (isScreen) {
     return (
-      <h1 className="text-lg font-semibold leading-none tracking-tight">
+      <h1
+        className={cn(
+          "text-lg font-semibold leading-none tracking-tight",
+          className
+        )}
+      >
         {children}
       </h1>
     );
   }
 
-  return <ResponsiveSheetTitle>{children}</ResponsiveSheetTitle>;
+  return (
+    <ResponsiveSheetTitle className={className}>
+      {children}
+    </ResponsiveSheetTitle>
+  );
 }
 
 function ResourceHeader({
@@ -91,7 +106,7 @@ function ResourceHeader({
   return (
     <ResponsiveSheetHeader
       className={cn(
-        "px-4 flex justify-between items-center flex-row space-x-0 space-y-0 lg:pt-4",
+        "px-4 flex justify-between items-center gap-2 flex-row space-x-0 space-y-0 lg:pt-4",
         className
       )}
       {...props}

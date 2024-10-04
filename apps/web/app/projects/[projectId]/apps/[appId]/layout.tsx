@@ -32,13 +32,15 @@ export default async function AppLayout({
       <ResourceHeader>
         <div
           className={cn(
-            "flex items-center gap-2",
+            "flex items-center gap-2 w-full overflow-hidden",
             app.deleted && "text-destructive"
           )}
         >
           <AppStatusLight token={token} project={projectId} app={appId} />
           <Container className="size-6" />
-          <ResourceName>{app.name}</ResourceName>
+          <ResourceName className="flex-1 overflow-hidden text-ellipsis text-nowrap">
+            {app.name}
+          </ResourceName>
         </div>
         <div className="flex items-center gap-2">
           <RenderSegment segment="(settings)">

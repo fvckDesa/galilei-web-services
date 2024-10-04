@@ -30,7 +30,10 @@ export default async function Resources({ projectId }: ResourcesProps) {
   const token = TokenCookie.get()?.value ?? "";
 
   return (
-    <ScrollArea className="size-full px-8 py-4" type="auto">
+    <ScrollArea
+      className="size-full px-8 py-4 [&>div>div[style]]:!block"
+      type="auto"
+    >
       <ul className="flex flex-wrap justify-center gap-x-4 gap-y-3 px-4 py-2">
         {apps.available
           .concat(...apps.deleted)
@@ -55,7 +58,9 @@ export default async function Resources({ projectId }: ResourcesProps) {
                       token={token}
                     />
                     <Container />
-                    <span>{name}</span>
+                    <span className="flex-1 overflow-hidden text-ellipsis text-nowrap">
+                      {name}
+                    </span>
                   </Link>
                 </ContextMenuTrigger>
                 <ContextMenuContent className="min-w-60">

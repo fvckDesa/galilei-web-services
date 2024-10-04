@@ -22,7 +22,6 @@ export default async function ProjectsPage() {
           {projects.map(({ id, name }) => (
             <Project key={id} id={id} name={name} />
           ))}
-          <li className="h-[2000px]" />
         </ul>
       </ScrollArea>
     </div>

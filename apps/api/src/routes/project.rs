@@ -185,6 +185,14 @@ pub async fn release_project(path: Path<ProjectPath>, pool: Pool) -> ApiResult<H
 
   let mut tx = pool.begin().await?;
 
+  let project = sqlx::query_as!(
+    Project,
+    "SELECT * FROM projects WHERE project_id = $1",
+    project_id
+  )
+  .fetch_one(tx.as_mut())
+  .await?;
+
   let apps = sqlx::query_as!(
     AppService,
     "SELECT * FROM app_services WHERE project_id = $1",
@@ -231,7 +239,7 @@ pub async fn release_project(path: Path<ProjectPath>, pool: Pool) -> ApiResult<H
   .execute(tx.as_mut())
   .await?;
 
-  if let Err(err) = k8s::release(apps, envs, volumes).await {
+  if let Err(err) = k8s::release(project, apps, envs, volumes).await {
     tx.rollback().await?;
     return Err(err.into());
   } else {

@@ -33,6 +33,12 @@ use utoipa::OpenApi;
     env::get_env,
     env::update_env,
     env::delete_env,
+    volume::list_volumes,
+    volume::create_volume,
+    volume::get_volume,
+    volume::update_volume,
+    volume::delete_volume,
+    volume::recover_volume,
   ),
   components(schemas(
     error::ApiError,
@@ -53,6 +59,10 @@ use utoipa::OpenApi;
     schemas::EnvVar,
     schemas::EnvSchema,
     schemas::PartialEnvSchema,
+    schemas::Volume,
+    schemas::VolumeAppId,
+    schemas::VolumeSchema,
+    schemas::PartialVolumeSchema,
   ))
 )]
 pub struct OpenApiSpec;

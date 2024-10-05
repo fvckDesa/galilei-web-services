@@ -3,21 +3,41 @@ use std::sync::LazyLock;
 use confique::Config;
 use kube::Client;
 
-use crate::schemas::{AppService, EnvVar};
+use crate::schemas::{AppService, EnvVar, Volume};
 
 pub use app::app_status;
 
 mod app;
+mod volume;
 
-pub async fn release(apps: Vec<AppService>, envs: Vec<EnvVar>) -> kube::Result<()> {
+pub async fn release(
+  apps: Vec<AppService>,
+  envs: Vec<EnvVar>,
+  volumes: Vec<Volume>,
+) -> kube::Result<()> {
   let client = Client::try_default().await?;
+
+  for volume in &volumes {
+    volume::reconcile_volume(volume, client.clone()).await?;
+  }
+
+  let apps_volumes: Vec<&Volume> = volumes
+    .iter()
+    .filter(|volume| volume.app_id.is_some())
+    .collect();
 
   for app_service in apps {
     let envs = envs
       .iter()
       .filter(|env| env.app_id == app_service.app_id)
       .collect();
-    app::reconcile_app(app_service, envs, client.clone()).await?;
+
+    let volume = apps_volumes
+      .iter()
+      .find(|&&volume| volume.app_id.is_some_and(|id| id == app_service.app_id))
+      .copied();
+
+    app::reconcile_app(app_service, envs, volume, client.clone()).await?;
   }
 
   Ok(())

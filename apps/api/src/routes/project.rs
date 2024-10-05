@@ -16,6 +16,7 @@ use crate::{
   middleware::UserId,
   schemas::{
     AppService, EnvVar, PartialProjectSchema, Project, ProjectPath, ProjectSchema, ProjectsList,
+    Volume,
   },
   ApiResult,
 };
@@ -215,7 +216,22 @@ pub async fn release_project(path: Path<ProjectPath>, pool: Pool) -> ApiResult<H
   .execute(tx.as_mut())
   .await?;
 
-  if let Err(err) = k8s::release(apps, envs).await {
+  let volumes = sqlx::query_as!(
+    Volume,
+    "SELECT * FROM volumes WHERE project_id = $1",
+    path.project_id
+  )
+  .fetch_all(tx.as_mut())
+  .await?;
+
+  sqlx::query!(
+    "DELETE FROM volumes WHERE project_id = $1 AND deleted = true",
+    path.project_id
+  )
+  .execute(tx.as_mut())
+  .await?;
+
+  if let Err(err) = k8s::release(apps, envs, volumes).await {
     tx.rollback().await?;
     return Err(err.into());
   } else {

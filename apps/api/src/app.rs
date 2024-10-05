@@ -13,7 +13,7 @@ use confique::Config;
 
 use crate::{
   middleware::{project_middleware, session_middleware},
-  routes::{app, auth as auth_routes, env, project},
+  routes::{app, auth as auth_routes, env, project, volume},
   ApiError, DatabaseConfig,
 };
 
@@ -63,7 +63,8 @@ pub fn create_app(
                     .configure(app::config_with_id)
                     .configure(env::config),
                 ),
-            ),
+            )
+            .configure(volume::config),
         ),
     )
     .default_service(web::to(default_route))

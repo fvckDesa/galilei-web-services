@@ -11,6 +11,48 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      backgroundColor: {
+        success: {
+          DEFAULT: "var(--success-bg)",
+        },
+        info: {
+          DEFAULT: "var(--info-bg)",
+        },
+        warning: {
+          DEFAULT: "var(--warning-bg)",
+        },
+        error: {
+          DEFAULT: "var(--error-bg)",
+        },
+      },
+      textColor: {
+        success: {
+          DEFAULT: "var(--success-text)",
+        },
+        info: {
+          DEFAULT: "var(--info-text)",
+        },
+        warning: {
+          DEFAULT: "var(--warning-text)",
+        },
+        error: {
+          DEFAULT: "var(--error-text)",
+        },
+      },
+      borderColor: {
+        success: {
+          DEFAULT: "var(--success-border)",
+        },
+        info: {
+          DEFAULT: "var(--info-border)",
+        },
+        warning: {
+          DEFAULT: "var(--warning-border)",
+        },
+        error: {
+          DEFAULT: "var(--error-border)",
+        },
+      },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":

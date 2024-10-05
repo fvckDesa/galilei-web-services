@@ -82,7 +82,7 @@ function ResourceName({
     return (
       <h1
         className={cn(
-          "text-lg font-semibold leading-none tracking-tight",
+          "text-lg font-semibold leading-none tracking-tight text-left",
           className
         )}
       >
@@ -92,7 +92,7 @@ function ResourceName({
   }
 
   return (
-    <ResponsiveSheetTitle className={className}>
+    <ResponsiveSheetTitle className={cn("text-left", className)}>
       {children}
     </ResponsiveSheetTitle>
   );

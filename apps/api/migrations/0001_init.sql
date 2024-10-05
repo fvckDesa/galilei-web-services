@@ -47,3 +47,17 @@ CREATE TABLE
     FOREIGN KEY (app_id) REFERENCES app_services (app_id) ON DELETE CASCADE,
     CONSTRAINT unique_env_name_for_app UNIQUE (env_name, app_id)
   );
+
+CREATE TABLE
+  IF NOT EXISTS volumes (
+    volume_id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
+    volume_name TEXT NOT NULL,
+    capacity INT NOT NULL CHECK (capacity >= 0), -- unit size is MB
+    path TEXT NOT NULL,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    app_id UUID UNIQUE, -- a volume may not have an app associated with it and an app can only have one volume
+    project_id UUID NOT NULL,
+    FOREIGN KEY (project_id) REFERENCES projects (project_id) ON DELETE CASCADE,
+    FOREIGN KEY (app_id) REFERENCES app_services (app_id) ON DELETE CASCADE,
+    CONSTRAINT unique_volume_name_for_project UNIQUE (volume_name, project_id)
+  );

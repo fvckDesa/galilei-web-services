@@ -19,16 +19,23 @@ import {
   SegmentTabsList,
   SegmentTabsTrigger,
 } from "@/components/segment-tabs";
+import { listVolumes } from "@/server-actions/volume";
 
 export default async function AppLayout({
   params: { projectId, appId },
   children,
 }: Layout & Page<{ projectId: string; appId: string }>) {
   const app = await getApp({ projectId, appId }).then(unwrap);
+  const volumes = await listVolumes(projectId).then(unwrap);
   const token = TokenCookie.get()?.value ?? "";
 
   return (
-    <Resource currentResource={app}>
+    <Resource
+      currentResource={{
+        app,
+        hasVolume: volumes.some((volume) => volume.appId === app.id),
+      }}
+    >
       <ResourceHeader>
         <div
           className={cn(

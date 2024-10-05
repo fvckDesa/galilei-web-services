@@ -12,25 +12,10 @@ export const listApps = apiActionClient
   })
   .schema(z.string().uuid())
   .action(async ({ parsedInput: projectId, ctx: { apiClient } }) => {
-    const apps = await apiClient.listApps({
+    return await apiClient.listApps({
       params: { project_id: projectId },
       fetchOptions: { next: { tags: ["apps-list"] } },
     });
-
-    return apps.reduce(
-      (acc, app) => {
-        if (app.deleted) {
-          acc.deleted.push(app);
-        } else {
-          acc.available.push(app);
-        }
-        return acc;
-      },
-      { available: [], deleted: [] } as {
-        available: typeof apps;
-        deleted: typeof apps;
-      }
-    );
   });
 
 export const createApp = apiActionClient

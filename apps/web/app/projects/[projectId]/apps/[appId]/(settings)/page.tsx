@@ -20,12 +20,18 @@ import {
 import { useEffect, useId, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { MinusCircle, PlusCircle, SquareArrowOutUpRight } from "lucide-react";
+import {
+  Info,
+  MinusCircle,
+  PlusCircle,
+  SquareArrowOutUpRight,
+} from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { getPublicUrl, HOST_DOMAIN } from "@/lib/utils";
 import CopyButton from "@/components/copy-button";
 import Link from "next/link";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function SettingsPage({
   params: { projectId, appId },
@@ -33,7 +39,9 @@ export default function SettingsPage({
   projectId: string;
   appId: string;
 }>) {
-  const { resource: app } = useResource<TAppService>();
+  const {
+    resource: { app, hasVolume },
+  } = useResource<{ app: TAppService; hasVolume: boolean }>();
 
   const formId = useId();
 
@@ -107,9 +115,6 @@ export default function SettingsPage({
           <FormField
             control={form.control}
             name="image"
-            rules={{
-              max: app.replicas,
-            }}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Container image</FormLabel>
@@ -160,20 +165,20 @@ export default function SettingsPage({
                       size="icon"
                       variant="ghost"
                       icon={<MinusCircle />}
-                      disabled={field.value <= 0 || app.deleted}
+                      disabled={field.value <= 0 || app.deleted || hasVolume}
                       onClick={() =>
                         field.onChange(Math.max(field.value - 1, 0))
                       }
                     />
                     <span className="block size-6 text-center">
-                      {field.value}
+                      {hasVolume ? 1 : field.value}
                     </span>
                     <Button
                       type="button"
                       size="icon"
                       variant="ghost"
                       icon={<PlusCircle />}
-                      disabled={field.value >= 5 || app.deleted}
+                      disabled={field.value >= 5 || app.deleted || hasVolume}
                       onClick={() =>
                         field.onChange(Math.min(field.value + 1, 5))
                       }
@@ -184,6 +189,17 @@ export default function SettingsPage({
               </FormItem>
             )}
           />
+          {hasVolume ? (
+            <Alert variant="info">
+              <Info />
+              <AlertTitle>Container replicas set to 1</AlertTitle>
+              <AlertDescription>
+                When app is connected to a volume the number of container
+                replicas is set to 1 for prevent data corruption and others bad
+                things
+              </AlertDescription>
+            </Alert>
+          ) : null}
           <div className="flex h-10 items-center gap-2">
             <Switch
               id="publicNetworking"

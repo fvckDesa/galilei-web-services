@@ -71,6 +71,30 @@ export const PartialEnvSchema = z
   .object({ name: z.string().min(1), value: z.string().min(1) })
   .partial();
 export type TPartialEnvSchema = z.infer<typeof PartialEnvSchema>;
+export const VolumeAppId = z.object({ id: z.string().uuid() }).partial();
+export type TVolumeAppId = z.infer<typeof VolumeAppId>;
+export const VolumeSchema = z.object({
+  app: VolumeAppId,
+  capacity: z.number().int().gte(1).lte(5000),
+  name: z.string().min(1),
+  path: z
+    .string()
+    .min(1)
+    .regex(/^\/([a-zA-Z0-9.\-_\/])*/),
+});
+export type TVolumeSchema = z.infer<typeof VolumeSchema>;
+export const PartialVolumeSchema = z
+  .object({
+    app: VolumeAppId,
+    capacity: z.number().int().gte(1).lte(5000),
+    name: z.string().min(1),
+    path: z
+      .string()
+      .min(1)
+      .regex(/^\/([a-zA-Z0-9.\-_\/])*/),
+  })
+  .partial();
+export type TPartialVolumeSchema = z.infer<typeof PartialVolumeSchema>;
 export const AppReleaseState = z.enum([
   "Unknown",
   "Failed",
@@ -101,6 +125,16 @@ export const EnvVar = z.object({
   value: z.string(),
 });
 export type TEnvVar = z.infer<typeof EnvVar>;
+export const Volume = z.object({
+  appId: z.string().uuid().optional(),
+  capacity: z.number().int(),
+  deleted: z.boolean(),
+  id: z.string().uuid(),
+  name: z.string(),
+  path: z.string(),
+  projectId: z.string().uuid(),
+});
+export type TVolume = z.infer<typeof Volume>;
 
 export const endpoints = makeApi([
   {
@@ -812,6 +846,246 @@ export const endpoints = makeApi([
       },
     ],
     response: z.void(),
+    errors: [
+      {
+        status: 401,
+        schema: ErrorMessage,
+      },
+      {
+        status: 404,
+        schema: ErrorMessage,
+      },
+    ],
+  },
+  {
+    method: "get",
+    path: "/projects/:project_id/volumes/",
+    alias: "listVolumes",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "project_id",
+        type: "Path",
+        schema: z.string().uuid(),
+      },
+    ],
+    response: z.array(
+      z.object({
+        appId: z.string().uuid().optional(),
+        capacity: z.number().int(),
+        deleted: z.boolean(),
+        id: z.string().uuid(),
+        name: z.string(),
+        path: z.string(),
+        projectId: z.string().uuid(),
+      })
+    ),
+    errors: [
+      {
+        status: 401,
+        schema: ErrorMessage,
+      },
+      {
+        status: 404,
+        schema: ErrorMessage,
+      },
+    ],
+  },
+  {
+    method: "post",
+    path: "/projects/:project_id/volumes/",
+    alias: "createVolume",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: VolumeSchema,
+      },
+      {
+        name: "project_id",
+        type: "Path",
+        schema: z.string().uuid(),
+      },
+    ],
+    response: z.object({
+      appId: z.string().uuid().optional(),
+      capacity: z.number().int(),
+      deleted: z.boolean(),
+      id: z.string().uuid(),
+      name: z.string(),
+      path: z.string(),
+      projectId: z.string().uuid(),
+    }),
+    errors: [
+      {
+        status: 400,
+        schema: ErrorMessage,
+      },
+      {
+        status: 401,
+        schema: ErrorMessage,
+      },
+      {
+        status: 404,
+        schema: ErrorMessage,
+      },
+      {
+        status: 409,
+        schema: ErrorMessage,
+      },
+    ],
+  },
+  {
+    method: "get",
+    path: "/projects/:project_id/volumes/:volume_id/",
+    alias: "getVolume",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "project_id",
+        type: "Path",
+        schema: z.string().uuid(),
+      },
+      {
+        name: "volume_id",
+        type: "Path",
+        schema: z.string().uuid(),
+      },
+    ],
+    response: z.object({
+      appId: z.string().uuid().optional(),
+      capacity: z.number().int(),
+      deleted: z.boolean(),
+      id: z.string().uuid(),
+      name: z.string(),
+      path: z.string(),
+      projectId: z.string().uuid(),
+    }),
+    errors: [
+      {
+        status: 401,
+        schema: ErrorMessage,
+      },
+      {
+        status: 404,
+        schema: ErrorMessage,
+      },
+    ],
+  },
+  {
+    method: "delete",
+    path: "/projects/:project_id/volumes/:volume_id/",
+    alias: "deleteVolume",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "project_id",
+        type: "Path",
+        schema: z.string().uuid(),
+      },
+      {
+        name: "volume_id",
+        type: "Path",
+        schema: z.string().uuid(),
+      },
+    ],
+    response: z.object({
+      appId: z.string().uuid().optional(),
+      capacity: z.number().int(),
+      deleted: z.boolean(),
+      id: z.string().uuid(),
+      name: z.string(),
+      path: z.string(),
+      projectId: z.string().uuid(),
+    }),
+    errors: [
+      {
+        status: 401,
+        schema: ErrorMessage,
+      },
+      {
+        status: 404,
+        schema: ErrorMessage,
+      },
+    ],
+  },
+  {
+    method: "patch",
+    path: "/projects/:project_id/volumes/:volume_id/",
+    alias: "updateVolume",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: PartialVolumeSchema,
+      },
+      {
+        name: "project_id",
+        type: "Path",
+        schema: z.string().uuid(),
+      },
+      {
+        name: "volume_id",
+        type: "Path",
+        schema: z.string().uuid(),
+      },
+    ],
+    response: z.object({
+      appId: z.string().uuid().optional(),
+      capacity: z.number().int(),
+      deleted: z.boolean(),
+      id: z.string().uuid(),
+      name: z.string(),
+      path: z.string(),
+      projectId: z.string().uuid(),
+    }),
+    errors: [
+      {
+        status: 400,
+        schema: ErrorMessage,
+      },
+      {
+        status: 401,
+        schema: ErrorMessage,
+      },
+      {
+        status: 404,
+        schema: ErrorMessage,
+      },
+      {
+        status: 409,
+        schema: ErrorMessage,
+      },
+    ],
+  },
+  {
+    method: "delete",
+    path: "/projects/:project_id/volumes/:volume_id/recover/",
+    alias: "recoverVolume",
+    requestFormat: "json",
+    parameters: [
+      {
+        name: "project_id",
+        type: "Path",
+        schema: z.string().uuid(),
+      },
+      {
+        name: "volume_id",
+        type: "Path",
+        schema: z.string().uuid(),
+      },
+    ],
+    response: z.object({
+      appId: z.string().uuid().optional(),
+      capacity: z.number().int(),
+      deleted: z.boolean(),
+      id: z.string().uuid(),
+      name: z.string(),
+      path: z.string(),
+      projectId: z.string().uuid(),
+    }),
     errors: [
       {
         status: 401,

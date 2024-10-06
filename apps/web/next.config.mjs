@@ -1,6 +1,12 @@
 import { makeEnvPublic } from "next-runtime-env";
 
-makeEnvPublic(["API_HOST", "HOST_DOMAIN", "HOST_HTTPS_PORT"]);
+makeEnvPublic([
+  "API_BASE_URL",
+  "HOST_PUBLIC_DOMAIN",
+  "HOST_PUBLIC_PORT",
+  "HOST_PRIVATE_DOMAIN",
+  "WEB_HOST_DOMAIN",
+]);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {

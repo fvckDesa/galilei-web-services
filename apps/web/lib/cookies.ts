@@ -26,7 +26,7 @@ class Cookie<const N extends string> {
 }
 
 export const TokenCookie = new Cookie("token", {
-  domain: "localhost",
+  domain: process.env.WEB_HOST_DOMAIN,
   path: "/",
   httpOnly: true,
   secure: true,

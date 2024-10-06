@@ -21,6 +21,8 @@ pub struct AppService {
   pub port: i32,
   #[serde(skip_serializing_if = "Option::is_none", default)]
   pub public_domain: Option<String>,
+  #[serde(skip_serializing_if = "Option::is_none", default)]
+  pub private_domain: Option<String>,
   pub deleted: bool,
   pub project_id: Uuid,
 }
@@ -67,6 +69,8 @@ partial_schema! {
     pub port: i32,
     #[validate(nested)]
     pub public_domain: DomainName,
+    #[validate(nested)]
+    pub private_domain: DomainName,
   }
 }
 

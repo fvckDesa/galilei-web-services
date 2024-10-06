@@ -72,16 +72,18 @@ pub async fn create_app(
     image,
     port,
     public_domain,
+    private_domain,
   } = app;
 
   let app = sqlx::query_as!(
     AppService,
-    "INSERT INTO app_services(app_name, replicas, image, port, public_domain, project_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+    "INSERT INTO app_services(app_name, replicas, image, port, public_domain, private_domain, project_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
     name,
     replicas,
     image,
     port,
     public_domain.subdomain,
+    private_domain.subdomain,
     project_id
   )
   .fetch_one(pool.as_ref())
@@ -175,6 +177,7 @@ pub async fn update_app(
     image,
     port,
     public_domain,
+    private_domain,
   } = app;
 
   let app = sqlx::query_as!(
@@ -185,8 +188,9 @@ pub async fn update_app(
       replicas = COALESCE($2, replicas),
       image = COALESCE($3, image),
       port = COALESCE($4, port),
-      public_domain = (CASE WHEN $5 = true THEN $6 ELSE public_domain END)
-    WHERE project_id = $7 AND app_id = $8
+      public_domain = (CASE WHEN $5 = true THEN $6 ELSE public_domain END),
+      private_domain = (CASE WHEN $7 = true THEN $8 ELSE private_domain END)
+    WHERE project_id = $9 AND app_id = $10
     RETURNING *
     "#,
     name,
@@ -195,6 +199,10 @@ pub async fn update_app(
     port,
     public_domain.is_some(),
     public_domain.map(|domain| domain.subdomain).unwrap_or(None),
+    private_domain.is_some(),
+    private_domain
+      .map(|domain| domain.subdomain)
+      .unwrap_or(None),
     project_id,
     app_id
   )

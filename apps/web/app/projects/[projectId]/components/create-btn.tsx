@@ -143,6 +143,7 @@ function NewAppForm({ project, closeDialog }: NewAppFormProps) {
           port: 80,
           replicas: 3,
           publicDomain: {},
+          privateDomain: {},
         },
       },
       actionProps: {

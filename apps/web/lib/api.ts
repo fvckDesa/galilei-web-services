@@ -3,7 +3,7 @@ import { TokenCookie } from "./cookies";
 import { pluginFetch } from "@zodios/plugins";
 
 export const apiClient = createApiClient(
-  process.env.API_HOST ?? "http://localhost:8000",
+  process.env.API_BASE_URL ?? "http://localhost:8000",
   {
     validate: "response",
   }

@@ -301,7 +301,7 @@ async fn reconcile_svc(
   }
 
   if service.is_none() {
-    let service = generate_svc(name);
+    let service = generate_svc(name, app.port);
 
     api.patch(name, params, &Patch::Apply(service)).await?;
   }
@@ -309,7 +309,7 @@ async fn reconcile_svc(
   Ok(())
 }
 
-fn generate_svc(name: &str) -> Service {
+fn generate_svc(name: &str, port: i32) -> Service {
   serde_json::from_value(json!({
     "apiVersion": "v1",
     "kind": "Service",
@@ -324,7 +324,7 @@ fn generate_svc(name: &str) -> Service {
       "ports": [
         {
           "protocol": "TCP",
-          "port": K8S_CONFIG.service_port,
+          "port": port,
           "targetPort": K8S_CONFIG.port_name
         }
       ]

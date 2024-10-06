@@ -19,7 +19,7 @@ pub async fn release(
 ) -> kube::Result<()> {
   let client = Client::try_default().await?;
 
-  project::reconcile_project(&project, client.clone()).await?;
+  project::reconcile_project(&project, &apps[..], client.clone()).await?;
 
   for volume in &volumes {
     volume::reconcile_volume(volume, client.clone()).await?;

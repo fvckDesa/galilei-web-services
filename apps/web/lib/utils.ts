@@ -59,9 +59,10 @@ export function unwrap<
   return result.data as Data;
 }
 
-export const HOST_DOMAIN = env("NEXT_PUBLIC_HOST_DOMAIN") ?? "localhost";
-export const HOST_HTTPS_PORT = env("NEXT_PUBLIC_HOST_PORT") ?? "8443";
+export const HOST_PUBLIC_DOMAIN =
+  env("NEXT_PUBLIC_HOST_PUBLIC_DOMAIN") ?? "localhost";
+export const HOST_PUBLIC_PORT = env("NEXT_PUBLIC_HOST_PUBLIC_PORT") ?? "8443";
 
 export function getPublicUrl(subdomain: string): string {
-  return `https://${subdomain}.${HOST_DOMAIN}:${HOST_HTTPS_PORT}`;
+  return `https://${subdomain}.${HOST_PUBLIC_DOMAIN}:${HOST_PUBLIC_PORT}`;
 }

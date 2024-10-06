@@ -9,7 +9,7 @@ import {
 import { env } from "next-runtime-env";
 import { AppStatus, TAppStatus } from "@gws/api-client";
 
-const API_HOST = env("NEXT_PUBLIC_API_HOST") ?? "http://localhost:8000";
+const API_BASE_URL = env("NEXT_PUBLIC_API_BASE_URL") ?? "http://localhost:8000";
 
 const UNKNOWN_DEFAULT_STATE: TAppStatus = {
   available: false,
@@ -28,7 +28,7 @@ export function useAppStatus({ app, project, token }: AppStatusOptions) {
 
   useEffect(() => {
     const eventSource = new EventSourcePolyfill(
-      `${API_HOST}/projects/${project}/apps/${app}/status`,
+      `${API_BASE_URL}/projects/${project}/apps/${app}/status`,
       {
         headers: {
           "X-Api-Key": token,

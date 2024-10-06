@@ -3,12 +3,11 @@
   "tasks": {
     "build": {
       "env": [
-        "API_HOST",
-        "HOST_DOMAIN",
-        "HOST_HTTPS_PORT",
-        "NEXT_PUBLIC_API_HOST",
-        "NEXT_PUBLIC_HOST_DOMAIN",
-        "NEXT_PUBLIC_HOST_HTTPS_PORT"
+        "API_BASE_URL",
+        "HOST_PUBLIC_DOMAIN",
+        "HOST_PUBLIC_PORT",
+        "HOST_PRIVATE_DOMAIN",
+        "WEB_HOST_DOMAIN"
       ]
     }
   }

@@ -32,10 +32,12 @@ CREATE TABLE
     image TEXT NOT NULL,
     port INT NOT NULL,
     public_domain TEXT UNIQUE,
+    private_domain TEXT,
     deleted BOOLEAN NOT NULL DEFAULT FALSE,
     project_id UUID NOT NULL,
     FOREIGN KEY (project_id) REFERENCES projects (project_id) ON DELETE CASCADE,
-    CONSTRAINT unique_app_name_for_project UNIQUE (app_name, project_id)
+    CONSTRAINT unique_app_name_for_project UNIQUE (app_name, project_id),
+    CONSTRAINT unique_private_domain_for_project UNIQUE (private_domain, project_id)
   );
 
 CREATE TABLE
@@ -58,6 +60,6 @@ CREATE TABLE
     app_id UUID UNIQUE, -- a volume may not have an app associated with it and an app can only have one volume
     project_id UUID NOT NULL,
     FOREIGN KEY (project_id) REFERENCES projects (project_id) ON DELETE CASCADE,
-    FOREIGN KEY (app_id) REFERENCES app_services (app_id) ON DELETE CASCADE,
+    FOREIGN KEY (app_id) REFERENCES app_services (app_id) ON DELETE SET NULL,
     CONSTRAINT unique_volume_name_for_project UNIQUE (volume_name, project_id)
   );

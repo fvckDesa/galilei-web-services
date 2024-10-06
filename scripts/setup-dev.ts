@@ -107,6 +107,16 @@ await spinner(
   () =>
     $$`kubectl apply -f ${path.join(process.cwd(), argv.kube, "traefik.yaml")}`
 );
+await spinner(
+  `Apply coredns configs...`,
+  () =>
+    $$`kubectl apply -f ${path.join(process.cwd(), argv.kube, "coredns.yaml")}`
+);
+await spinner(
+  `Apply coredns custom configs...`,
+  () =>
+    $$`kubectl apply -f ${path.join(process.cwd(), argv.kube, "coredns-custom.yaml")}`
+);
 
 log.success(`Cluster ${CLUSTER_NAME} running`);
 

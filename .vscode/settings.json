@@ -22,6 +22,8 @@
     "clippy",
     "clsx",
     "confique",
+    "coredns",
+    "Corefile",
     "crds",
     "dotenv",
     "getrandom",

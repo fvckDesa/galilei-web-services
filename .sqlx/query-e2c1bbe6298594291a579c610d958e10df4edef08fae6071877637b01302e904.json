@@ -35,11 +35,16 @@
       },
       {
         "ordinal": 6,
+        "name": "private_domain",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 7,
         "name": "deleted",
         "type_info": "Bool"
       },
       {
-        "ordinal": 7,
+        "ordinal": 8,
         "name": "project_id",
         "type_info": "Uuid"
       }
@@ -47,7 +52,7 @@
     "parameters": {
       "Left": ["Uuid", "Uuid"]
     },
-    "nullable": [false, false, false, false, false, true, false, false]
+    "nullable": [false, false, false, false, false, true, true, false, false]
   },
   "hash": "e2c1bbe6298594291a579c610d958e10df4edef08fae6071877637b01302e904"
 }

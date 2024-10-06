@@ -1,0 +1,53 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE app_services SET deleted = true WHERE project_id = $1 AND app_id = $2 RETURNING *",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "app_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "app_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "replicas",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 3,
+        "name": "image",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "port",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 5,
+        "name": "public_domain",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 6,
+        "name": "deleted",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 7,
+        "name": "project_id",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": ["Uuid", "Uuid"]
+    },
+    "nullable": [false, false, false, false, false, true, false, false]
+  },
+  "hash": "e2c1bbe6298594291a579c610d958e10df4edef08fae6071877637b01302e904"
+}

@@ -1,0 +1,33 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n    UPDATE envs\n    SET env_name = COALESCE($1, env_name),\n      env_value = COALESCE($2, env_value)\n    WHERE app_id = $3 AND env_id = $4\n    RETURNING *\n    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "env_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "env_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "env_value",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "app_id",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": ["Text", "Text", "Uuid", "Uuid"]
+    },
+    "nullable": [false, false, false, false]
+  },
+  "hash": "6dafa57aa43f7ba6e56458fea77696c12687cbe2572ca5e09771ab37db4b86eb"
+}

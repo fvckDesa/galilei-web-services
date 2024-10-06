@@ -1,0 +1,48 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT * FROM volumes WHERE project_id = $1 AND volume_id = $2",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "volume_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "volume_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "capacity",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 3,
+        "name": "path",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "deleted",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 5,
+        "name": "app_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 6,
+        "name": "project_id",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": ["Uuid", "Uuid"]
+    },
+    "nullable": [false, false, false, false, false, true, false]
+  },
+  "hash": "f2455a4c3750a119598676f7f5934352aa5323d2c7f7ffa43da4fa741a5d79a8"
+}

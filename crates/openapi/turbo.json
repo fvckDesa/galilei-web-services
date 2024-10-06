@@ -1,6 +1,9 @@
 {
   "extends": ["//"],
   "tasks": {
+    "build": {
+      "env": ["SQLX_OFFLINE"]
+    },
     "gen": {
       "dependsOn": ["build"],
       "outputs": ["openapi.yaml"]

@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM envs USING app_services WHERE envs.app_id = app_services.app_id AND app_services.deleted = true",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "d42e87c89cd7db4850fe64108ff28f606a09ceec0a87592680d653df1a6b9d51"
+}

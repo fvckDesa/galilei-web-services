@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM volumes WHERE project_id = $1 AND deleted = true",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Uuid"]
+    },
+    "nullable": []
+  },
+  "hash": "2a218a41c5d235d9dc27f327de0be3b8908f8af0b4a737b412a6496830b386ce"
+}

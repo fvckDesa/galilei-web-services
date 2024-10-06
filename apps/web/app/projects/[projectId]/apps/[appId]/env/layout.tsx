@@ -1,9 +1,8 @@
 "use client";
 
-import { Layout, Page } from "@/lib/types";
 import { EnvForm } from "./components/env-form";
 import { ResourceContent, useResource } from "@/components/resource";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { TAppService } from "@gws/api-client";
@@ -11,7 +10,10 @@ import { TAppService } from "@gws/api-client";
 export default function EnvLayout({
   params: { projectId, appId },
   children,
-}: Layout & Page<{ projectId: string; appId: string }>) {
+}: {
+  children: ReactNode;
+  params: { projectId: string; appId: string };
+}) {
   const [formOpen, setFormOpen] = useState(false);
   const { resource: app } = useResource<TAppService>();
 

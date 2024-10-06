@@ -1,0 +1,33 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO envs(env_name, env_value, app_id) VALUES ($1, $2, $3) RETURNING *",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "env_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "env_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "env_value",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "app_id",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": ["Text", "Text", "Uuid"]
+    },
+    "nullable": [false, false, false, false]
+  },
+  "hash": "34eb05d9dbfc09a25c31be42ba79062ac1e225eb5410e440d35c22c48dfa8e2c"
+}

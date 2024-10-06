@@ -1,0 +1,33 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT * FROM envs WHERE app_id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "env_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "env_name",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "env_value",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "app_id",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": ["Uuid"]
+    },
+    "nullable": [false, false, false, false]
+  },
+  "hash": "4effb52bdb183d62f08cdf72e2d8e6168300b7cada2930d110c626cd89e2ba3b"
+}

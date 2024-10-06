@@ -1,4 +1,3 @@
-import { Layout, Page } from "@/lib/types";
 import {
   Resource,
   ResourceActionButton,
@@ -18,11 +17,15 @@ import {
 import { Mount } from "./components/mount";
 import { MountSelectContent } from "../../components/mount-select-content";
 import { Button } from "@/components/ui/button";
+import { ReactNode } from "react";
 
 export default async function AppLayout({
   params: { projectId, volumeId },
   children,
-}: Layout & Page<{ projectId: string; volumeId: string }>) {
+}: {
+  children: ReactNode;
+  params: { projectId: string; volumeId: string };
+}) {
   const volume = await getVolume({ projectId, volumeId }).then(unwrap);
 
   return (

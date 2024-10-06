@@ -3,6 +3,7 @@
   "tasks": {
     "build": {
       "env": [
+        "SQLX_OFFLINE",
         "RUST_LOG",
         "DATABASE_URL",
         "SERVER_ADDRESS",

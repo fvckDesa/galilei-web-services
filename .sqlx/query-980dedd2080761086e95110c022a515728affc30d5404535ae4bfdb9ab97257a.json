@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM app_services WHERE project_id = $1 AND deleted = true",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": ["Uuid"]
+    },
+    "nullable": []
+  },
+  "hash": "980dedd2080761086e95110c022a515728affc30d5404535ae4bfdb9ab97257a"
+}

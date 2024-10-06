@@ -2,7 +2,14 @@
   "extends": ["//"],
   "tasks": {
     "build": {
-      "env": ["API_HOST", "HOST_DOMAIN"]
+      "env": [
+        "API_HOST",
+        "HOST_DOMAIN",
+        "HOST_HTTPS_PORT",
+        "NEXT_PUBLIC_API_HOST",
+        "NEXT_PUBLIC_HOST_DOMAIN",
+        "NEXT_PUBLIC_HOST_HTTPS_PORT"
+      ]
     }
   }
 }

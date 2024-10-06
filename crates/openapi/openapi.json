@@ -11,7 +11,9 @@
   "paths": {
     "/auth/login/": {
       "post": {
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "operationId": "login",
         "requestBody": {
           "description": "",
@@ -60,7 +62,9 @@
     },
     "/auth/register/": {
       "post": {
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "operationId": "register",
         "requestBody": {
           "description": "",
@@ -119,7 +123,9 @@
     },
     "/projects/": {
       "get": {
-        "tags": ["project"],
+        "tags": [
+          "project"
+        ],
         "operationId": "list_projects",
         "responses": {
           "200": {
@@ -130,7 +136,11 @@
                   "type": "array",
                   "items": {
                     "type": "object",
-                    "required": ["id", "name", "userId"],
+                    "required": [
+                      "id",
+                      "name",
+                      "userId"
+                    ],
                     "properties": {
                       "id": {
                         "type": "string",
@@ -162,7 +172,9 @@
         }
       },
       "post": {
-        "tags": ["project"],
+        "tags": [
+          "project"
+        ],
         "operationId": "create_project",
         "requestBody": {
           "description": "",
@@ -182,7 +194,11 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["id", "name", "userId"],
+                  "required": [
+                    "id",
+                    "name",
+                    "userId"
+                  ],
                   "properties": {
                     "id": {
                       "type": "string",
@@ -235,7 +251,9 @@
     },
     "/projects/{project_id}/": {
       "get": {
-        "tags": ["project"],
+        "tags": [
+          "project"
+        ],
         "operationId": "get_project",
         "parameters": [
           {
@@ -255,7 +273,11 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["id", "name", "userId"],
+                  "required": [
+                    "id",
+                    "name",
+                    "userId"
+                  ],
                   "properties": {
                     "id": {
                       "type": "string",
@@ -296,7 +318,9 @@
         }
       },
       "post": {
-        "tags": ["project"],
+        "tags": [
+          "project"
+        ],
         "operationId": "release_project",
         "parameters": [
           {
@@ -356,7 +380,9 @@
         }
       },
       "delete": {
-        "tags": ["project"],
+        "tags": [
+          "project"
+        ],
         "operationId": "delete_project",
         "parameters": [
           {
@@ -376,7 +402,11 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["id", "name", "userId"],
+                  "required": [
+                    "id",
+                    "name",
+                    "userId"
+                  ],
                   "properties": {
                     "id": {
                       "type": "string",
@@ -417,7 +447,9 @@
         }
       },
       "patch": {
-        "tags": ["project"],
+        "tags": [
+          "project"
+        ],
         "operationId": "update_project",
         "parameters": [
           {
@@ -448,7 +480,11 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["id", "name", "userId"],
+                  "required": [
+                    "id",
+                    "name",
+                    "userId"
+                  ],
                   "properties": {
                     "id": {
                       "type": "string",
@@ -511,7 +547,9 @@
     },
     "/projects/{project_id}/apps/": {
       "get": {
-        "tags": ["app"],
+        "tags": [
+          "app"
+        ],
         "operationId": "list_apps",
         "parameters": [
           {
@@ -600,7 +638,9 @@
         }
       },
       "post": {
-        "tags": ["app"],
+        "tags": [
+          "app"
+        ],
         "operationId": "create_app",
         "parameters": [
           {
@@ -719,7 +759,9 @@
     },
     "/projects/{project_id}/apps/{app_id}/": {
       "get": {
-        "tags": ["app"],
+        "tags": [
+          "app"
+        ],
         "operationId": "get_app",
         "parameters": [
           {
@@ -814,7 +856,9 @@
         }
       },
       "delete": {
-        "tags": ["app"],
+        "tags": [
+          "app"
+        ],
         "operationId": "delete_app",
         "parameters": [
           {
@@ -909,7 +953,9 @@
         }
       },
       "patch": {
-        "tags": ["app"],
+        "tags": [
+          "app"
+        ],
         "operationId": "update_app",
         "parameters": [
           {
@@ -1037,7 +1083,9 @@
     },
     "/projects/{project_id}/apps/{app_id}/envs/": {
       "get": {
-        "tags": ["env"],
+        "tags": [
+          "env"
+        ],
         "operationId": "list_envs",
         "parameters": [
           {
@@ -1068,7 +1116,12 @@
                   "type": "array",
                   "items": {
                     "type": "object",
-                    "required": ["id", "name", "value", "appId"],
+                    "required": [
+                      "id",
+                      "name",
+                      "value",
+                      "appId"
+                    ],
                     "properties": {
                       "appId": {
                         "type": "string",
@@ -1113,7 +1166,9 @@
         }
       },
       "post": {
-        "tags": ["env"],
+        "tags": [
+          "env"
+        ],
         "operationId": "create_env",
         "parameters": [
           {
@@ -1153,7 +1208,12 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["id", "name", "value", "appId"],
+                  "required": [
+                    "id",
+                    "name",
+                    "value",
+                    "appId"
+                  ],
                   "properties": {
                     "appId": {
                       "type": "string",
@@ -1219,7 +1279,9 @@
     },
     "/projects/{project_id}/apps/{app_id}/envs/{env_id}/": {
       "get": {
-        "tags": ["env"],
+        "tags": [
+          "env"
+        ],
         "operationId": "get_env",
         "parameters": [
           {
@@ -1257,7 +1319,12 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["id", "name", "value", "appId"],
+                  "required": [
+                    "id",
+                    "name",
+                    "value",
+                    "appId"
+                  ],
                   "properties": {
                     "appId": {
                       "type": "string",
@@ -1301,7 +1368,9 @@
         }
       },
       "delete": {
-        "tags": ["env"],
+        "tags": [
+          "env"
+        ],
         "operationId": "delete_env",
         "parameters": [
           {
@@ -1339,7 +1408,12 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["id", "name", "value", "appId"],
+                  "required": [
+                    "id",
+                    "name",
+                    "value",
+                    "appId"
+                  ],
                   "properties": {
                     "appId": {
                       "type": "string",
@@ -1383,7 +1457,9 @@
         }
       },
       "patch": {
-        "tags": ["env"],
+        "tags": [
+          "env"
+        ],
         "operationId": "update_env",
         "parameters": [
           {
@@ -1432,7 +1508,12 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "required": ["id", "name", "value", "appId"],
+                  "required": [
+                    "id",
+                    "name",
+                    "value",
+                    "appId"
+                  ],
                   "properties": {
                     "appId": {
                       "type": "string",
@@ -1498,7 +1579,9 @@
     },
     "/projects/{project_id}/apps/{app_id}/recover/": {
       "post": {
-        "tags": ["app"],
+        "tags": [
+          "app"
+        ],
         "operationId": "recover_app",
         "parameters": [
           {
@@ -1595,7 +1678,9 @@
     },
     "/projects/{project_id}/apps/{app_id}/status/": {
       "get": {
-        "tags": ["app"],
+        "tags": [
+          "app"
+        ],
         "operationId": "get_app_status",
         "parameters": [
           {
@@ -1624,7 +1709,10 @@
               "text/event-stream": {
                 "schema": {
                   "type": "object",
-                  "required": ["available", "state"],
+                  "required": [
+                    "available",
+                    "state"
+                  ],
                   "properties": {
                     "available": {
                       "type": "boolean"
@@ -1662,7 +1750,9 @@
     },
     "/projects/{project_id}/volumes/": {
       "get": {
-        "tags": ["volume"],
+        "tags": [
+          "volume"
+        ],
         "operationId": "list_volumes",
         "parameters": [
           {
@@ -1747,7 +1837,9 @@
         }
       },
       "post": {
-        "tags": ["volume"],
+        "tags": [
+          "volume"
+        ],
         "operationId": "create_volume",
         "parameters": [
           {
@@ -1862,7 +1954,9 @@
     },
     "/projects/{project_id}/volumes/{volume_id}/": {
       "get": {
-        "tags": ["volume"],
+        "tags": [
+          "volume"
+        ],
         "operationId": "get_volume",
         "parameters": [
           {
@@ -1953,7 +2047,9 @@
         }
       },
       "delete": {
-        "tags": ["volume"],
+        "tags": [
+          "volume"
+        ],
         "operationId": "delete_volume",
         "parameters": [
           {
@@ -2044,7 +2140,9 @@
         }
       },
       "patch": {
-        "tags": ["volume"],
+        "tags": [
+          "volume"
+        ],
         "operationId": "update_volume",
         "parameters": [
           {
@@ -2168,7 +2266,9 @@
     },
     "/projects/{project_id}/volumes/{volume_id}/recover/": {
       "delete": {
-        "tags": ["volume"],
+        "tags": [
+          "volume"
+        ],
         "operationId": "recover_volume",
         "parameters": [
           {
@@ -2266,61 +2366,85 @@
         "oneOf": [
           {
             "type": "object",
-            "required": ["kind"],
+            "required": [
+              "kind"
+            ],
             "properties": {
               "kind": {
                 "type": "string",
-                "enum": ["BadRequest"]
+                "enum": [
+                  "BadRequest"
+                ]
               }
             }
           },
           {
             "type": "object",
-            "required": ["kind"],
+            "required": [
+              "kind"
+            ],
             "properties": {
               "kind": {
                 "type": "string",
-                "enum": ["Validation"]
+                "enum": [
+                  "Validation"
+                ]
               }
             }
           },
           {
             "type": "object",
-            "required": ["kind"],
+            "required": [
+              "kind"
+            ],
             "properties": {
               "kind": {
                 "type": "string",
-                "enum": ["AlreadyExists"]
+                "enum": [
+                  "AlreadyExists"
+                ]
               }
             }
           },
           {
             "type": "object",
-            "required": ["kind"],
+            "required": [
+              "kind"
+            ],
             "properties": {
               "kind": {
                 "type": "string",
-                "enum": ["NotFound"]
+                "enum": [
+                  "NotFound"
+                ]
               }
             }
           },
           {
             "type": "object",
-            "required": ["kind"],
+            "required": [
+              "kind"
+            ],
             "properties": {
               "kind": {
                 "type": "string",
-                "enum": ["Unauthorized"]
+                "enum": [
+                  "Unauthorized"
+                ]
               }
             }
           },
           {
             "type": "object",
-            "required": ["kind"],
+            "required": [
+              "kind"
+            ],
             "properties": {
               "kind": {
                 "type": "string",
-                "enum": ["InternalError"]
+                "enum": [
+                  "InternalError"
+                ]
               }
             }
           }
@@ -2328,7 +2452,12 @@
       },
       "AppReleaseState": {
         "type": "string",
-        "enum": ["Unknown", "Failed", "Progressing", "Released"]
+        "enum": [
+          "Unknown",
+          "Failed",
+          "Progressing",
+          "Released"
+        ]
       },
       "AppService": {
         "type": "object",
@@ -2374,7 +2503,13 @@
       },
       "AppServiceSchema": {
         "type": "object",
-        "required": ["name", "replicas", "image", "port", "publicDomain"],
+        "required": [
+          "name",
+          "replicas",
+          "image",
+          "port",
+          "publicDomain"
+        ],
         "properties": {
           "image": {
             "type": "string",
@@ -2402,7 +2537,10 @@
       },
       "AppStatus": {
         "type": "object",
-        "required": ["available", "state"],
+        "required": [
+          "available",
+          "state"
+        ],
         "properties": {
           "available": {
             "type": "boolean"
@@ -2419,7 +2557,10 @@
           },
           {
             "type": "object",
-            "required": ["username", "remember"],
+            "required": [
+              "username",
+              "remember"
+            ],
             "properties": {
               "remember": {
                 "type": "boolean"
@@ -2434,7 +2575,10 @@
       },
       "AuthResponse": {
         "type": "object",
-        "required": ["user", "token"],
+        "required": [
+          "user",
+          "token"
+        ],
         "properties": {
           "expires": {
             "type": "integer",
@@ -2461,7 +2605,10 @@
       },
       "EnvSchema": {
         "type": "object",
-        "required": ["name", "value"],
+        "required": [
+          "name",
+          "value"
+        ],
         "properties": {
           "name": {
             "type": "string",
@@ -2475,7 +2622,12 @@
       },
       "EnvVar": {
         "type": "object",
-        "required": ["id", "name", "value", "appId"],
+        "required": [
+          "id",
+          "name",
+          "value",
+          "appId"
+        ],
         "properties": {
           "appId": {
             "type": "string",
@@ -2500,7 +2652,9 @@
           },
           {
             "type": "object",
-            "required": ["message"],
+            "required": [
+              "message"
+            ],
             "properties": {
               "message": {
                 "type": "string"
@@ -2591,7 +2745,9 @@
       },
       "Password": {
         "type": "object",
-        "required": ["password"],
+        "required": [
+          "password"
+        ],
         "properties": {
           "password": {
             "type": "string",
@@ -2601,7 +2757,9 @@
       },
       "ProjectSchema": {
         "type": "object",
-        "required": ["name"],
+        "required": [
+          "name"
+        ],
         "properties": {
           "name": {
             "type": "string",
@@ -2614,7 +2772,10 @@
       },
       "User": {
         "type": "object",
-        "required": ["id", "username"],
+        "required": [
+          "id",
+          "username"
+        ],
         "properties": {
           "id": {
             "type": "string",
@@ -2627,7 +2788,14 @@
       },
       "Volume": {
         "type": "object",
-        "required": ["id", "name", "capacity", "path", "deleted", "projectId"],
+        "required": [
+          "id",
+          "name",
+          "capacity",
+          "path",
+          "deleted",
+          "projectId"
+        ],
         "properties": {
           "appId": {
             "type": "string",
@@ -2667,7 +2835,12 @@
       },
       "VolumeSchema": {
         "type": "object",
-        "required": ["name", "capacity", "path", "app"],
+        "required": [
+          "name",
+          "capacity",
+          "path",
+          "app"
+        ],
         "properties": {
           "app": {
             "$ref": "#/components/schemas/VolumeAppId"

@@ -1,0 +1,18 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT 1 as ok FROM projects WHERE project_id = $1 AND user_id = $2",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "ok",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": ["Uuid", "Uuid"]
+    },
+    "nullable": [null]
+  },
+  "hash": "152f62f73ef18cd6967096314535ebd4c95dc9291bd22ddf730e0a456098c757"
+}

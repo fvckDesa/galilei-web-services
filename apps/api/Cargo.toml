@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-actix-web = { version = "4.9.0", features = ["secure-cookies"] }
+actix-web = { version = "4.9.0", features = ["secure-cookies", "http2"] }
 utoipa = { workspace = true }
 anyhow = { workspace = true }
 log = "0.4.22"

@@ -79,7 +79,7 @@ impl AppConfig {
     let pool = DatabaseConfig::from_env()?.create_pool().await?;
 
     let server = HttpServer::new(move || create_app(pool.clone()))
-      .bind((self.address, self.port))?
+      .bind_auto_h2c((self.address, self.port))?
       .run();
 
     Ok(server)

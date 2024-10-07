@@ -7,7 +7,7 @@ use confique::Config;
 async fn main() -> std::io::Result<()> {
   let crate_path = Path::new(env!("CARGO_MANIFEST_DIR"));
 
-  dotenv::from_path(crate_path.join(".env")).ok().unwrap();
+  dotenv::from_path(crate_path.join(".env")).ok();
   env_logger::init();
 
   let app_config = AppConfig::builder()

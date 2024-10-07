@@ -22,6 +22,10 @@ Permette di eseguire una qualsiasi applicazione sotto forma di container. Ogni a
 
 Permette di persistere i dati di un'applicazione in modo tale che essi non vengano eliminati quando i container all'interno di un'app vengono cancellati o riavviati
 
+## Online
+
+Il progetto è disponibile online all'indirizzo [dashboard.gwshost.live](https://dashboard.gwshost.live/), rimarrà online per circa un mesetto
+
 ## Informazioni tecniche
 
 Il progetto presenta le seguanti componenti:
@@ -30,6 +34,7 @@ Il progetto presenta le seguanti componenti:
 - Kubernetes cluster
 - Backend
 - Frontend
+- Online version
 
 ### Database
 
@@ -52,3 +57,7 @@ Nel backend troviamo una semplice rest api scritta in rust che si occupa di gest
 ### Frontend
 
 Nel frontend troviamo un'applicazione web che utilizza il web framework [Next.js](https://nextjs.org/). La web app cerca di adattarsi il più possibile a qualsiasi tipo di dispositivo permettendo anche la navigazione da schermi più piccoli come quelli dei telefoni
+
+### Online version
+
+La versione online del progetto è hostata su una macchina virtuale del cloud di [Azure](https://https://azure.microsoft.com/).

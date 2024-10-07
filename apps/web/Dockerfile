@@ -38,24 +38,24 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 COPY --from=prune /app/out/full/ .
 RUN --mount=type=cache,id=cargo,target=/usr/local/cargo/registry \
   --mount=type=cache,id=rust,target=/app/target \
-  SQLX_OFFLINE=true turbo build --filter=web
+  SQLX_OFFLINE=true turbo build --env-mode=loose --filter=web
 RUN --mount=type=cache,id=pnpm,target=~/.pnpm-store pnpm prune --prod --no-optional
 RUN rm -rf ./**/*/src
 
-FROM alpine
+FROM node-alpine
 ARG PORT=80
 ARG HOSTNAME="0.0.0.0"
 WORKDIR /app
 ENV NODE_ENV=production
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
-COPY --from=build /app/apps/web/public ./public
 RUN mkdir .next
 RUN chown nextjs:nodejs .next
 COPY --from=build --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
-COPY --from=build --chown=nextjs:nodejs /app/apps/web/.next/static ./.next/static
+COPY --from=build --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=build /app/apps/web/public ./apps/web/public
 USER nextjs
 EXPOSE ${PORT}
 ENV PORT=${PORT}
 ENV HOSTNAME=${HOSTNAME}
-CMD ["node", "server.js"]
+CMD ["node", "apps/web/server.js"]
